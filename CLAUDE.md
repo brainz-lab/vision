@@ -1,0 +1,191 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project: Vision by Brainz Lab
+
+Visual regression testing and browser automation platform for UI validation.
+
+**Domain**: vision.brainzlab.ai
+
+**Tagline**: "See what your users see"
+
+**Status**: Implemented - Rails 8 application with Playwright browser automation
+
+## Architecture
+
+```
++---------------------------------------------------------------------+
+|                          VISION (Rails 8)                            |
+|                                                                      |
+|  +---------------+  +---------------+  +---------------+             |
+|  |   Dashboard   |  |      API      |  |  MCP Server   |             |
+|  |   (Hotwire)   |  |  (JSON API)   |  |    (Ruby)     |             |
+|  | /dashboard/*  |  |  /api/v1/*    |  |    /mcp/*     |             |
+|  +---------------+  +---------------+  +---------------+             |
+|                            |                   |                     |
+|                            v                   v                     |
+|              +------------------------------------------+            |
+|              |   PostgreSQL + S3/Minio + Playwright     |            |
+|              +------------------------------------------+            |
++---------------------------------------------------------------------+
+        ^
+        | Trigger
++-------+-------+
+| CI/CD/Synapse |
+| GitHub/GitLab |
++---------------+
+```
+
+## Tech Stack
+
+- **Backend**: Rails 8 API + Dashboard
+- **Frontend**: Hotwire (Turbo + Stimulus), Tailwind CSS
+- **Database**: PostgreSQL (with UUID primary keys)
+- **Browser Engine**: Playwright (via playwright-ruby-client)
+- **Image Processing**: ImageMagick (via mini_magick)
+- **Storage**: ActiveStorage with S3/Minio
+- **Background Jobs**: Solid Queue
+- **Real-time**: ActionCable (live results)
+
+## Common Commands
+
+```bash
+# Development
+bin/rails server
+bin/rails console
+bin/rails db:migrate
+
+# Testing
+bin/rails test
+bin/rails test test/models/snapshot_test.rb
+
+# Docker (from brainzlab root)
+docker-compose --profile vision up
+docker-compose exec vision bin/rails db:migrate
+
+# Database
+bin/rails db:create db:migrate
+bin/rails db:seed
+
+# Tailwind
+bin/rails tailwindcss:build
+```
+
+## Key Models
+
+| Model | Purpose |
+|-------|---------|
+| **Project** | Test project config, links to Platform via `platform_project_id` |
+| **Page** | URL/path to capture with settings |
+| **BrowserConfig** | Browser/viewport configuration (chromium, firefox, webkit) |
+| **Baseline** | Approved baseline screenshot |
+| **Snapshot** | Captured screenshot |
+| **Comparison** | Diff result between baseline and snapshot |
+| **TestRun** | Collection of comparisons for a deployment |
+| **TestCase** | E2E test definition with steps |
+
+## Screenshot Capture Flow
+
+1. **Create Snapshot** - API/MCP creates pending snapshot record
+2. **CaptureScreenshotJob** - Background job runs Playwright capture
+3. **ScreenshotService** - Navigates, waits, hides elements, captures
+4. **Upload to S3** - Screenshots stored via ActiveStorage
+5. **CompareScreenshotsJob** - Compares to baseline if exists
+6. **ComparisonService** - Runs ImageMagick diff, stores result
+
+## Key Services
+
+| Service | Responsibility |
+|---------|----------------|
+| `ScreenshotService` | Playwright capture with element hiding/masking |
+| `ComparisonService` | Orchestrates baseline vs snapshot comparison |
+| `DiffService` | ImageMagick pixel-level image diffing |
+| `BrowserPool` | Connection pool for Playwright instances |
+| `TestRunner` | Executes full test suites |
+| `PlatformClient` | Platform API key validation |
+
+## MCP Tools
+
+| Tool | Description |
+|------|-------------|
+| `vision_capture` | Take screenshot of a URL |
+| `vision_compare` | Compare current state to baseline |
+| `vision_test` | Run full visual test suite |
+| `vision_approve` | Approve changes, update baseline |
+| `vision_list_failures` | List failed comparisons needing review |
+
+## API Endpoints
+
+**Projects**:
+- `POST /api/v1/projects/provision` - Auto-provision project (master key)
+- `GET /api/v1/projects/lookup` - Find project by platform_project_id
+
+**Pages**:
+- `GET /api/v1/pages` - List pages
+- `POST /api/v1/pages` - Create page
+- `GET /api/v1/pages/:id` - Get page with baselines
+
+**Snapshots**:
+- `GET /api/v1/snapshots` - List snapshots
+- `POST /api/v1/snapshots` - Capture screenshot
+- `POST /api/v1/snapshots/:id/compare` - Compare to baseline
+
+**Test Runs**:
+- `GET /api/v1/test_runs` - List test runs
+- `POST /api/v1/test_runs` - Start test run
+- `GET /api/v1/test_runs/:id` - Get run with comparisons
+
+**Comparisons**:
+- `POST /api/v1/comparisons/:id/approve` - Approve changes
+- `POST /api/v1/comparisons/:id/reject` - Reject changes
+- `POST /api/v1/comparisons/:id/update_baseline` - Set as new baseline
+
+**MCP**:
+- `GET /mcp/tools` - List tools
+- `POST /mcp/tools/:name` - Call tool
+- `POST /mcp/rpc` - JSON-RPC protocol
+
+Authentication: `Authorization: Bearer <key>` or `X-API-Key: <key>`
+
+## Browser Support
+
+| Browser | Viewports |
+|---------|-----------|
+| Chromium | Desktop (1280x720), Mobile (375x812), Tablet (768x1024) |
+| Firefox | Desktop |
+| WebKit | Desktop, Mobile |
+
+## Threshold Configuration
+
+- Default threshold: 1% (0.01)
+- Comparisons with diff_percentage <= threshold pass
+- Failed comparisons require manual review
+
+## Environment Variables
+
+| Variable | Purpose |
+|----------|---------|
+| `DATABASE_URL` | PostgreSQL connection |
+| `REDIS_URL` | Redis for ActionCable/jobs |
+| `VISION_MASTER_KEY` | Master key for provisioning |
+| `AWS_ENDPOINT` | S3/MinIO endpoint |
+| `AWS_ACCESS_KEY_ID` | S3 access key |
+| `AWS_SECRET_ACCESS_KEY` | S3 secret key |
+| `AWS_BUCKET` | Bucket for screenshots |
+| `BRAINZLAB_PLATFORM_URL` | Platform service URL |
+
+## Docker
+
+```bash
+# Start Vision
+docker-compose --profile vision up
+
+# Run migrations
+docker-compose exec vision bin/rails db:migrate
+
+# Rails console
+docker-compose exec vision bin/rails console
+
+# Access at http://localhost:4008
+```

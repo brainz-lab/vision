@@ -1,0 +1,15 @@
+en:
+  hello: "Hello world"
+  vision:
+    name: "Vision"
+    tagline: "See what your users see"
+    statuses:
+      pending: "Pending"
+      running: "Running"
+      passed: "Passed"
+      failed: "Failed"
+      error: "Error"
+    review_statuses:
+      pending: "Pending Review"
+      approved: "Approved"
+      rejected: "Rejected"
