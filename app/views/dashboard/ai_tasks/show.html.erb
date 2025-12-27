@@ -1,0 +1,365 @@
+<% content_for(:title) { "Task Details" } %>
+
+<div class="space-y-8">
+  <!-- Header -->
+  <div class="flex items-start justify-between">
+    <div class="flex-1">
+      <%= link_to dashboard_project_ai_tasks_path(@project), class: "inline-flex items-center gap-1 text-[13px] mb-3 hover:underline", style: "color: #8B8780;" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to tasks
+      <% end %>
+      <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;"><%= @task.instruction %></h1>
+      <div class="mt-2 flex items-center gap-4">
+        <% case @task.status %>
+        <% when 'pending' %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium" style="background: #F0EFED; color: #6B6760;">Pending</span>
+        <% when 'running' %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium" style="background: #DBEAFE; color: #1E40AF;">Running</span>
+        <% when 'completed' %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium" style="background: #D1FAE5; color: #065F46;">Completed</span>
+        <% when 'stopped' %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium" style="background: #FEF3C7; color: #92400E;">Stopped</span>
+        <% when 'timeout' %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium" style="background: #FEE2E2; color: #991B1B;">Timeout</span>
+        <% when 'error' %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[12px] font-medium" style="background: #FEE2E2; color: #991B1B;">Error</span>
+        <% end %>
+        <span class="text-[13px]" style="color: #8B8780;"><%= @task.model %></span>
+        <span class="text-[13px]" style="color: #8B8780;"><%= @task.browser_provider %></span>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <% if @task.screenshots.attached? %>
+        <button onclick="openReplayModal()"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition cursor-pointer"
+            style="background: #1A1A1A; color: white; border: none;">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Replay
+        </button>
+      <% end %>
+      <%= button_to retry_dashboard_project_ai_task_path(@project, @task),
+          method: :post,
+          form: { data: { turbo_confirm: "Run this task again with the same parameters?" } },
+          class: "inline-flex items-center gap-2 px-4 py-2 rounded-lg text-[13px] font-medium transition cursor-pointer",
+          style: "background: var(--color-vision); color: white; border: none;" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Retry
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Task Info -->
+    <div class="col-span-2 space-y-6">
+      <!-- Result -->
+      <% if @task.result.present? %>
+        <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+          <h3 class="text-[11px] font-medium uppercase tracking-wider mb-3" style="color: #8B8780;">Result</h3>
+          <p class="text-[14px] leading-relaxed" style="color: #1A1A1A;"><%= @task.result %></p>
+        </div>
+      <% end %>
+
+      <!-- Error -->
+      <% if @task.error_message.present? %>
+        <div class="rounded-xl p-5" style="background: #FEF2F2; border: 1px solid #FECACA;">
+          <h3 class="text-[11px] font-medium uppercase tracking-wider mb-3" style="color: #991B1B;">Error</h3>
+          <p class="text-[14px] leading-relaxed" style="color: #991B1B;"><%= @task.error_message %></p>
+        </div>
+      <% end %>
+
+      <!-- Extracted Data -->
+      <% if @task.extracted_data.present? && @task.extracted_data.any? %>
+        <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+          <h3 class="text-[11px] font-medium uppercase tracking-wider mb-3" style="color: #8B8780;">Extracted Data</h3>
+          <pre class="text-[13px] overflow-x-auto p-4 rounded-lg" style="background: #F5F3EF; color: #1A1A1A;"><%= JSON.pretty_generate(@task.extracted_data) %></pre>
+        </div>
+      <% end %>
+
+      <!-- Screenshots -->
+      <% if @task.screenshots.attached? %>
+        <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+          <h3 class="text-[11px] font-medium uppercase tracking-wider mb-4" style="color: #8B8780;">Screenshots (<%= @task.screenshots.count %>)</h3>
+          <div class="grid grid-cols-2 gap-4">
+            <% @task.screenshots.each_with_index do |screenshot, index| %>
+              <div class="relative group">
+                <%= image_tag public_storage_url(screenshot),
+                    class: "w-full rounded-lg border cursor-pointer hover:opacity-90 transition",
+                    style: "border-color: #E8E5E0;",
+                    onclick: "window.open('#{public_storage_url(screenshot)}', '_blank')" %>
+                <div class="absolute bottom-2 left-2 px-2 py-1 rounded text-[11px] font-medium" style="background: rgba(0,0,0,0.7); color: white;">
+                  Step <%= index + 1 %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- Steps Timeline -->
+      <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+        <h3 class="text-[11px] font-medium uppercase tracking-wider mb-4" style="color: #8B8780;">Execution Steps (<%= @steps.count %>)</h3>
+
+        <% if @steps.any? %>
+          <div class="space-y-4">
+            <% @steps.each do |step| %>
+              <div class="flex gap-4">
+                <div class="flex flex-col items-center">
+                  <div class="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-medium <%= step.success ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+                    <%= step.position %>
+                  </div>
+                  <% unless step == @steps.last %>
+                    <div class="w-0.5 flex-1 my-1" style="background: #E8E5E0;"></div>
+                  <% end %>
+                </div>
+                <div class="flex-1 pb-4">
+                  <div class="flex items-center gap-2 mb-1">
+                    <span class="text-[13px] font-medium px-2 py-0.5 rounded" style="background: #F0EFED; color: #525252;"><%= step.action %></span>
+                    <% if step.duration_ms %>
+                      <span class="text-[12px]" style="color: #8B8780;"><%= step.duration_ms %>ms</span>
+                    <% end %>
+                    <% if step.total_tokens > 0 %>
+                      <span class="text-[11px] px-1.5 py-0.5 rounded" style="background: #EEF2FF; color: #4F46E5;"><%= number_with_delimiter(step.total_tokens) %> tokens</span>
+                    <% end %>
+                  </div>
+                  <% if step.selector.present? %>
+                    <p class="text-[13px] font-mono mt-1" style="color: #6B6760;"><%= step.selector %></p>
+                  <% end %>
+                  <% if step.value.present? %>
+                    <p class="text-[13px] mt-1" style="color: #6B6760;">Value: <%= step.value.to_s.truncate(100) %></p>
+                  <% end %>
+                  <% if step.error_message.present? %>
+                    <p class="text-[13px] mt-1" style="color: #DC2626;"><%= step.error_message %></p>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="text-[13px]" style="color: #8B8780;">No steps recorded</p>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <!-- Metadata -->
+      <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+        <h3 class="text-[11px] font-medium uppercase tracking-wider mb-4" style="color: #8B8780;">Details</h3>
+        <dl class="space-y-3">
+          <div>
+            <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Task ID</dt>
+            <dd class="text-[13px] font-mono mt-0.5" style="color: #1A1A1A;"><%= @task.id.to_s[0..7] %></dd>
+          </div>
+          <% if @task.start_url.present? %>
+            <div>
+              <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Start URL</dt>
+              <dd class="text-[13px] mt-0.5 break-all" style="color: #1A1A1A;"><%= @task.start_url %></dd>
+            </div>
+          <% end %>
+          <% if @task.final_url.present? %>
+            <div>
+              <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Final URL</dt>
+              <dd class="text-[13px] mt-0.5 break-all" style="color: #1A1A1A;"><%= @task.final_url %></dd>
+            </div>
+          <% end %>
+          <div>
+            <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Steps</dt>
+            <dd class="text-[13px] mt-0.5" style="color: #1A1A1A;"><%= @task.steps_executed %> / <%= @task.max_steps %></dd>
+          </div>
+          <div>
+            <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Duration</dt>
+            <dd class="text-[13px] mt-0.5" style="color: #1A1A1A;">
+              <% if @task.duration_ms %>
+                <%= (@task.duration_ms / 1000.0).round(2) %> seconds
+              <% else %>
+                -
+              <% end %>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Tokens Used</dt>
+            <dd class="text-[13px] mt-0.5" style="color: #1A1A1A;">
+              <% if @task.total_tokens > 0 %>
+                <%= number_with_delimiter(@task.total_tokens) %>
+                <span class="text-[11px] block mt-0.5" style="color: #8B8780;">
+                  Input: <%= number_with_delimiter(@task.total_input_tokens || 0) %> / Output: <%= number_with_delimiter(@task.total_output_tokens || 0) %>
+                </span>
+              <% else %>
+                -
+              <% end %>
+            </dd>
+          </div>
+          <div>
+            <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Triggered By</dt>
+            <dd class="text-[13px] mt-0.5" style="color: #1A1A1A;"><%= @task.triggered_by || 'api' %></dd>
+          </div>
+          <div>
+            <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Created</dt>
+            <dd class="text-[13px] mt-0.5" style="color: #1A1A1A;"><%= @task.created_at.strftime("%b %d, %Y at %H:%M") %></dd>
+          </div>
+          <% if @task.completed_at %>
+            <div>
+              <dt class="text-[11px] uppercase tracking-wider" style="color: #8B8780;">Completed</dt>
+              <dd class="text-[13px] mt-0.5" style="color: #1A1A1A;"><%= @task.completed_at.strftime("%b %d, %Y at %H:%M") %></dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+
+      <!-- Retried From -->
+      <% retried_from = @task.metadata&.dig('retried_from') || @task.metadata&.dig('replayed_from') %>
+      <% if retried_from %>
+        <div class="rounded-xl p-5" style="background: #F0F9FF; border: 1px solid #BAE6FD;">
+          <p class="text-[12px]" style="color: #0369A1;">
+            Retried from task
+            <%= link_to retried_from.to_s[0..7],
+                dashboard_project_ai_task_path(@project, retried_from),
+                class: "font-mono underline" %>
+          </p>
+        </div>
+      <% end %>
+
+      <!-- Viewport -->
+      <% if @task.viewport.present? %>
+        <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+          <h3 class="text-[11px] font-medium uppercase tracking-wider mb-3" style="color: #8B8780;">Viewport</h3>
+          <p class="text-[13px]" style="color: #1A1A1A;"><%= @task.viewport['width'] %>x<%= @task.viewport['height'] %></p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- Replay Modal -->
+<% if @task.screenshots.attached? %>
+<div id="replayModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 50;">
+  <div style="position: absolute; top: 0; left: 0; right: 0; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+    <div style="color: white;">
+      <span id="stepCounter" style="font-size: 14px; opacity: 0.8;">Step 1 of <%= @task.screenshots.count %></span>
+      <span id="stepAction" style="font-size: 14px; margin-left: 16px; padding: 4px 12px; background: rgba(255,255,255,0.1); border-radius: 6px;"></span>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <button onclick="toggleAutoplay()" id="autoplayBtn" style="padding: 8px 16px; background: var(--color-vision); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">
+        Auto Play
+      </button>
+      <button onclick="closeReplayModal()" style="padding: 8px 16px; background: rgba(255,255,255,0.1); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 13px;">
+        Close (Esc)
+      </button>
+    </div>
+  </div>
+
+  <div style="position: absolute; inset: 80px 60px 80px 60px; display: flex; align-items: center; justify-content: center;">
+    <img id="replayImage" src="" style="max-width: 100%; max-height: 100%; object-fit: contain; border-radius: 8px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);">
+  </div>
+
+  <button onclick="prevStep()" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; cursor: pointer; color: white; font-size: 24px;">
+    &#8249;
+  </button>
+  <button onclick="nextStep()" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); width: 48px; height: 48px; background: rgba(255,255,255,0.1); border: none; border-radius: 50%; cursor: pointer; color: white; font-size: 24px;">
+    &#8250;
+  </button>
+
+  <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px;">
+    <% @task.screenshots.each_with_index do |_, index| %>
+      <button onclick="goToStep(<%= index %>)" class="stepDot" data-index="<%= index %>" style="width: 10px; height: 10px; border-radius: 50%; border: none; cursor: pointer; background: rgba(255,255,255,0.3);"></button>
+    <% end %>
+  </div>
+</div>
+
+<script>
+  const screenshots = [
+    <% @task.screenshots.each_with_index do |screenshot, index| %>
+      { url: "<%= public_storage_url(screenshot) %>", step: <%= index + 1 %> },
+    <% end %>
+  ];
+
+  const steps = [
+    <% @steps.each do |step| %>
+      { action: "<%= step.action %>", selector: "<%= j(step.selector.to_s.truncate(50)) %>" },
+    <% end %>
+  ];
+
+  let currentStep = 0;
+  let autoplayInterval = null;
+
+  function openReplayModal() {
+    document.getElementById('replayModal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    goToStep(0);
+  }
+
+  function closeReplayModal() {
+    document.getElementById('replayModal').style.display = 'none';
+    document.body.style.overflow = '';
+    stopAutoplay();
+  }
+
+  function goToStep(index) {
+    currentStep = index;
+    if (currentStep < 0) currentStep = screenshots.length - 1;
+    if (currentStep >= screenshots.length) currentStep = 0;
+
+    document.getElementById('replayImage').src = screenshots[currentStep].url;
+    document.getElementById('stepCounter').textContent = `Step ${currentStep + 1} of ${screenshots.length}`;
+
+    const stepInfo = steps[currentStep];
+    if (stepInfo) {
+      document.getElementById('stepAction').textContent = stepInfo.action + (stepInfo.selector ? ': ' + stepInfo.selector : '');
+    } else {
+      document.getElementById('stepAction').textContent = '';
+    }
+
+    document.querySelectorAll('.stepDot').forEach((dot, i) => {
+      dot.style.background = i === currentStep ? 'var(--color-vision)' : 'rgba(255,255,255,0.3)';
+    });
+  }
+
+  function nextStep() { goToStep(currentStep + 1); }
+  function prevStep() { goToStep(currentStep - 1); }
+
+  function toggleAutoplay() {
+    if (autoplayInterval) {
+      stopAutoplay();
+    } else {
+      startAutoplay();
+    }
+  }
+
+  function startAutoplay() {
+    document.getElementById('autoplayBtn').textContent = 'Pause';
+    document.getElementById('autoplayBtn').style.background = '#EF4444';
+    autoplayInterval = setInterval(() => {
+      if (currentStep >= screenshots.length - 1) {
+        stopAutoplay();
+      } else {
+        nextStep();
+      }
+    }, 1500);
+  }
+
+  function stopAutoplay() {
+    if (autoplayInterval) {
+      clearInterval(autoplayInterval);
+      autoplayInterval = null;
+    }
+    document.getElementById('autoplayBtn').textContent = 'Auto Play';
+    document.getElementById('autoplayBtn').style.background = 'var(--color-vision)';
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (document.getElementById('replayModal').style.display === 'block') {
+      if (e.key === 'Escape') closeReplayModal();
+      if (e.key === 'ArrowLeft') prevStep();
+      if (e.key === 'ArrowRight') nextStep();
+      if (e.key === ' ') { e.preventDefault(); toggleAutoplay(); }
+    }
+  });
+</script>
+<% end %>

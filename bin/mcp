@@ -1,0 +1,252 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# MCP (Model Context Protocol) server for Vision
+# Runs as a stdio server for Claude Code integration
+# Makes HTTP calls to the Vision API
+
+require "json"
+require "net/http"
+require "uri"
+
+class McpServer
+  PROTOCOL_VERSION = "2024-11-05"
+
+  TOOLS = [
+    {
+      name: "vision_task",
+      description: "Execute an autonomous browser task with AI. The AI agent will navigate, click, type, and extract data to complete your instruction.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          instruction: {
+            type: "string",
+            description: "Natural language task instruction (e.g., 'Go to amazon.com, search for laptop, get top 5 prices')"
+          },
+          start_url: {
+            type: "string",
+            description: "Starting URL for the task"
+          },
+          model: {
+            type: "string",
+            enum: ["claude-sonnet-4", "claude-opus-4", "gpt-4o", "gpt-4o-mini", "gemini-2.5-flash"],
+            description: "LLM model to use for decision making (default: claude-sonnet-4)"
+          },
+          max_steps: {
+            type: "integer",
+            description: "Maximum number of steps before stopping (default: 30, max: 100)"
+          }
+        },
+        required: ["instruction"]
+      }
+    },
+    {
+      name: "vision_ai_action",
+      description: "Execute a single AI-powered browser action in an existing session.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          session_id: { type: "string", description: "Browser session ID" },
+          instruction: { type: "string", description: "Natural language instruction" },
+          model: { type: "string", description: "LLM model to use" }
+        },
+        required: ["session_id", "instruction"]
+      }
+    },
+    {
+      name: "vision_perform",
+      description: "Execute a direct browser action (click, type, scroll, navigate) without AI.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          session_id: { type: "string", description: "Browser session ID" },
+          action: { type: "string", enum: ["navigate", "click", "type", "scroll", "screenshot", "wait"], description: "Action type" },
+          selector: { type: "string", description: "CSS selector for element" },
+          value: { type: "string", description: "Value for type/navigate actions" }
+        },
+        required: ["session_id", "action"]
+      }
+    },
+    {
+      name: "vision_extract",
+      description: "Extract structured data from the current page using AI.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          session_id: { type: "string", description: "Browser session ID" },
+          schema: { type: "object", description: "JSON schema for extraction" },
+          instruction: { type: "string", description: "Optional extraction instruction" }
+        },
+        required: ["session_id", "schema"]
+      }
+    },
+    {
+      name: "vision_session_create",
+      description: "Create a new browser session for interactive browsing.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          url: { type: "string", description: "Initial URL to navigate to" },
+          viewport: { type: "object", description: "Viewport dimensions {width, height}" }
+        }
+      }
+    },
+    {
+      name: "vision_session_close",
+      description: "Close a browser session.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          session_id: { type: "string", description: "Session ID to close" }
+        },
+        required: ["session_id"]
+      }
+    },
+    {
+      name: "vision_capture",
+      description: "Take a screenshot of a URL.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          url: { type: "string", description: "URL to capture" },
+          viewport: { type: "string", enum: ["desktop", "mobile", "tablet"], description: "Viewport preset" },
+          full_page: { type: "boolean", description: "Capture full page" }
+        },
+        required: ["url"]
+      }
+    }
+  ].freeze
+
+  def initialize
+    @api_url = ENV["VISION_URL"] || "http://localhost:4008"
+    @api_key = ENV["VISION_API_KEY"]
+    raise "VISION_API_KEY environment variable required" unless @api_key
+  end
+
+  def run
+    $stderr.puts "Vision MCP server started"
+    $stdin.each_line do |line|
+      next if line.strip.empty?
+
+      begin
+        request = JSON.parse(line)
+        response = handle_request(request)
+        send_response(response) if response
+      rescue JSON::ParserError => e
+        send_error(-32700, "Parse error: #{e.message}", nil)
+      rescue => e
+        $stderr.puts "MCP error: #{e.message}"
+        send_error(-32603, e.message, request&.dig("id"))
+      end
+    end
+  end
+
+  private
+
+  def handle_request(request)
+    method = request["method"]
+    id = request["id"]
+    params = request["params"] || {}
+
+    case method
+    when "initialize"
+      handle_initialize(id, params)
+    when "initialized"
+      nil
+    when "tools/list"
+      handle_tools_list(id)
+    when "tools/call"
+      handle_tool_call(id, params)
+    else
+      error_response(id, -32601, "Method not found: #{method}")
+    end
+  end
+
+  def handle_initialize(id, _params)
+    {
+      jsonrpc: "2.0",
+      id: id,
+      result: {
+        protocolVersion: PROTOCOL_VERSION,
+        capabilities: { tools: {} },
+        serverInfo: { name: "vision-mcp", version: "1.0.0" }
+      }
+    }
+  end
+
+  def handle_tools_list(id)
+    {
+      jsonrpc: "2.0",
+      id: id,
+      result: { tools: TOOLS }
+    }
+  end
+
+  def handle_tool_call(id, params)
+    tool_name = params["name"]
+    arguments = params["arguments"] || {}
+
+    result = call_vision_api(tool_name, arguments)
+
+    {
+      jsonrpc: "2.0",
+      id: id,
+      result: {
+        content: [{ type: "text", text: format_result(result) }]
+      }
+    }
+  rescue => e
+    {
+      jsonrpc: "2.0",
+      id: id,
+      result: {
+        content: [{ type: "text", text: "Error: #{e.message}" }],
+        isError: true
+      }
+    }
+  end
+
+  def call_vision_api(tool_name, arguments)
+    uri = URI.parse("#{@api_url}/mcp/tools/#{tool_name}")
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = uri.scheme == "https"
+    http.read_timeout = 300  # Long timeout for AI tasks
+
+    request = Net::HTTP::Post.new(uri)
+    request["Content-Type"] = "application/json"
+    request["Authorization"] = "Bearer #{@api_key}"
+    request.body = JSON.generate(arguments)
+
+    response = http.request(request)
+    JSON.parse(response.body)
+  end
+
+  def format_result(result)
+    if result.is_a?(Hash)
+      if result["success"] && result["data"]
+        JSON.pretty_generate(result["data"])
+      elsif result["error"]
+        "Error: #{result["error"]}"
+      else
+        JSON.pretty_generate(result)
+      end
+    else
+      result.to_s
+    end
+  end
+
+  def error_response(id, code, message)
+    { jsonrpc: "2.0", id: id, error: { code: code, message: message } }
+  end
+
+  def send_response(response)
+    $stdout.puts JSON.generate(response)
+    $stdout.flush
+  end
+
+  def send_error(code, message, id)
+    send_response(error_response(id, code, message))
+  end
+end
+
+McpServer.new.run

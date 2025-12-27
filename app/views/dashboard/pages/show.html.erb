@@ -38,7 +38,7 @@
               </div>
               <% if baseline.screenshot&.attached? %>
                 <div class="rounded-lg overflow-hidden" style="border: 1px solid #E8E5E0;">
-                  <%= image_tag url_for(baseline.screenshot), class: "w-full h-auto" %>
+                  <%= image_tag public_storage_url(baseline.screenshot), class: "w-full h-auto" %>
                 </div>
               <% else %>
                 <div class="rounded-lg p-8 text-center" style="background: #FAF9F7;">
@@ -78,7 +78,7 @@
               </div>
               <% if snapshot.screenshot&.attached? %>
                 <div class="rounded-lg overflow-hidden" style="border: 1px solid #E8E5E0;">
-                  <%= image_tag url_for(snapshot.screenshot), class: "w-full h-auto" %>
+                  <%= image_tag public_storage_url(snapshot.screenshot), class: "w-full h-auto" %>
                 </div>
               <% else %>
                 <div class="rounded-lg p-8 text-center" style="background: #FAF9F7;">

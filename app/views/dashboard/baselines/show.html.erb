@@ -55,7 +55,7 @@
     <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Baseline Image</h2>
     <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
       <% if @baseline.screenshot&.attached? %>
-        <%= image_tag url_for(@baseline.screenshot), class: "w-full h-auto" %>
+        <%= image_tag public_storage_url(@baseline.screenshot), class: "w-full h-auto" %>
       <% else %>
         <div class="p-16 text-center" style="background: #FAF9F7;">
           <svg class="w-16 h-16 mx-auto mb-4" style="color: #C4C0B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">

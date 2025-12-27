@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_27_100004) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_27_100006) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -67,6 +67,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_100004) do
 
   create_table "ai_tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "browser_provider", default: "local", null: false
+    t.uuid "browser_session_id"
     t.boolean "capture_screenshots", default: true
     t.datetime "completed_at"
     t.datetime "created_at", null: false
@@ -86,9 +87,12 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_100004) do
     t.integer "steps_executed", default: 0
     t.boolean "stop_requested", default: false
     t.integer "timeout_seconds", default: 300
+    t.integer "total_input_tokens", default: 0
+    t.integer "total_output_tokens", default: 0
     t.string "triggered_by"
     t.datetime "updated_at", null: false
     t.jsonb "viewport", default: {"width" => 1280, "height" => 720}
+    t.index ["browser_session_id"], name: "index_ai_tasks_on_browser_session_id"
     t.index ["project_id", "created_at"], name: "index_ai_tasks_on_project_id_and_created_at"
     t.index ["project_id", "status"], name: "index_ai_tasks_on_project_id_and_status"
     t.index ["project_id"], name: "index_ai_tasks_on_project_id"
@@ -374,6 +378,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_100004) do
     t.integer "duration_ms"
     t.text "error_message"
     t.datetime "executed_at"
+    t.integer "input_tokens", default: 0
+    t.integer "output_tokens", default: 0
     t.integer "position", null: false
     t.text "reasoning"
     t.string "selector"
@@ -436,6 +442,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_100004) do
   add_foreign_key "action_cache_entries", "projects"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_tasks", "browser_sessions"
   add_foreign_key "ai_tasks", "projects"
   add_foreign_key "baselines", "browser_configs"
   add_foreign_key "baselines", "pages"

@@ -72,7 +72,7 @@
       <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Baseline</h2>
       <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <% if @baseline&.screenshot&.attached? %>
-          <%= image_tag url_for(@baseline.screenshot), class: "w-full h-auto" %>
+          <%= image_tag public_storage_url(@baseline.screenshot), class: "w-full h-auto" %>
         <% else %>
           <div class="p-12 text-center" style="background: #FAF9F7;">
             <span class="text-[13px]" style="color: #8B8780;">No baseline image</span>
@@ -86,7 +86,7 @@
       <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Snapshot</h2>
       <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <% if @snapshot&.screenshot&.attached? %>
-          <%= image_tag url_for(@snapshot.screenshot), class: "w-full h-auto" %>
+          <%= image_tag public_storage_url(@snapshot.screenshot), class: "w-full h-auto" %>
         <% else %>
           <div class="p-12 text-center" style="background: #FAF9F7;">
             <span class="text-[13px]" style="color: #8B8780;">No snapshot image</span>
@@ -100,7 +100,7 @@
       <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Difference</h2>
       <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <% if @comparison.diff_image&.attached? %>
-          <%= image_tag url_for(@comparison.diff_image), class: "w-full h-auto" %>
+          <%= image_tag public_storage_url(@comparison.diff_image), class: "w-full h-auto" %>
         <% else %>
           <div class="p-12 text-center" style="background: #FAF9F7;">
             <span class="text-[13px]" style="color: #8B8780;">No diff image</span>

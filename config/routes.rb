@@ -87,6 +87,11 @@ Rails.application.routes.draw do
           post :reject
         end
       end
+      resources :ai_tasks, only: [:index, :show] do
+        member do
+          post :retry, action: :retry_task
+        end
+      end
       member do
         get :settings
       end

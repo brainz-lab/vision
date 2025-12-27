@@ -451,6 +451,7 @@ DEPENDENCIES
   rails (~> 8.1.1)
   redis (~> 5.0)
   rubocop-rails-omakase
+  ruby-vips
   solid_cable
   solid_cache
   solid_queue

@@ -10,6 +10,7 @@ class Baseline < ApplicationRecord
 
   scope :active, -> { where(active: true) }
   scope :for_branch, ->(branch) { where(branch: branch) }
+  scope :recent, -> { order(created_at: :desc) }
 
   before_save :deactivate_previous, if: :active?
 

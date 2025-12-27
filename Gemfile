@@ -49,6 +49,7 @@ gem "playwright-ruby-client"
 # Image processing for screenshots
 gem "image_processing", "~> 1.2"
 gem "mini_magick"
+gem "ruby-vips"
 
 # AWS SDK for S3-compatible storage (MinIO in development)
 gem "aws-sdk-s3", require: false

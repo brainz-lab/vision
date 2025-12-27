@@ -12,6 +12,8 @@ RUN apt-get update -qq && \
     # ImageMagick for image processing
     imagemagick \
     libmagickwand-dev \
+    # libvips for ActiveStorage analysis
+    libvips-dev \
     # Playwright dependencies
     libnss3 \
     libatk1.0-0 \

@@ -50,9 +50,9 @@ module Dashboard
 
     def page_params
       params.require(:page).permit(
-        :name, :path, :full_url, :wait_for_selector,
-        :hide_selectors, :mask_selectors, :threshold,
-        :viewport_width, :viewport_height
+        :name, :path, :wait_for, :wait_ms,
+        :hide_selectors, :mask_selectors, :enabled,
+        viewport: [:width, :height]
       )
     end
   end

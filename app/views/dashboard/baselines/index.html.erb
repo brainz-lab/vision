@@ -12,7 +12,7 @@
         <%= link_to dashboard_project_baseline_path(@project, baseline), class: "block rounded-xl overflow-hidden transition-shadow hover:shadow-md", style: "background: #FFFFFE; border: 1px solid #E8E5E0;" do %>
           <% if baseline.screenshot&.attached? %>
             <div class="aspect-video overflow-hidden" style="background: #FAF9F7;">
-              <%= image_tag url_for(baseline.screenshot), class: "w-full h-full object-cover object-top" %>
+              <%= image_tag public_storage_url(baseline.screenshot), class: "w-full h-full object-cover object-top" %>
             </div>
           <% else %>
             <div class="aspect-video flex items-center justify-center" style="background: #FAF9F7;">
