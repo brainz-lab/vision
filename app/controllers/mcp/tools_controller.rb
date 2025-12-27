@@ -96,10 +96,22 @@ module Mcp
 
     def authenticate!
       raw_key = extract_api_key
+
+      # Check if it's a Vision key (vis_ingest_*, vis_api_*, or legacy vis_*)
+      if raw_key&.start_with?("vis_")
+        @current_project = find_project_by_vision_key(raw_key)
+        unless @current_project
+          render json: { error: "Invalid API key" }, status: :unauthorized
+          return
+        end
+        return
+      end
+
+      # Otherwise validate with Platform
       key_info = PlatformClient.validate_key(raw_key)
 
       unless key_info[:valid]
-        render json: { error: 'Invalid API key' }, status: :unauthorized
+        render json: { error: "Invalid API key" }, status: :unauthorized
         return
       end
 
@@ -110,6 +122,20 @@ module Mcp
       )
     end
 
+    # Find project by any Vision key type
+    def find_project_by_vision_key(key)
+      # Try ingest_key first (SDK pattern)
+      project = Project.find_by("settings->>'ingest_key' = ?", key)
+      return project if project
+
+      # Try api_key (dashboard/query pattern)
+      project = Project.find_by("settings->>'api_key' = ?", key)
+      return project if project
+
+      # Legacy: try old api_key format (for backwards compatibility)
+      Project.find_by("settings->>'api_key' = ?", key)
+    end
+
     def extract_api_key
       auth_header = request.headers['Authorization']
       return auth_header.sub(/^Bearer\s+/, '') if auth_header&.start_with?('Bearer ')
@@ -117,7 +143,8 @@ module Mcp
     end
 
     def tool_params
-      params.except(:controller, :action, :name, :format).to_unsafe_h.symbolize_keys
+      # Use request_parameters to get just the body params (excludes routing params like :action, :controller)
+      request.request_parameters.symbolize_keys
     end
   end
 end

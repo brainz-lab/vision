@@ -1,11 +1,18 @@
 module Mcp
   class Server
     TOOLS = {
+      # Visual regression testing tools
       'vision_capture' => Tools::VisionCapture,
       'vision_compare' => Tools::VisionCompare,
       'vision_test' => Tools::VisionTest,
       'vision_approve' => Tools::VisionApprove,
-      'vision_list_failures' => Tools::VisionListFailures
+      'vision_list_failures' => Tools::VisionListFailures,
+
+      # AI browser automation tools
+      'vision_task' => Tools::VisionTask,
+      'vision_ai_action' => Tools::VisionAiAction,
+      'vision_perform' => Tools::VisionPerform,
+      'vision_extract' => Tools::VisionExtract
     }.freeze
 
     attr_reader :project

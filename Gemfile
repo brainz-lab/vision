@@ -56,6 +56,10 @@ gem "aws-sdk-s3", require: false
 # Connection pooling for browser instances
 gem "connection_pool"
 
+# HTTP client with retries for external API calls
+gem "faraday", "~> 2.0"
+gem "faraday-retry"
+
 # BrainzLab SDK - use local path in Docker, published gem otherwise
 if File.exist?("/brainzlab-sdk")
   gem "brainzlab", path: "/brainzlab-sdk"

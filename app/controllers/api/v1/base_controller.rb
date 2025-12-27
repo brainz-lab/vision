@@ -11,9 +11,9 @@ module Api
       def authenticate!
         raw_key = extract_api_key
 
-        # Check if it's a standalone vis_ API key (from auto-provisioning)
+        # Check if it's a Vision key (vis_ingest_*, vis_api_*, or legacy vis_*)
         if raw_key&.start_with?("vis_")
-          @current_project = Project.find_by("settings->>'api_key' = ?", raw_key)
+          @current_project = find_project_by_vision_key(raw_key)
           unless @current_project
             render json: { error: "Invalid API key" }, status: :unauthorized
             return
@@ -32,7 +32,7 @@ module Api
         @key_info = PlatformClient.validate_key(raw_key)
 
         unless @key_info[:valid]
-          render json: { error: 'Invalid API key' }, status: :unauthorized
+          render json: { error: "Invalid API key" }, status: :unauthorized
           return
         end
 
@@ -41,6 +41,20 @@ module Api
           name: @key_info[:project_name],
           environment: @key_info[:environment]
         )
+      end
+
+      # Find project by any Vision key type
+      def find_project_by_vision_key(key)
+        # Try ingest_key first (SDK pattern)
+        project = Project.find_by("settings->>'ingest_key' = ?", key)
+        return project if project
+
+        # Try api_key (dashboard/query pattern)
+        project = Project.find_by("settings->>'api_key' = ?", key)
+        return project if project
+
+        # Legacy: try old api_key format (for backwards compatibility)
+        Project.find_by("settings->>'api_key' = ?", key)
       end
 
       def check_feature_access!

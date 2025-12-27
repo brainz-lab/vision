@@ -128,6 +128,14 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
+    faraday (2.14.0)
+      faraday-net_http (>= 2.0, < 3.5)
+      json
+      logger
+    faraday-net_http (3.4.2)
+      net-http (~> 0.5)
+    faraday-retry (2.4.0)
+      faraday (~> 2.0)
     ffi (1.17.2)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-aarch64-linux-musl)
@@ -197,6 +205,8 @@ GEM
     minitest (6.0.0)
       prism (~> 1.5)
     msgpack (1.8.0)
+    net-http (0.9.1)
+      uri (>= 0.11.1)
     net-imap (0.6.2)
       date
       net-protocol
@@ -427,6 +437,8 @@ DEPENDENCIES
   bundler-audit
   connection_pool
   debug
+  faraday (~> 2.0)
+  faraday-retry
   image_processing (~> 1.2)
   importmap-rails
   jbuilder

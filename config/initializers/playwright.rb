@@ -1,7 +1,6 @@
-# Playwright configuration for Vision
-# This initializer sets up the Playwright browser automation
+# frozen_string_literal: true
 
-Rails.application.config.to_prepare do
-  # Configure Playwright paths
-  ENV['PLAYWRIGHT_BROWSERS_PATH'] ||= Rails.root.join('.cache/ms-playwright').to_s
-end
+# Set Playwright browsers path for persistent storage
+# This must be set before Playwright gem is loaded
+ENV["PLAYWRIGHT_BROWSERS_PATH"] ||= Rails.root.join(".playwright").to_s
+

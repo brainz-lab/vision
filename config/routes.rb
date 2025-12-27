@@ -41,6 +41,25 @@ Rails.application.routes.draw do
 
       # Test cases
       resources :test_cases, only: [:index, :show, :create, :update, :destroy]
+
+      # AI Tasks
+      resources :tasks, only: [:index, :show, :create] do
+        member do
+          post :stop
+          get :steps
+        end
+      end
+
+      # Browser Sessions
+      resources :sessions, only: [:index, :show, :create, :destroy] do
+        member do
+          post :ai        # page.ai() - AI-powered action
+          post :perform   # page.perform() - direct action
+          post :extract   # page.extract() - data extraction
+          get :screenshot
+          get :state
+        end
+      end
     end
   end
 

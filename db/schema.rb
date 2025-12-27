@@ -10,11 +10,32 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_27_000001) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_27_100004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
   enable_extension "timescaledb"
+
+  create_table "action_cache_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.jsonb "action_data", default: {}, null: false
+    t.string "action_type", null: false
+    t.float "avg_duration_ms"
+    t.jsonb "context", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "expires_at"
+    t.integer "failure_count", default: 0
+    t.string "instruction_hash"
+    t.datetime "last_used_at"
+    t.uuid "project_id", null: false
+    t.integer "success_count", default: 1
+    t.datetime "updated_at", null: false
+    t.string "url_pattern", null: false
+    t.index ["expires_at"], name: "index_action_cache_entries_on_expires_at"
+    t.index ["last_used_at"], name: "index_action_cache_entries_on_last_used_at"
+    t.index ["project_id", "instruction_hash"], name: "index_action_cache_entries_on_project_id_and_instruction_hash"
+    t.index ["project_id", "url_pattern", "action_type"], name: "idx_on_project_id_url_pattern_action_type_1a90e4efc9"
+    t.index ["project_id"], name: "index_action_cache_entries_on_project_id"
+  end
 
   create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "blob_id", null: false
@@ -42,6 +63,37 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_000001) do
     t.uuid "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ai_tasks", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "browser_provider", default: "local", null: false
+    t.boolean "capture_screenshots", default: true
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.text "error_message"
+    t.jsonb "extracted_data", default: {}
+    t.string "final_url"
+    t.text "instruction", null: false
+    t.integer "max_steps", default: 25
+    t.jsonb "metadata", default: {}
+    t.string "model", default: "claude-sonnet-4", null: false
+    t.uuid "project_id", null: false
+    t.text "result"
+    t.string "start_url"
+    t.datetime "started_at"
+    t.string "status", default: "pending", null: false
+    t.integer "steps_executed", default: 0
+    t.boolean "stop_requested", default: false
+    t.integer "timeout_seconds", default: 300
+    t.string "triggered_by"
+    t.datetime "updated_at", null: false
+    t.jsonb "viewport", default: {"width" => 1280, "height" => 720}
+    t.index ["project_id", "created_at"], name: "index_ai_tasks_on_project_id_and_created_at"
+    t.index ["project_id", "status"], name: "index_ai_tasks_on_project_id_and_status"
+    t.index ["project_id"], name: "index_ai_tasks_on_project_id"
+    t.index ["status"], name: "index_ai_tasks_on_status"
+    t.index ["triggered_by"], name: "index_ai_tasks_on_triggered_by"
   end
 
   create_table "baselines", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -82,6 +134,29 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_000001) do
     t.index ["project_id", "browser"], name: "index_browser_configs_on_project_id_and_browser"
     t.index ["project_id", "enabled"], name: "index_browser_configs_on_project_id_and_enabled"
     t.index ["project_id"], name: "index_browser_configs_on_project_id"
+  end
+
+  create_table "browser_sessions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "browser_provider", default: "local", null: false
+    t.datetime "closed_at"
+    t.string "connect_url"
+    t.datetime "created_at", null: false
+    t.string "current_title"
+    t.string "current_url"
+    t.datetime "expires_at"
+    t.jsonb "metadata", default: {}
+    t.uuid "project_id", null: false
+    t.string "provider_session_id", null: false
+    t.string "start_url"
+    t.string "status", default: "initializing", null: false
+    t.datetime "updated_at", null: false
+    t.jsonb "viewport", default: {"width" => 1280, "height" => 720}
+    t.string "websocket_url"
+    t.index ["expires_at"], name: "index_browser_sessions_on_expires_at"
+    t.index ["project_id", "status"], name: "index_browser_sessions_on_project_id_and_status"
+    t.index ["project_id"], name: "index_browser_sessions_on_project_id"
+    t.index ["provider_session_id"], name: "index_browser_sessions_on_provider_session_id", unique: true
+    t.index ["status"], name: "index_browser_sessions_on_status"
   end
 
   create_table "comparisons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -291,6 +366,27 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_000001) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "task_steps", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "action", null: false
+    t.jsonb "action_data", default: {}
+    t.uuid "ai_task_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.text "error_message"
+    t.datetime "executed_at"
+    t.integer "position", null: false
+    t.text "reasoning"
+    t.string "selector"
+    t.boolean "success", default: true
+    t.datetime "updated_at", null: false
+    t.string "url_after"
+    t.string "url_before"
+    t.text "value"
+    t.index ["ai_task_id", "position"], name: "index_task_steps_on_ai_task_id_and_position"
+    t.index ["ai_task_id", "success"], name: "index_task_steps_on_ai_task_id_and_success"
+    t.index ["ai_task_id"], name: "index_task_steps_on_ai_task_id"
+  end
+
   create_table "test_cases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
@@ -337,11 +433,14 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_000001) do
     t.index ["project_id"], name: "index_test_runs_on_project_id"
   end
 
+  add_foreign_key "action_cache_entries", "projects"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ai_tasks", "projects"
   add_foreign_key "baselines", "browser_configs"
   add_foreign_key "baselines", "pages"
   add_foreign_key "browser_configs", "projects"
+  add_foreign_key "browser_sessions", "projects"
   add_foreign_key "comparisons", "baselines"
   add_foreign_key "comparisons", "snapshots"
   add_foreign_key "comparisons", "test_runs"
@@ -355,6 +454,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_000001) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "task_steps", "ai_tasks"
   add_foreign_key "test_cases", "projects"
   add_foreign_key "test_runs", "projects"
 end
