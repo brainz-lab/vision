@@ -1,0 +1,61 @@
+<% content_for(:title) { "Pages" } %>
+
+<div class="space-y-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;">Pages</h1>
+      <p class="mt-1 text-[13px]" style="color: #8B8780;"><%= @project.base_url %></p>
+    </div>
+  </div>
+
+  <% if @pages.any? %>
+    <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <table class="min-w-full">
+        <thead>
+          <tr style="border-bottom: 1px solid #E8E5E0;">
+            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Name</th>
+            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Path</th>
+            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Baselines</th>
+            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Last Snapshot</th>
+            <th class="px-5 py-3 text-right text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @pages.each_with_index do |page, index| %>
+            <tr style="<%= index < @pages.size - 1 ? 'border-bottom: 1px solid #E8E5E0;' : '' %>">
+              <td class="px-5 py-4">
+                <%= link_to page.name, dashboard_page_path(page), class: "text-[14px] font-medium hover:underline", style: "color: #1A1A1A;" %>
+              </td>
+              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+                <%= page.path %>
+              </td>
+              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+                <%= page.baselines.count %>
+              </td>
+              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+                <% if page.snapshots.any? %>
+                  <%= time_ago_in_words(page.snapshots.recent.first.created_at) %> ago
+                <% else %>
+                  <span style="color: #C4C0B8;">Never</span>
+                <% end %>
+              </td>
+              <td class="px-5 py-4 text-right">
+                <%= link_to "Edit", edit_dashboard_page_path(page), class: "text-[13px] font-medium", style: "color: #8B8780;" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="text-center py-16 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="space-y-3">
+        <svg class="mx-auto w-12 h-12" style="color: #C4C1BC;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/>
+        </svg>
+        <p class="text-[15px]" style="color: #6B6760;">No pages configured</p>
+        <p class="text-[13px]" style="color: #8B8780;">Pages are created via the API or MCP tools</p>
+      </div>
+    </div>
+  <% end %>
+</div>

@@ -1,9 +1,13 @@
 module Dashboard
   class ProjectsController < BaseController
-    skip_before_action :require_authentication, only: [:index]
+    before_action :set_project, only: [:show, :edit, :update, :settings]
 
     def index
       @projects = Project.all.order(created_at: :desc)
+    end
+
+    def show
+      redirect_to dashboard_project_pages_path(@project)
     end
 
     def new
@@ -15,28 +19,31 @@ module Dashboard
       @project.platform_project_id ||= "vis_#{SecureRandom.hex(8)}"
 
       if @project.save
-        session[:project_id] = @project.id
         redirect_to dashboard_project_pages_path(@project), notice: 'Project created'
       else
         render :new, status: :unprocessable_entity
       end
     end
 
-    def pages
-      @project = Project.find(params[:id])
-      @pages = @project.pages.ordered
+    def edit
     end
 
-    def test_runs
-      @project = Project.find(params[:id])
-      @test_runs = @project.test_runs.recent.limit(50)
+    def update
+      if @project.update(project_params)
+        redirect_to dashboard_project_pages_path(@project), notice: 'Project updated'
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
 
     def settings
-      @project = Project.find(params[:id])
     end
 
     private
+
+    def set_project
+      @project = Project.find(params[:id])
+    end
 
     def project_params
       params.require(:project).permit(:name, :base_url, :staging_url)

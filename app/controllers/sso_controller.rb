@@ -8,7 +8,7 @@ class SsoController < ApplicationController
     return_to = params[:return_to] || dashboard_root_path
 
     if token.blank?
-      redirect_to return_to, alert: 'SSO token missing'
+      redirect_to safe_return_to(return_to), alert: 'SSO token missing'
       return
     end
 
@@ -20,13 +20,40 @@ class SsoController < ApplicationController
       session[:user_email] = result[:email]
       session[:project_id] = result[:project_id]
 
-      redirect_to return_to, notice: 'Signed in successfully'
+      redirect_to safe_return_to(return_to), allow_other_host: true, notice: 'Signed in successfully'
     else
-      redirect_to return_to, alert: 'SSO authentication failed'
+      redirect_to safe_return_to(return_to), alert: 'SSO authentication failed'
     end
   end
 
   private
+
+  # Validate return_to URL to prevent open redirect attacks
+  # Only allow redirects to trusted hosts or internal paths
+  def safe_return_to(url)
+    return dashboard_root_path if url.blank?
+
+    uri = URI.parse(url)
+
+    # Allow relative paths
+    return url if uri.host.nil?
+
+    # Allow trusted hosts
+    trusted_hosts = [
+      'brainzlab.ai',
+      'vision.brainzlab.ai',
+      'platform.brainzlab.ai',
+      'localhost'
+    ]
+
+    if trusted_hosts.any? { |host| uri.host == host || uri.host&.end_with?(".#{host}") }
+      url
+    else
+      dashboard_root_path
+    end
+  rescue URI::InvalidURIError
+    dashboard_root_path
+  end
 
   def validate_sso_token(token)
     # In production, validate with Platform

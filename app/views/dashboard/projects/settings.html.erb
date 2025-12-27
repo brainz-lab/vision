@@ -1,0 +1,67 @@
+<% content_for(:title) { "Settings" } %>
+
+<div class="space-y-8 max-w-2xl">
+  <div>
+    <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;">Project Settings</h1>
+    <p class="mt-1 text-[13px]" style="color: #8B8780;"><%= @project.name %></p>
+  </div>
+
+  <!-- Project Details -->
+  <div class="rounded-xl p-6" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <h2 class="text-[15px] font-semibold mb-4" style="color: #1A1A1A;">Project Details</h2>
+    <dl class="space-y-4">
+      <div>
+        <dt class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Name</dt>
+        <dd class="mt-1 text-[14px]" style="color: #1A1A1A;"><%= @project.name %></dd>
+      </div>
+      <div>
+        <dt class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Base URL</dt>
+        <dd class="mt-1 text-[14px]" style="color: #1A1A1A;"><%= @project.base_url %></dd>
+      </div>
+      <% if @project.staging_url.present? %>
+        <div>
+          <dt class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Staging URL</dt>
+          <dd class="mt-1 text-[14px]" style="color: #1A1A1A;"><%= @project.staging_url %></dd>
+        </div>
+      <% end %>
+      <div>
+        <dt class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Platform Project ID</dt>
+        <dd class="mt-1 font-mono text-[13px]" style="color: #6B6760;"><%= @project.platform_project_id %></dd>
+      </div>
+      <div>
+        <dt class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Created</dt>
+        <dd class="mt-1 text-[14px]" style="color: #1A1A1A;"><%= @project.created_at.strftime('%B %d, %Y at %I:%M %p') %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <!-- API Access -->
+  <div class="rounded-xl p-6" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <h2 class="text-[15px] font-semibold mb-4" style="color: #1A1A1A;">API Access</h2>
+    <p class="text-[13px] mb-4" style="color: #8B8780;">Use the Platform API key to authenticate requests to Vision.</p>
+    <div class="rounded-lg p-4" style="background: #FAF9F7;">
+      <code class="text-[13px] font-mono" style="color: #6B6760;">
+        Authorization: Bearer YOUR_PLATFORM_API_KEY
+      </code>
+    </div>
+  </div>
+
+  <!-- Statistics -->
+  <div class="rounded-xl p-6" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <h2 class="text-[15px] font-semibold mb-4" style="color: #1A1A1A;">Statistics</h2>
+    <div class="grid grid-cols-3 gap-4">
+      <div class="text-center p-4 rounded-lg" style="background: #FAF9F7;">
+        <div class="text-[28px] font-semibold" style="color: #1A1A1A;"><%= @project.pages.count %></div>
+        <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Pages</div>
+      </div>
+      <div class="text-center p-4 rounded-lg" style="background: #FAF9F7;">
+        <div class="text-[28px] font-semibold" style="color: #1A1A1A;"><%= @project.test_runs.count %></div>
+        <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Test Runs</div>
+      </div>
+      <div class="text-center p-4 rounded-lg" style="background: #FAF9F7;">
+        <div class="text-[28px] font-semibold" style="color: #1A1A1A;"><%= Baseline.joins(:page).where(pages: { project_id: @project.id }).count %></div>
+        <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Baselines</div>
+      </div>
+    </div>
+  </div>
+</div>

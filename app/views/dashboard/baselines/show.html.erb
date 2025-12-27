@@ -1,0 +1,69 @@
+<% content_for(:title) { "Baseline - #{@page&.name}" } %>
+
+<div class="space-y-8">
+  <div>
+    <div class="mb-2">
+      <%= link_to dashboard_baselines_path, class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Back to Baselines
+      <% end %>
+    </div>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;"><%= @page&.name || 'Baseline' %></h1>
+        <p class="mt-1 text-[13px]" style="color: #8B8780;"><%= @page&.path %></p>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #F0EFED; color: #6B6760;">
+          <%= @baseline.browser_config&.browser || 'chromium' %>
+        </span>
+        <span class="text-[12px]" style="color: #8B8780;">
+          <%= @baseline.browser_config&.viewport_width || 1280 %>x<%= @baseline.browser_config&.viewport_height || 720 %>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Details -->
+  <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <dl class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div>
+        <dt class="text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Created</dt>
+        <dd class="mt-1 text-[14px] font-medium" style="color: #1A1A1A;"><%= @baseline.created_at.strftime('%b %d, %Y') %></dd>
+      </div>
+      <% if @baseline.approved_at %>
+        <div>
+          <dt class="text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Approved</dt>
+          <dd class="mt-1 text-[14px] font-medium" style="color: #1A1A1A;"><%= @baseline.approved_at.strftime('%b %d, %Y') %></dd>
+        </div>
+      <% end %>
+      <div>
+        <dt class="text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Browser</dt>
+        <dd class="mt-1 text-[14px] font-medium" style="color: #1A1A1A;"><%= @baseline.browser_config&.browser || 'chromium' %></dd>
+      </div>
+      <div>
+        <dt class="text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Viewport</dt>
+        <dd class="mt-1 text-[14px] font-medium" style="color: #1A1A1A;"><%= @baseline.browser_config&.viewport_width || 1280 %>x<%= @baseline.browser_config&.viewport_height || 720 %></dd>
+      </div>
+    </dl>
+  </div>
+
+  <!-- Baseline Image -->
+  <div class="space-y-4">
+    <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Baseline Image</h2>
+    <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <% if @baseline.screenshot&.attached? %>
+        <%= image_tag url_for(@baseline.screenshot), class: "w-full h-auto" %>
+      <% else %>
+        <div class="p-16 text-center" style="background: #FAF9F7;">
+          <svg class="w-16 h-16 mx-auto mb-4" style="color: #C4C0B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <p class="text-[13px]" style="color: #8B8780;">No image available</p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

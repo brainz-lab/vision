@@ -1,1 +1,144 @@
 @import "tailwindcss";
+
+/* Ensure proper content detection for views */
+@source "../../../app/views/**/*.erb";
+@source "../../../app/helpers/**/*.rb";
+@source "../../../app/javascript/**/*.js";
+
+/* Add missing utility classes via layer */
+@layer utilities {
+  .max-w-5xl {
+    max-width: 64rem;
+  }
+
+  .max-w-lg {
+    max-width: 32rem;
+  }
+
+  .min-h-full {
+    min-height: 100%;
+  }
+
+  .antialiased {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  .tracking-tight {
+    letter-spacing: -0.025em;
+  }
+
+  .rounded-xl {
+    border-radius: 0.75rem;
+  }
+
+  .gap-2 {
+    gap: 0.5rem;
+  }
+
+  .gap-2\.5 {
+    gap: 0.625rem;
+  }
+
+  .gap-3 {
+    gap: 0.75rem;
+  }
+
+  .py-10 {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .py-12 {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+
+  .py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+
+  .px-5 {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .py-2\.5 {
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
+  }
+
+  .p-5 {
+    padding: 1.25rem;
+  }
+
+  .space-y-3 > :not(:last-child) {
+    margin-bottom: 0.75rem;
+  }
+
+  .space-y-8 > :not(:last-child) {
+    margin-bottom: 2rem;
+  }
+
+  .mt-3 {
+    margin-top: 0.75rem;
+  }
+
+  .w-4 {
+    width: 1rem;
+  }
+
+  .h-4 {
+    height: 1rem;
+  }
+
+  .w-10 {
+    width: 2.5rem;
+  }
+
+  .h-10 {
+    height: 2.5rem;
+  }
+
+  .transition-colors {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .transition-shadow {
+    transition-property: box-shadow;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+  }
+
+  .hover\:shadow-md:hover {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+
+  .hover\:underline:hover {
+    text-decoration-line: underline;
+  }
+
+  .hover\:opacity-80:hover {
+    opacity: 0.8;
+  }
+
+  .hover\:border-\[\#D0CEC9\]:hover {
+    border-color: #D0CEC9;
+  }
+
+  .focus\:outline-none:focus {
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+  }
+
+  .focus\:ring-2:focus {
+    box-shadow: 0 0 0 2px var(--tw-ring-color, currentColor);
+  }
+
+  .focus\:ring-orange-500:focus {
+    --tw-ring-color: #f97316;
+  }
+}

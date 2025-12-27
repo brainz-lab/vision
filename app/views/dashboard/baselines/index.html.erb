@@ -1,0 +1,54 @@
+<% content_for(:title) { "Baselines" } %>
+
+<div class="space-y-8">
+  <div>
+    <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;">Baselines</h1>
+    <p class="mt-1 text-[13px]" style="color: #8B8780;">Approved baseline screenshots for visual comparisons</p>
+  </div>
+
+  <% if @baselines.respond_to?(:any?) && @baselines.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @baselines.each do |baseline| %>
+        <%= link_to dashboard_baseline_path(baseline), class: "block rounded-xl overflow-hidden transition-shadow hover:shadow-md", style: "background: #FFFFFE; border: 1px solid #E8E5E0;" do %>
+          <% if baseline.screenshot&.attached? %>
+            <div class="aspect-video overflow-hidden" style="background: #FAF9F7;">
+              <%= image_tag url_for(baseline.screenshot), class: "w-full h-full object-cover object-top" %>
+            </div>
+          <% else %>
+            <div class="aspect-video flex items-center justify-center" style="background: #FAF9F7;">
+              <svg class="w-12 h-12" style="color: #C4C0B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+              </svg>
+            </div>
+          <% end %>
+          <div class="p-4">
+            <h3 class="text-[14px] font-medium" style="color: #1A1A1A;"><%= baseline.page&.name || 'Unknown Page' %></h3>
+            <div class="flex items-center gap-2 mt-2">
+              <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #F0EFED; color: #6B6760;">
+                <%= baseline.browser_config&.browser || 'chromium' %>
+              </span>
+              <span class="text-[12px]" style="color: #8B8780;">
+                <%= baseline.browser_config&.viewport_width || 1280 %>x<%= baseline.browser_config&.viewport_height || 720 %>
+              </span>
+            </div>
+            <p class="text-[11px] mt-2" style="color: #C4C0B8;"><%= time_ago_in_words(baseline.created_at) %> ago</p>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if @baselines.respond_to?(:total_pages) && @baselines.total_pages > 1 %>
+      <div class="mt-8 flex justify-center">
+        <%# Add pagination if using kaminari/pagy %>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="text-center py-16 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <svg class="mx-auto w-12 h-12 mb-3" style="color: #C4C1BC;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+      <p class="text-[15px] font-medium" style="color: #6B6760;">No baselines yet</p>
+      <p class="text-[13px] mt-1" style="color: #8B8780;">Baselines are created when you approve comparisons.</p>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <title>Vision - <%= content_for(:title) || "Dashboard" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= javascript_importmap_tags %>
+</head>
+<body class="h-full antialiased" style="font-family: 'Inter', system-ui, sans-serif; background: #FAF9F7;">
+  <div class="min-h-full">
+    <!-- Header -->
+    <header class="border-b" style="border-color: #E8E5E0; background: #FFFFFE;">
+      <div class="mx-auto max-w-5xl px-6">
+        <div class="flex h-16 items-center justify-between">
+          <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="8" fill="#F97316"/>
+              <circle cx="10" cy="10" r="4" stroke="white" stroke-width="2" fill="none"/>
+              <circle cx="10" cy="10" r="1.5" fill="white"/>
+            </svg>
+            <span class="text-[15px] font-semibold tracking-tight" style="color: #1A1A1A;">Vision</span>
+          <% end %>
+
+          <% if defined?(current_project) && current_project %>
+            <div class="flex items-center gap-6">
+              <div class="flex items-center gap-3">
+                <span style="color: #C4C0B8;">/</span>
+                <%= link_to current_project.name, pages_dashboard_project_path(current_project), class: "text-[14px] hover:underline", style: "color: #6B6760;" %>
+              </div>
+              <nav class="flex items-center gap-4 text-[13px]">
+                <% pages_active = request.path.include?('/pages') || (controller_name == 'projects' && action_name == 'pages') %>
+                <% test_runs_active = request.path.include?('/test_runs') %>
+                <% baselines_active = request.path.include?('/baselines') %>
+                <% comparisons_active = request.path.include?('/comparisons') %>
+                <% settings_active = request.path.include?('/settings') %>
+
+                <%= link_to "Pages", pages_dashboard_project_path(current_project), class: "font-medium transition-colors", style: "color: #{pages_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Test Runs", test_runs_dashboard_project_path(current_project), class: "font-medium transition-colors", style: "color: #{test_runs_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Baselines", dashboard_baselines_path, class: "font-medium transition-colors", style: "color: #{baselines_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Settings", settings_dashboard_project_path(current_project), class: "font-medium transition-colors", style: "color: #{settings_active ? '#1A1A1A' : '#8B8780'};" %>
+              </nav>
+              <%= link_to dashboard_projects_path, class: "text-[13px] font-medium px-3 py-1.5 rounded-lg transition-colors hover:opacity-80", style: "background: #F0EFED; color: #6B6760;" do %>
+                Projects
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="mx-auto max-w-5xl px-6 py-10">
+      <% if notice.present? %>
+        <div class="mb-6 px-4 py-3 rounded-lg text-[14px]" style="background: #E8F5E8; color: #2D5A2D;">
+          <%= notice %>
+        </div>
+      <% end %>
+      <% if alert.present? %>
+        <div class="mb-6 px-4 py-3 rounded-lg text-[14px]" style="background: #FEE8E8; color: #8B2D2D;">
+          <%= alert %>
+        </div>
+      <% end %>
+      <%= yield %>
+    </main>
+  </div>
+</body>
+</html>

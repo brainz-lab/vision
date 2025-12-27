@@ -1,0 +1,55 @@
+<% content_for(:title) { "Projects" } %>
+
+<div class="space-y-8">
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;">Projects</h1>
+      <p class="mt-1 text-[13px]" style="color: #8B8780;">Visual regression testing projects</p>
+    </div>
+    <a href="<%= new_dashboard_project_path %>" class="inline-flex items-center gap-2 px-4 py-2 text-[13px] font-medium rounded-lg transition-colors" style="background: #1A1A1A; color: #FFFFFE;">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      New Project
+    </a>
+  </div>
+
+  <% if @projects.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <% @projects.each do |project| %>
+        <a href="<%= pages_dashboard_project_path(project) %>" class="block px-5 py-4 rounded-xl transition-colors hover:border-[#D0CEC9]" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+          <div class="flex items-start justify-between">
+            <div class="space-y-1">
+              <h3 class="text-[15px] font-medium" style="color: #1A1A1A;"><%= project.name %></h3>
+              <p class="text-[13px]" style="color: #8B8780;">
+                <%= project.base_url %>
+              </p>
+            </div>
+            <svg class="w-5 h-5" style="color: #C4C0B8;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+          <div class="mt-3 flex items-center gap-4 text-[12px]" style="color: #8B8780;">
+            <span><%= project.pages.count %> pages</span>
+            <span><%= project.test_runs.count %> test runs</span>
+            <span>Created <%= time_ago_in_words(project.created_at) %> ago</span>
+          </div>
+        </a>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-16 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="space-y-3">
+        <svg class="mx-auto w-12 h-12" style="color: #C4C1BC;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+        </svg>
+        <p class="text-[15px]" style="color: #6B6760;">No projects yet</p>
+        <p class="text-[13px]" style="color: #8B8780;">Create your first project to start visual testing</p>
+        <a href="<%= new_dashboard_project_path %>" class="inline-flex items-center gap-2 mt-4 px-4 py-2 text-[13px] font-medium rounded-lg transition-colors" style="background: #1A1A1A; color: #FFFFFE;">
+          Create your first project
+        </a>
+      </div>
+    </div>
+  <% end %>
+</div>
