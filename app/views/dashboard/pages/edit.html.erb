@@ -2,7 +2,7 @@
 
 <div class="max-w-lg">
   <div class="mb-8">
-    <%= link_to dashboard_page_path(@page), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
+    <%= link_to dashboard_project_page_path(@project, @page), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
       <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
       </svg>
@@ -12,7 +12,7 @@
 
   <h1 class="text-[22px] font-semibold tracking-tight mb-8" style="color: #1A1A1A;">Edit Page</h1>
 
-  <%= form_with model: @page, url: dashboard_page_path(@page), method: :patch, class: "space-y-6" do |f| %>
+  <%= form_with model: @page, url: dashboard_project_page_path(@project, @page), method: :patch, class: "space-y-6" do |f| %>
     <% if @page.errors.any? %>
       <div class="px-4 py-3 rounded-lg text-[14px]" style="background: #FEE8E8; color: #8B2D2D;">
         <ul class="list-disc list-inside">
@@ -32,12 +32,6 @@
       <%= f.label :path, class: "block text-[13px] font-medium mb-2", style: "color: #1A1A1A;" %>
       <%= f.text_field :path, class: "w-full px-4 py-2.5 text-[14px] rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500", style: "background: #FFFFFE; border: 1px solid #E8E5E0; color: #1A1A1A;", placeholder: "/about" %>
       <p class="mt-2 text-[12px]" style="color: #8B8780;">Relative path from base URL</p>
-    </div>
-
-    <div>
-      <%= f.label :full_url, "Full URL (optional)", class: "block text-[13px] font-medium mb-2", style: "color: #1A1A1A;" %>
-      <%= f.url_field :full_url, class: "w-full px-4 py-2.5 text-[14px] rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500", style: "background: #FFFFFE; border: 1px solid #E8E5E0; color: #1A1A1A;", placeholder: "https://example.com/page" %>
-      <p class="mt-2 text-[12px]" style="color: #8B8780;">Use this to override the base URL + path</p>
     </div>
 
     <div>
@@ -80,7 +74,7 @@
 
     <div class="pt-4 flex gap-4">
       <%= f.submit "Save Changes", class: "flex-1 px-4 py-2.5 text-[14px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #1A1A1A; color: #FFFFFE;" %>
-      <%= link_to "Cancel", dashboard_page_path(@page), class: "px-4 py-2.5 text-[14px] font-medium rounded-lg transition-colors text-center", style: "background: #F0EFED; color: #6B6760;" %>
+      <%= link_to "Cancel", dashboard_project_page_path(@project, @page), class: "px-4 py-2.5 text-[14px] font-medium rounded-lg transition-colors text-center", style: "background: #F0EFED; color: #6B6760;" %>
     </div>
   <% end %>
 </div>

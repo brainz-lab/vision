@@ -3,7 +3,7 @@
 <div class="space-y-8">
   <div>
     <div class="mb-2">
-      <%= link_to test_runs_dashboard_project_path(current_project), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
+      <%= link_to dashboard_project_test_runs_path(@project), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
@@ -72,7 +72,7 @@
             <% @comparisons.each_with_index do |comparison, index| %>
               <tr style="<%= index < @comparisons.size - 1 ? 'border-bottom: 1px solid #E8E5E0;' : '' %>">
                 <td class="px-5 py-4">
-                  <%= link_to comparison.page&.name || 'Unknown', dashboard_comparison_path(comparison), class: "text-[14px] font-medium hover:underline", style: "color: #1A1A1A;" %>
+                  <%= link_to comparison.page&.name || 'Unknown', dashboard_project_comparison_path(@project, comparison), class: "text-[14px] font-medium hover:underline", style: "color: #1A1A1A;" %>
                 </td>
                 <td class="px-5 py-4">
                   <% case comparison.status %>
@@ -101,7 +101,7 @@
                   <%= comparison.snapshot&.browser_config&.browser || 'chromium' %>
                 </td>
                 <td class="px-5 py-4 text-right">
-                  <%= link_to "View", dashboard_comparison_path(comparison), class: "text-[13px] font-medium", style: "color: #8B8780;" %>
+                  <%= link_to "View", dashboard_project_comparison_path(@project, comparison), class: "text-[13px] font-medium", style: "color: #8B8780;" %>
                 </td>
               </tr>
             <% end %>

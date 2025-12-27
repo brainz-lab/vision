@@ -4,7 +4,7 @@
   <div class="flex items-center justify-between">
     <div>
       <div class="mb-2">
-        <%= link_to pages_dashboard_project_path(current_project), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
+        <%= link_to dashboard_project_pages_path(@project), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
@@ -14,7 +14,7 @@
       <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;"><%= @page.name %></h1>
       <p class="mt-1 text-[13px]" style="color: #8B8780;"><%= @page.path || @page.full_url %></p>
     </div>
-    <%= link_to "Edit", edit_dashboard_page_path(@page), class: "px-4 py-2 text-[13px] font-medium rounded-lg", style: "background: #F0EFED; color: #6B6760;" %>
+    <%= link_to "Edit", edit_dashboard_project_page_path(@project, @page), class: "px-4 py-2 text-[13px] font-medium rounded-lg", style: "background: #F0EFED; color: #6B6760;" %>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">

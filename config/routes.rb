@@ -58,23 +58,20 @@ Rails.application.routes.draw do
   namespace :dashboard do
     root to: 'projects#index'
 
-    resources :projects, only: [:index, :new, :create] do
+    resources :projects, only: [:index, :show, :new, :create, :edit, :update] do
+      resources :pages, only: [:index, :show, :new, :create, :edit, :update, :destroy]
+      resources :test_runs, only: [:index, :show, :create]
+      resources :baselines, only: [:index, :show]
+      resources :comparisons, only: [:index, :show] do
+        member do
+          post :approve
+          post :reject
+        end
+      end
       member do
-        get 'pages'
-        get 'test_runs'
-        get 'settings'
+        get :settings
       end
     end
-
-    resources :pages, only: [:show, :edit, :update]
-    resources :test_runs, only: [:show]
-    resources :comparisons, only: [:show] do
-      member do
-        post :approve
-        post :reject
-      end
-    end
-    resources :baselines, only: [:index, :show]
   end
 
   # Health check

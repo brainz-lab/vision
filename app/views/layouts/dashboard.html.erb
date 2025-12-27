@@ -26,23 +26,23 @@
             <span class="text-[15px] font-semibold tracking-tight" style="color: #1A1A1A;">Vision</span>
           <% end %>
 
-          <% if defined?(current_project) && current_project %>
+          <% if defined?(@project) && @project&.persisted? %>
             <div class="flex items-center gap-6">
               <div class="flex items-center gap-3">
                 <span style="color: #C4C0B8;">/</span>
-                <%= link_to current_project.name, pages_dashboard_project_path(current_project), class: "text-[14px] hover:underline", style: "color: #6B6760;" %>
+                <%= link_to @project.name, dashboard_project_pages_path(@project), class: "text-[14px] hover:underline", style: "color: #6B6760;" %>
               </div>
               <nav class="flex items-center gap-4 text-[13px]">
-                <% pages_active = request.path.include?('/pages') || (controller_name == 'projects' && action_name == 'pages') %>
-                <% test_runs_active = request.path.include?('/test_runs') %>
-                <% baselines_active = request.path.include?('/baselines') %>
-                <% comparisons_active = request.path.include?('/comparisons') %>
-                <% settings_active = request.path.include?('/settings') %>
+                <% pages_active = controller_name == 'pages' %>
+                <% test_runs_active = controller_name == 'test_runs' %>
+                <% baselines_active = controller_name == 'baselines' %>
+                <% comparisons_active = controller_name == 'comparisons' %>
+                <% settings_active = action_name == 'settings' %>
 
-                <%= link_to "Pages", pages_dashboard_project_path(current_project), class: "font-medium transition-colors", style: "color: #{pages_active ? '#1A1A1A' : '#8B8780'};" %>
-                <%= link_to "Test Runs", test_runs_dashboard_project_path(current_project), class: "font-medium transition-colors", style: "color: #{test_runs_active ? '#1A1A1A' : '#8B8780'};" %>
-                <%= link_to "Baselines", dashboard_baselines_path, class: "font-medium transition-colors", style: "color: #{baselines_active ? '#1A1A1A' : '#8B8780'};" %>
-                <%= link_to "Settings", settings_dashboard_project_path(current_project), class: "font-medium transition-colors", style: "color: #{settings_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Pages", dashboard_project_pages_path(@project), class: "font-medium transition-colors", style: "color: #{pages_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Test Runs", dashboard_project_test_runs_path(@project), class: "font-medium transition-colors", style: "color: #{test_runs_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Baselines", dashboard_project_baselines_path(@project), class: "font-medium transition-colors", style: "color: #{baselines_active ? '#1A1A1A' : '#8B8780'};" %>
+                <%= link_to "Settings", settings_dashboard_project_path(@project), class: "font-medium transition-colors", style: "color: #{settings_active ? '#1A1A1A' : '#8B8780'};" %>
               </nav>
               <%= link_to dashboard_projects_path, class: "text-[13px] font-medium px-3 py-1.5 rounded-lg transition-colors hover:opacity-80", style: "background: #F0EFED; color: #6B6760;" do %>
                 Projects

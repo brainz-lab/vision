@@ -4,18 +4,18 @@
   <div>
     <div class="mb-2">
       <% if @comparison.test_run %>
-        <%= link_to dashboard_test_run_path(@comparison.test_run), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
+        <%= link_to dashboard_project_test_run_path(@project, @comparison.test_run), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
           Back to Test Run
         <% end %>
       <% else %>
-        <%= link_to dashboard_root_path, class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
+        <%= link_to dashboard_project_pages_path(@project), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
           </svg>
-          Back to Dashboard
+          Back to Pages
         <% end %>
       <% end %>
     </div>
@@ -44,8 +44,8 @@
 
         <% if @comparison.needs_review? %>
           <div class="flex gap-2">
-            <%= button_to "Approve", approve_dashboard_comparison_path(@comparison), method: :post, class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #059669; color: #FFFFFE;" %>
-            <%= button_to "Reject", reject_dashboard_comparison_path(@comparison), method: :post, class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #DC2626; color: #FFFFFE;" %>
+            <%= button_to "Approve", approve_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #059669; color: #FFFFFE;" %>
+            <%= button_to "Reject", reject_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #DC2626; color: #FFFFFE;" %>
           </div>
         <% end %>
       </div>
@@ -114,7 +114,7 @@
     <div class="rounded-xl p-6" style="background: #FFFBEB; border: 1px solid #FCD34D;">
       <h3 class="text-[15px] font-semibold mb-2" style="color: #92400E;">Update Baseline?</h3>
       <p class="text-[13px] mb-4" style="color: #A16207;">If this change is intentional, you can approve it and update the baseline.</p>
-      <%= form_with url: approve_dashboard_comparison_path(@comparison), method: :post, class: "flex items-center gap-4" do %>
+      <%= form_with url: approve_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "flex items-center gap-4" do %>
         <label class="flex items-center">
           <%= check_box_tag :update_baseline, '1', false, class: "rounded mr-2 focus:ring-orange-500", style: "border-color: #D1D5DB; color: #F97316;" %>
           <span class="text-[13px]" style="color: #6B6760;">Update baseline to new snapshot</span>
