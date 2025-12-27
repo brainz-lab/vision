@@ -187,6 +187,27 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_100006) do
     t.index ["test_run_id"], name: "index_comparisons_on_test_run_id"
   end
 
+  create_table "credentials", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.string "credential_type", default: "login"
+    t.datetime "expires_at"
+    t.datetime "last_used_at"
+    t.jsonb "metadata", default: {}
+    t.string "name", null: false
+    t.uuid "project_id", null: false
+    t.string "service_url"
+    t.datetime "updated_at", null: false
+    t.integer "use_count", default: 0
+    t.string "vault_environment", default: "production"
+    t.string "vault_path", null: false
+    t.index ["active"], name: "index_credentials_on_active"
+    t.index ["project_id", "name"], name: "index_credentials_on_project_id_and_name", unique: true
+    t.index ["project_id"], name: "index_credentials_on_project_id"
+    t.index ["service_url"], name: "index_credentials_on_service_url"
+    t.index ["vault_path"], name: "index_credentials_on_vault_path"
+  end
+
   create_table "pages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.jsonb "actions", default: []
     t.datetime "created_at", null: false
@@ -451,6 +472,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_100006) do
   add_foreign_key "comparisons", "baselines"
   add_foreign_key "comparisons", "snapshots"
   add_foreign_key "comparisons", "test_runs"
+  add_foreign_key "credentials", "projects"
   add_foreign_key "pages", "projects"
   add_foreign_key "snapshots", "browser_configs"
   add_foreign_key "snapshots", "pages"

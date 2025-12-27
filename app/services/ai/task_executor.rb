@@ -203,22 +203,31 @@ module Ai
         {
           "thinking": "your reasoning about the current state and what to do next",
           "action": {
-            "type": "click|type|fill|navigate|scroll|hover|select|wait|press",
+            "type": "click|type|fill|navigate|scroll|hover|select|wait|press|scroll_into_view",
             "selector": "CSS selector or element index (e.g., '#submit' or 'button:has-text(\"Login\")')",
-            "value": "value for type/fill/navigate actions"
+            "value": "value for type/fill/navigate/scroll actions"
           },
           "complete": false,
           "result": null
         }
 
-        Set "complete": true and provide "result" when the task is finished.
+        Set "complete": true and provide "result" with extracted data when the task is finished.
         Set "action.type": "wait" with "value": "1000" to wait 1 second if page is loading.
+
+        Scroll options (use these for efficient scrolling):
+        - "down" or "page_down": scroll down one screen (800px)
+        - "up" or "page_up": scroll up one screen
+        - "bottom": scroll to page bottom
+        - "top": scroll to page top
+        - scroll_into_view: scroll element into view (requires selector)
 
         Important:
         - Use specific selectors from the interactive elements list
         - For buttons/links, use text content: button:has-text("Submit")
         - For inputs, use labels or placeholders: input[placeholder="Email"]
-        - If stuck, try scrolling or waiting
+        - When scrolling to see more content, use "page_down" for full-page scrolls
+        - Complete the task efficiently with minimal steps
+        - If you have enough data to answer the task, mark complete=true immediately
       PROMPT
     end
 
@@ -249,6 +258,12 @@ module Ai
       result = case action[:type].to_sym
       when :navigate
         @browser.navigate(@session.provider_session_id, action[:value])
+      when :scroll_into_view
+        @browser.perform_action(
+          @session.provider_session_id,
+          action: :scroll_into_view,
+          selector: action[:selector]
+        )
       else
         @browser.perform_action(
           @session.provider_session_id,
@@ -288,8 +303,8 @@ module Ai
       # Update task counters
       task.increment_steps!
 
-      # Cache successful action for replay
-      if step.success?
+      # Cache successful action for replay (only cacheable action types)
+      if step.success? && ActionCacheEntry::CACHEABLE_ACTIONS.include?(action[:type].to_s)
         ActionCacheEntry.store(
           project: project,
           url: url_before,

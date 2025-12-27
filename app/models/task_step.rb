@@ -6,7 +6,7 @@ class TaskStep < ApplicationRecord
   has_one_attached :screenshot
 
   # Action types
-  ACTIONS = %w[click type fill navigate scroll hover select wait press extract done].freeze
+  ACTIONS = %w[click type fill navigate scroll scroll_into_view hover select wait press extract done].freeze
 
   # Validations
   validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }
@@ -67,6 +67,8 @@ class TaskStep < ApplicationRecord
       "Navigate: #{value || url_after}"
     when "scroll"
       "Scroll: #{value || 'down'}"
+    when "scroll_into_view"
+      "Scroll to: #{selector || 'element'}"
     when "hover"
       "Hover: #{selector || 'element'}"
     when "select"

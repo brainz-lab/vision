@@ -60,6 +60,13 @@ Rails.application.routes.draw do
           get :state
         end
       end
+
+      # Credentials (Vault integration)
+      resources :credentials, only: [:index, :show, :create, :update, :destroy] do
+        member do
+          post :test  # Test credential fetch from Vault
+        end
+      end
     end
   end
 

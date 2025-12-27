@@ -210,11 +210,15 @@ class McpServer
     uri = URI.parse("#{@api_url}/mcp/tools/#{tool_name}")
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
-    http.read_timeout = 300  # Long timeout for AI tasks
+    http.open_timeout = 30      # Connection timeout
+    http.read_timeout = 600     # 10 min for long AI tasks
+    http.write_timeout = 60     # Write timeout
+    http.keep_alive_timeout = 30
 
     request = Net::HTTP::Post.new(uri)
     request["Content-Type"] = "application/json"
     request["Authorization"] = "Bearer #{@api_key}"
+    request["Connection"] = "keep-alive"
     request.body = JSON.generate(arguments)
 
     response = http.request(request)

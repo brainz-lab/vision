@@ -84,6 +84,7 @@ bin/rails tailwindcss:build
 | **Comparison** | Diff result between baseline and snapshot |
 | **TestRun** | Collection of comparisons for a deployment |
 | **TestCase** | E2E test definition with steps |
+| **Credential** | Reference to credentials stored in Vault (never stores actual secrets) |
 
 ## Screenshot Capture Flow
 
@@ -104,6 +105,8 @@ bin/rails tailwindcss:build
 | `BrowserPool` | Connection pool for Playwright instances |
 | `TestRunner` | Executes full test suites |
 | `PlatformClient` | Platform API key validation |
+| `VaultClient` | Secure credential fetching from Vault service |
+| `Ai::CredentialInjector` | Injects credentials into browser automation flows |
 
 ## MCP Tools
 
@@ -114,6 +117,11 @@ bin/rails tailwindcss:build
 | `vision_test` | Run full visual test suite |
 | `vision_approve` | Approve changes, update baseline |
 | `vision_list_failures` | List failed comparisons needing review |
+| `vision_task` | Execute autonomous AI browser task (supports credentials) |
+| `vision_ai_action` | Single AI-powered browser action |
+| `vision_perform` | Direct browser action without AI |
+| `vision_extract` | Extract structured data from page |
+| `vision_credential` | Store/manage credentials in Vault |
 
 ## API Endpoints
 
@@ -174,6 +182,51 @@ Authentication: `Authorization: Bearer <key>` or `X-API-Key: <key>`
 | `AWS_SECRET_ACCESS_KEY` | S3 secret key |
 | `AWS_BUCKET` | Bucket for screenshots |
 | `BRAINZLAB_PLATFORM_URL` | Platform service URL |
+| `BRAINZLAB_VAULT_URL` | Vault service URL for credentials |
+| `VAULT_ACCESS_TOKEN` | Default Vault access token |
+
+## Vault Integration (Credential Management)
+
+Vision integrates with the Vault service for secure credential storage. Credentials are **never stored in Vision** - only references to Vault paths.
+
+### Storing Credentials
+
+```ruby
+# Via MCP tool
+vision_credential(action: "store", name: "github", username: "user", password: "secret")
+
+# Via API
+POST /api/v1/credentials
+{ "name": "github", "username": "user", "password": "secret", "service_url": "https://github.com/*" }
+
+# Via model
+credential = project.credentials.create!(name: "github", service_url: "https://github.com/*")
+credential.store!(username: "user", password: "secret")
+```
+
+### Using Credentials in Browser Automation
+
+```ruby
+# MCP tool with automatic login
+vision_task(
+  instruction: "Add item 12345 to my collection",
+  start_url: "https://example.com",
+  credential: "my-service"  # Will auto-login before task
+)
+
+# Programmatic usage
+credential = project.find_credential("my-service")
+injector = Ai::CredentialInjector.new(browser: browser, session_id: sid, project: project)
+injector.login(credential)
+```
+
+### Security Model
+
+- Credentials encrypted with AES-256-GCM in Vault
+- Vision stores only Vault path references
+- Audit logging for all credential access
+- Environment separation (production/staging/development)
+- Automatic credential rotation support
 
 ## Docker
 

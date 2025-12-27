@@ -11,6 +11,9 @@ class Project < ApplicationRecord
   has_many :browser_sessions, dependent: :destroy
   has_many :action_cache_entries, dependent: :destroy
 
+  # Vault integration for secure credential storage
+  has_many :credentials, dependent: :destroy
+
   validates :platform_project_id, presence: true, uniqueness: true
   validates :name, presence: true
   validates :base_url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
@@ -166,6 +169,43 @@ class Project < ApplicationRecord
       capture_screenshots: ai_settings.fetch('capture_screenshots', true),
       retry_count: ai_settings['retry_count'] || 3
     }
+  end
+
+  # ============================================
+  # Vault Integration
+  # ============================================
+
+  # Get Vault access token for this project
+  def vault_access_token
+    # First check encrypted storage
+    if settings.dig('vault', 'access_token_encrypted').present?
+      decrypt_credential(settings.dig('vault', 'access_token_encrypted'))
+    else
+      # Fall back to environment variable
+      ENV["VAULT_ACCESS_TOKEN"]
+    end
+  end
+
+  # Set Vault access token (encrypted)
+  def vault_access_token=(token)
+    vault_settings = settings['vault'] || {}
+    vault_settings['access_token_encrypted'] = encrypt_credential(token)
+    update!(settings: settings.merge('vault' => vault_settings))
+  end
+
+  # Check if Vault integration is configured
+  def vault_configured?
+    vault_access_token.present?
+  end
+
+  # Find credential by name for this project
+  def find_credential(name)
+    credentials.active.find_by(name: name)
+  end
+
+  # Find credential matching a URL
+  def credential_for_url(url)
+    credentials.active.for_url(url).first
   end
 
   private

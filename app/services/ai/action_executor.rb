@@ -112,12 +112,15 @@ module Ai
         Action types:
         - click: Click element by index or selector
         - type/fill: Enter text into input field
-        - scroll: Scroll the page (value: "up", "down", or pixel amount)
+        - scroll: Scroll the page (value: "down", "up", "page_down", "page_up", "bottom", "top", or pixel amount)
+        - scroll_into_view: Scroll element into view (requires element_index or selector)
         - hover: Hover over element
         - select: Select option from dropdown (value: option text)
         - wait: Wait for something (value: milliseconds)
         - press: Press keyboard key (value: key name like "Enter", "Tab")
         - navigate: Go to URL (value: full URL)
+
+        Scroll efficiently: use "page_down" to scroll full pages, "bottom" to jump to end.
       PROMPT
     end
 
@@ -191,7 +194,7 @@ module Ai
         }
 
       when :scroll
-        scroll_value = action[:value]
+        scroll_value = action[:value] || "page_down"
         result = @browser.perform_action(
           @session_id,
           action: :scroll,
@@ -201,6 +204,21 @@ module Ai
           success: true,
           action: "scroll",
           value: scroll_value,
+          url: @browser.current_url(@session_id),
+          reasoning: decision[:reasoning]
+        }
+
+      when :scroll_into_view
+        target = resolve_target(action, elements)
+        result = @browser.perform_action(
+          @session_id,
+          action: :scroll_into_view,
+          selector: target[:selector]
+        )
+        {
+          success: result[:success] != false,
+          action: "scroll_into_view",
+          selector: target[:selector],
           url: @browser.current_url(@session_id),
           reasoning: decision[:reasoning]
         }

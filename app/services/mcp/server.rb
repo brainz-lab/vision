@@ -12,7 +12,10 @@ module Mcp
       'vision_task' => Tools::VisionTask,
       'vision_ai_action' => Tools::VisionAiAction,
       'vision_perform' => Tools::VisionPerform,
-      'vision_extract' => Tools::VisionExtract
+      'vision_extract' => Tools::VisionExtract,
+
+      # Credential management (Vault integration)
+      'vision_credential' => Tools::VisionCredential
     }.freeze
 
     attr_reader :project

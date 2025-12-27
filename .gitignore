@@ -41,3 +41,34 @@
 /.cache/ms-playwright
 
 .playwright
+
+# macOS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Build artifacts
+/app/assets/builds/*
+!/app/assets/builds/.keep
+
+# Test coverage
+/coverage/
+
+# Vendor bundle
+/vendor/bundle
+
+# Package manager locks (optional - uncomment if needed)
+# package-lock.json
+# yarn.lock
+
+# Database dumps
+*.sql
+*.dump
+
+# Local development
+.byebug_history
+.irb_history

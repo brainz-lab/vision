@@ -119,11 +119,29 @@ module BrowserProviders
       when :hover
         page.hover(selector, **options.slice(:timeout, :position))
       when :scroll
-        if value.is_a?(Hash)
+        scroll_amount = case value.to_s.downcase
+        when "down" then 800
+        when "up" then -800
+        when "bottom" then "document.body.scrollHeight"
+        when "top" then 0
+        when "page_down" then "window.innerHeight * 0.9"
+        when "page_up" then "-(window.innerHeight * 0.9)"
+        else value.to_i
+        end
+
+        if scroll_amount.is_a?(String)
+          if scroll_amount.include?("scrollHeight")
+            page.evaluate("window.scrollTo(0, #{scroll_amount})")
+          else
+            page.evaluate("window.scrollBy(0, #{scroll_amount})")
+          end
+        elsif value.is_a?(Hash)
           page.evaluate("window.scrollTo(#{value[:x] || 0}, #{value[:y] || 0})")
         else
-          page.evaluate("window.scrollBy(0, #{value.to_i})")
+          page.evaluate("window.scrollBy(0, #{scroll_amount})")
         end
+      when :scroll_into_view
+        page.evaluate("document.querySelector('#{selector}')?.scrollIntoView({behavior: 'smooth', block: 'center'})")
       when :select
         page.select_option(selector, value)
       when :wait
