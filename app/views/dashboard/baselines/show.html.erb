@@ -27,7 +27,7 @@
   </div>
 
   <!-- Details -->
-  <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+  <div class="rounded-xl p-5 card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
     <dl class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div>
         <dt class="text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Created</dt>
@@ -53,7 +53,7 @@
   <!-- Baseline Image -->
   <div class="space-y-4">
     <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Baseline Image</h2>
-    <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
       <% if @baseline.screenshot&.attached? %>
         <%= image_tag public_storage_url(@baseline.screenshot), class: "w-full h-auto" %>
       <% else %>

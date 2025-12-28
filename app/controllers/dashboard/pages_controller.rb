@@ -8,8 +8,8 @@ module Dashboard
     end
 
     def show
-      @baselines = @page.baselines.includes(:browser_config).recent
-      @snapshots = @page.snapshots.includes(:browser_config).recent.limit(20)
+      @baselines = @page.baselines.includes(:browser_config).with_attached_screenshot.recent
+      @snapshots = @page.snapshots.includes(:browser_config).with_attached_screenshot.recent.limit(20)
     end
 
     def new

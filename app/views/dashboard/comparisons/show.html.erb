@@ -44,8 +44,8 @@
 
         <% if @comparison.needs_review? %>
           <div class="flex gap-2">
-            <%= button_to "Approve", approve_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #059669; color: #FFFFFE;" %>
-            <%= button_to "Reject", reject_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "px-4 py-2 text-[13px] font-medium rounded-lg transition-colors cursor-pointer", style: "background: #DC2626; color: #FFFFFE;" %>
+            <%= button_to "Approve", approve_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "px-4 py-2.5 text-[13px] font-medium rounded-xl transition-all cursor-pointer btn-primary", style: "color: #FFFFFE;" %>
+            <%= button_to "Reject", reject_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "px-4 py-2.5 text-[13px] font-medium rounded-xl transition-colors cursor-pointer", style: "background: #DC2626; color: #FFFFFE;" %>
           </div>
         <% end %>
       </div>
@@ -53,15 +53,15 @@
   </div>
 
   <% if @comparison.diff_percentage.present? %>
-    <div class="rounded-xl p-5" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="rounded-xl p-5 card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
       <div class="flex items-center justify-between">
         <span class="text-[13px]" style="color: #8B8780;">Difference</span>
         <span class="text-[24px] font-semibold" style="color: <%= @comparison.diff_percentage > (@comparison.page&.threshold || 1) ? '#DC2626' : '#059669' %>;">
           <%= number_to_percentage(@comparison.diff_percentage, precision: 2) %>
         </span>
       </div>
-      <div class="mt-3 w-full rounded-full h-2" style="background: #E8E5E0;">
-        <div class="h-2 rounded-full" style="width: <%= [@comparison.diff_percentage, 100].min %>%; background: <%= @comparison.diff_percentage > (@comparison.page&.threshold || 1) ? '#DC2626' : '#059669' %>;"></div>
+      <div class="mt-3 w-full rounded-full h-2.5" style="background: #E8E5E0;">
+        <div class="h-2.5 rounded-full transition-all" style="width: <%= [@comparison.diff_percentage, 100].min %>%; background: <%= @comparison.diff_percentage > (@comparison.page&.threshold || 1) ? '#DC2626' : 'linear-gradient(90deg, #22C55E 0%, #16A34A 100%)' %>;"></div>
       </div>
     </div>
   <% end %>
@@ -70,7 +70,7 @@
     <!-- Baseline -->
     <div class="space-y-3">
       <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Baseline</h2>
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <% if @baseline&.screenshot&.attached? %>
           <%= image_tag public_storage_url(@baseline.screenshot), class: "w-full h-auto" %>
         <% else %>
@@ -84,7 +84,7 @@
     <!-- Snapshot -->
     <div class="space-y-3">
       <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Snapshot</h2>
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <% if @snapshot&.screenshot&.attached? %>
           <%= image_tag public_storage_url(@snapshot.screenshot), class: "w-full h-auto" %>
         <% else %>
@@ -98,7 +98,7 @@
     <!-- Diff -->
     <div class="space-y-3">
       <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Difference</h2>
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <% if @comparison.diff_image&.attached? %>
           <%= image_tag public_storage_url(@comparison.diff_image), class: "w-full h-auto" %>
         <% else %>
@@ -111,15 +111,15 @@
   </div>
 
   <% if @comparison.needs_review? %>
-    <div class="rounded-xl p-6" style="background: #FFFBEB; border: 1px solid #FCD34D;">
+    <div class="rounded-xl p-6" style="background: linear-gradient(135deg, rgba(217, 119, 6, 0.08) 0%, rgba(251, 191, 36, 0.06) 100%); border: 1px solid rgba(217, 119, 6, 0.3);">
       <h3 class="text-[15px] font-semibold mb-2" style="color: #92400E;">Update Baseline?</h3>
       <p class="text-[13px] mb-4" style="color: #A16207;">If this change is intentional, you can approve it and update the baseline.</p>
       <%= form_with url: approve_dashboard_project_comparison_path(@project, @comparison), method: :post, class: "flex items-center gap-4" do %>
         <label class="flex items-center">
-          <%= check_box_tag :update_baseline, '1', false, class: "rounded mr-2 focus:ring-orange-500", style: "border-color: #D1D5DB; color: #F97316;" %>
+          <%= check_box_tag :update_baseline, '1', false, class: "rounded mr-2 focus:ring-orange-500", style: "border-color: #D97706; color: #D97706; accent-color: #D97706;" %>
           <span class="text-[13px]" style="color: #6B6760;">Update baseline to new snapshot</span>
         </label>
-        <%= submit_tag "Approve with options", class: "px-4 py-2 text-[13px] font-medium rounded-lg cursor-pointer", style: "background: #059669; color: #FFFFFE;" %>
+        <%= submit_tag "Approve with options", class: "px-4 py-2.5 text-[13px] font-medium rounded-xl cursor-pointer btn-primary transition-all", style: "color: #FFFFFE;" %>
       <% end %>
     </div>
   <% end %>

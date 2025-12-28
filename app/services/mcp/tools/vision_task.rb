@@ -82,9 +82,16 @@ module Mcp
           start_url ||= credential.login_selectors[:login_url]
         end
 
+        # Modify instruction if we're doing auto-login
+        final_instruction = instruction
+        if credential && auto_login
+          final_instruction = "NOTE: You have been automatically logged in. Do NOT try to login again. " \
+                             "Proceed directly with the task: #{instruction}"
+        end
+
         # Create the task
         task = project.ai_tasks.create!(
-          instruction: instruction,
+          instruction: final_instruction,
           start_url: start_url,
           model: args[:model] || project.default_llm_model,
           browser_provider: args[:browser_provider] || project.default_browser_provider,
@@ -93,7 +100,8 @@ module Mcp
           metadata: {
             extraction_schema: args[:extraction_schema],
             credential_id: credential&.id,
-            auto_login: auto_login && credential.present?
+            auto_login: auto_login && credential.present?,
+            original_instruction: instruction
           }.compact,
           viewport: { width: 1280, height: 720 }
         )
@@ -102,13 +110,10 @@ module Mcp
           # Execute synchronously for MCP
           executor = Ai::TaskExecutor.new(task)
 
-          # Inject credential callback if needed
+          # Register pre-execution callback for credential login
           if credential && auto_login
-            executor.on_step do |step|
-              # After first navigation, perform login
-              if step.position == 1 && step.action == "navigate"
-                perform_credential_login(task, credential)
-              end
+            executor.before_execute do |browser, session|
+              perform_credential_login(task, credential, browser, session)
             end
           end
 
@@ -148,13 +153,15 @@ module Mcp
 
       private
 
-      def perform_credential_login(task, credential)
-        return unless task.browser_session
+      def perform_credential_login(task, credential, browser = nil, session = nil)
+        browser ||= BrowserProviders::Factory.for_project(project, provider_override: task.browser_provider)
+        session_id = session&.provider_session_id || task.browser_session&.provider_session_id
 
-        browser = BrowserProviders::Factory.for_project(project, provider_override: task.browser_provider)
+        return unless session_id
+
         injector = Ai::CredentialInjector.new(
           browser: browser,
-          session_id: task.browser_session.provider_session_id,
+          session_id: session_id,
           project: project
         )
 

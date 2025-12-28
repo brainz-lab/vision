@@ -34,20 +34,20 @@
 
   <!-- Stats -->
   <div class="grid grid-cols-4 gap-4">
-    <div class="rounded-xl p-4 text-center" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
       <div class="text-[28px] font-semibold" style="color: #1A1A1A;"><%= @comparisons.count %></div>
       <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Total</div>
     </div>
-    <div class="rounded-xl p-4 text-center" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
       <div class="text-[28px] font-semibold" style="color: #059669;"><%= @comparisons.select { |c| c.status == 'passed' }.count %></div>
       <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Passed</div>
     </div>
-    <div class="rounded-xl p-4 text-center" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
       <div class="text-[28px] font-semibold" style="color: #DC2626;"><%= @comparisons.select { |c| c.status == 'failed' }.count %></div>
       <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Failed</div>
     </div>
-    <div class="rounded-xl p-4 text-center" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[28px] font-semibold" style="color: #F59E0B;"><%= @comparisons.select { |c| c.status == 'pending' }.count %></div>
+    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="text-[28px] font-semibold" style="color: #D97706;"><%= @comparisons.select { |c| c.status == 'pending' }.count %></div>
       <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Pending</div>
     </div>
   </div>
@@ -57,7 +57,7 @@
     <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Comparisons</h2>
 
     <% if @comparisons.any? %>
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
+      <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
         <table class="min-w-full">
           <thead>
             <tr style="border-bottom: 1px solid #E8E5E0;">

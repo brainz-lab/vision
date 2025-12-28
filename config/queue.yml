@@ -2,17 +2,40 @@ default: &default
   dispatchers:
     - polling_interval: 1
       batch_size: 500
-  workers:
-    - queues: "*"
-      threads: 3
-      processes: <%= ENV.fetch("JOB_CONCURRENCY", 4) %>
-      polling_interval: 0.1
 
 development:
   <<: *default
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: 1
+      polling_interval: 0.1
 
 test:
   <<: *default
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: 1
+      polling_interval: 0.1
 
 production:
   <<: *default
+  workers:
+    # Screenshot capture - resource intensive, limited concurrency
+    - queues: [screenshots]
+      threads: <%= ENV.fetch("SCREENSHOT_WORKER_THREADS", 2) %>
+      processes: <%= ENV.fetch("SCREENSHOT_WORKER_PROCESSES", 2) %>
+      polling_interval: 0.1
+
+    # Comparison processing
+    - queues: [comparisons]
+      threads: <%= ENV.fetch("COMPARISON_WORKER_THREADS", 3) %>
+      processes: <%= ENV.fetch("COMPARISON_WORKER_PROCESSES", 1) %>
+      polling_interval: 0.5
+
+    # Default queue - general tasks
+    - queues: [default]
+      threads: <%= ENV.fetch("DEFAULT_WORKER_THREADS", 3) %>
+      processes: <%= ENV.fetch("DEFAULT_WORKER_PROCESSES", 1) %>
+      polling_interval: 0.5

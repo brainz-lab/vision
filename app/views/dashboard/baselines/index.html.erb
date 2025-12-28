@@ -9,7 +9,7 @@
   <% if @baselines.respond_to?(:any?) && @baselines.any? %>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <% @baselines.each do |baseline| %>
-        <%= link_to dashboard_project_baseline_path(@project, baseline), class: "block rounded-xl overflow-hidden transition-shadow hover:shadow-md", style: "background: #FFFFFE; border: 1px solid #E8E5E0;" do %>
+        <%= link_to dashboard_project_baseline_path(@project, baseline), class: "block rounded-xl overflow-hidden transition-all card hover:border-[#D97706]", style: "background: #FFFFFE; border: 1px solid #E8E5E0;" do %>
           <% if baseline.screenshot&.attached? %>
             <div class="aspect-video overflow-hidden" style="background: #FAF9F7;">
               <%= image_tag public_storage_url(baseline.screenshot), class: "w-full h-full object-cover object-top" %>

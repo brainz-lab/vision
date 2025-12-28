@@ -5,7 +5,7 @@ module Ai
   # Handles login forms, API key inputs, and cookie injection
   #
   # Usage:
-  #   injector = CredentialInjector.new(browser: browser, session_id: session_id)
+  #   injector = CredentialInjector.new(browser: browser, session_id: session_id, project: project)
   #   injector.login(credential)  # Performs full login flow
   #   injector.fill_credentials(credential)  # Just fills the form
   #
@@ -13,6 +13,37 @@ module Ai
     class InjectionError < StandardError; end
 
     attr_reader :browser, :session_id, :project
+
+    # Common login field selectors for fallback
+    USERNAME_SELECTORS = [
+      'input#fldEmail',
+      'input[name="email"]',
+      'input[type="email"]',
+      'input#email',
+      'input#username',
+      'input[name="username"]',
+      'input[name="user"]',
+      'input[name="login"]',
+      'input[type="text"]:first-of-type'
+    ].freeze
+
+    PASSWORD_SELECTORS = [
+      'input#fldPassword',
+      'input[type="password"]',
+      'input[name="password"]',
+      'input[name="pass"]',
+      'input#password'
+    ].freeze
+
+    SUBMIT_SELECTORS = [
+      'button.btn-primary',
+      'button[type="submit"]',
+      'input[type="submit"]',
+      'button:has-text("Sign in")',
+      'button:has-text("Log in")',
+      'button:has-text("Login")',
+      'button:has-text("Submit")'
+    ].freeze
 
     def initialize(browser:, session_id:, project:)
       @browser = browser
@@ -28,32 +59,39 @@ module Ai
       creds = credential.fetch
       selectors = credential.login_selectors
 
+      Rails.logger.info "[CredentialInjector] Starting login for #{credential.name}"
+
       # Navigate to login page if specified
       if selectors[:login_url].present? && options[:navigate] != false
+        Rails.logger.info "[CredentialInjector] Navigating to #{selectors[:login_url]}"
         @browser.navigate(@session_id, selectors[:login_url])
         wait_for_page_load
       end
 
-      # Fill username
-      fill_field(selectors[:username_field], creds[:username])
+      # Try configured selectors first, then fallback to common ones
+      username_filled = smart_fill_field(:username, selectors[:username_field], creds[:username])
+      password_filled = smart_fill_field(:password, selectors[:password_field], creds[:password])
 
-      # Fill password
-      fill_field(selectors[:password_field], creds[:password])
+      if !username_filled || !password_filled
+        Rails.logger.warn "[CredentialInjector] Failed to fill some fields - username: #{username_filled}, password: #{password_filled}"
+      end
 
       # Wait briefly for form validation
-      sleep(0.3)
+      sleep(0.5)
 
       # Submit form
       if options[:submit] != false
-        submit_form(selectors[:submit_button])
+        smart_submit_form(selectors[:submit_button])
         wait_for_navigation
       end
 
       # Verify login success
       verify_login(credential, options)
     rescue VaultClient::VaultError => e
+      Rails.logger.error "[CredentialInjector] Vault error: #{e.message}"
       { success: false, error: "Failed to fetch credentials: #{e.message}" }
     rescue => e
+      Rails.logger.error "[CredentialInjector] Login failed: #{e.message}\n#{e.backtrace.first(5).join("\n")}"
       { success: false, error: "Login failed: #{e.message}" }
     end
 
@@ -145,6 +183,92 @@ module Ai
 
     private
 
+    # Smart fill that tries multiple selectors
+    def smart_fill_field(field_type, primary_selector, value)
+      return false unless value.present?
+
+      # Build list of selectors to try
+      selectors_to_try = [primary_selector].compact
+      selectors_to_try += case field_type
+      when :username then USERNAME_SELECTORS
+      when :password then PASSWORD_SELECTORS
+      else []
+      end
+
+      selectors_to_try.uniq.each do |selector|
+        next if selector.blank?
+
+        begin
+          # Check if element exists first
+          if element_exists?(selector)
+            result = @browser.perform_action(
+              @session_id,
+              action: :fill,
+              selector: selector,
+              value: value
+            )
+
+            if result[:success] != false
+              Rails.logger.info "[CredentialInjector] Successfully filled #{field_type} using selector: #{selector}"
+              return true
+            end
+          end
+        rescue => e
+          Rails.logger.debug "[CredentialInjector] Selector #{selector} failed: #{e.message}"
+        end
+      end
+
+      Rails.logger.warn "[CredentialInjector] Could not fill #{field_type} field with any selector"
+      false
+    end
+
+    # Smart submit that tries multiple selectors
+    def smart_submit_form(primary_selector)
+      selectors_to_try = [primary_selector].compact + SUBMIT_SELECTORS
+
+      selectors_to_try.uniq.each do |selector|
+        next if selector.blank?
+
+        begin
+          if element_exists?(selector)
+            result = @browser.perform_action(
+              @session_id,
+              action: :click,
+              selector: selector
+            )
+
+            if result[:success] != false
+              Rails.logger.info "[CredentialInjector] Successfully clicked submit using selector: #{selector}"
+              return true
+            end
+          end
+        rescue => e
+          Rails.logger.debug "[CredentialInjector] Submit selector #{selector} failed: #{e.message}"
+        end
+      end
+
+      # Last resort: press Enter
+      Rails.logger.info "[CredentialInjector] Trying Enter key as submit fallback"
+      @browser.perform_action(@session_id, action: :press, value: "Enter")
+      true
+    rescue => e
+      Rails.logger.warn "[CredentialInjector] Submit failed: #{e.message}"
+      false
+    end
+
+    # Check if an element exists on the page
+    def element_exists?(selector)
+      result = @browser.evaluate(
+        @session_id,
+        "(function() { try { return document.querySelector('#{selector.gsub("'", "\\\\'")}') !== null; } catch(e) { return false; } })()"
+      )
+      result == true
+    rescue => e
+      Rails.logger.debug "[CredentialInjector] element_exists? check failed for #{selector}: #{e.message}"
+      # Return true to let the fill attempt happen (Playwright will report if it fails)
+      true
+    end
+
     def fill_field(selector, value)
       return false unless value.present?
 
@@ -173,11 +297,11 @@ module Ai
     end
 
     def wait_for_page_load
-      sleep(1)
+      sleep(2)
     end
 
     def wait_for_navigation
-      sleep(2)
+      sleep(3)
     end
 
     def verify_login(credential, options)

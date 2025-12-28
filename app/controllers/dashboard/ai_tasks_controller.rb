@@ -39,7 +39,7 @@ module Dashboard
     private
 
     def set_task
-      @task = @project.ai_tasks.find(params[:id])
+      @task = @project.ai_tasks.with_attached_screenshots.find(params[:id])
     end
   end
 end

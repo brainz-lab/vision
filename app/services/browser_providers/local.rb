@@ -111,6 +111,10 @@ module BrowserProviders
 
       case action.to_sym
       when :click
+        # Scroll element into view first to improve reliability
+        if selector
+          scroll_into_view_if_needed(page, selector)
+        end
         page.click(selector, **options.slice(:timeout, :button, :modifiers, :position))
       when :type
         page.type(selector, value.to_s, **options.slice(:timeout, :delay))
@@ -120,12 +124,12 @@ module BrowserProviders
         page.hover(selector, **options.slice(:timeout, :position))
       when :scroll
         scroll_amount = case value.to_s.downcase
-        when "down" then 800
-        when "up" then -800
+        when "down" then 400  # Reduced from 800 for smoother scrolling
+        when "up" then -400
         when "bottom" then "document.body.scrollHeight"
         when "top" then 0
-        when "page_down" then "window.innerHeight * 0.9"
-        when "page_up" then "-(window.innerHeight * 0.9)"
+        when "page_down" then "window.innerHeight * 0.7"  # Reduced from 0.9 for overlap
+        when "page_up" then "-(window.innerHeight * 0.7)"
         else value.to_i
         end
 
@@ -279,6 +283,34 @@ module BrowserProviders
       ]
 
       paths.find { |path| system("which #{path.split.first} > /dev/null 2>&1") } || "npx playwright"
+    end
+
+    # Scroll element into view if it's not visible
+    # Uses Playwright's native locator to handle special selectors like :has-text()
+    def scroll_into_view_if_needed(page, selector)
+      # Skip non-standard selectors that might cause issues with scrolling
+      # Playwright will handle scrolling automatically on click if needed
+      return if selector.include?(":has-text") || selector.include?(":text") || selector.include?(":contains")
+
+      # Only use querySelector for standard CSS selectors
+      page.evaluate(<<~JS)
+        (function() {
+          try {
+            const el = document.querySelector('#{selector.gsub("'", "\\\\'")}');
+            if (el) {
+              const rect = el.getBoundingClientRect();
+              const isInView = rect.top >= 0 && rect.bottom <= window.innerHeight;
+              if (!isInView) {
+                el.scrollIntoView({ behavior: 'instant', block: 'center' });
+              }
+            }
+          } catch(e) {
+            // Ignore selector errors - Playwright will handle the click
+          }
+        })()
+      JS
+    rescue => e
+      Rails.logger.debug "[Local] scroll_into_view_if_needed failed: #{e.message}"
     end
   end
 end

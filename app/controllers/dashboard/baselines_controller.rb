@@ -13,7 +13,10 @@ module Dashboard
     end
 
     def show
-      @baseline = Baseline.joins(:page).where(pages: { project_id: @project.id }).find(params[:id])
+      @baseline = Baseline.joins(:page)
+                          .with_attached_screenshot
+                          .where(pages: { project_id: @project.id })
+                          .find(params[:id])
       @page = @baseline.page
     end
   end
