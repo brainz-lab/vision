@@ -309,6 +309,8 @@ module Ai
       current_url = @browser.current_url(@session_id)
       page_html = @browser.page_content(@session_id, format: :html)
 
+      Rails.logger.info "[CredentialInjector] Post-login URL: #{current_url}"
+
       # Check if we're still on login page (indicates failure)
       login_url = credential.login_selectors[:login_url]
       still_on_login = login_url.present? && current_url.include?(URI.parse(login_url).path)
@@ -317,17 +319,25 @@ module Ai
       has_error = page_html.match?(/error|invalid|incorrect|failed/i) &&
                   page_html.match?(/password|login|credential|authentication/i)
 
-      # Check for success indicators
-      success_patterns = credential.metadata["success_patterns"] || []
+      # Check for success indicators (common logged-in elements)
+      success_patterns = credential.metadata&.dig("success_patterns") || []
       has_success = success_patterns.any? { |pattern| page_html.match?(Regexp.new(pattern, Regexp::IGNORECASE)) }
 
-      if has_success || (!still_on_login && !has_error)
+      # Also check for common logged-in indicators
+      has_logout = page_html.include?("signout") || page_html.include?("logout") || page_html.include?("Sign out")
+      has_username = page_html.include?("legocolombia") || page_html.include?("My account")
+
+      Rails.logger.info "[CredentialInjector] Login verification: still_on_login=#{still_on_login}, has_error=#{has_error}, has_logout=#{has_logout}, has_username=#{has_username}"
+
+      if has_success || has_logout || has_username || (!still_on_login && !has_error)
+        Rails.logger.info "[CredentialInjector] Login SUCCESSFUL for #{credential.name}"
         {
           success: true,
           url: current_url,
           message: "Login successful"
         }
       else
+        Rails.logger.warn "[CredentialInjector] Login may have FAILED for #{credential.name}"
         {
           success: false,
           url: current_url,

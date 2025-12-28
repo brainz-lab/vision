@@ -124,13 +124,16 @@ module BrowserProviders
         page.hover(selector, **options.slice(:timeout, :position))
       when :scroll
         scroll_amount = case value.to_s.downcase
-        when "down" then 400  # Reduced from 800 for smoother scrolling
+        when "down", "body" then 400  # Reduced from 800 for smoother scrolling
         when "up" then -400
         when "bottom" then "document.body.scrollHeight"
         when "top" then 0
         when "page_down" then "window.innerHeight * 0.7"  # Reduced from 0.9 for overlap
         when "page_up" then "-(window.innerHeight * 0.7)"
-        else value.to_i
+        else
+          # If the value is a number or empty, default to scrolling down
+          amount = value.to_i
+          amount == 0 ? 400 : amount
         end
 
         if scroll_amount.is_a?(String)

@@ -572,7 +572,19 @@ module Ai
         }
       end
 
-      elements.uniq { |e| [e[:tag], e[:text], e[:id]].compact.join("-") }
+      unique_elements = elements.uniq { |e| [e[:tag], e[:text], e[:id]].compact.join("-") }
+
+      # Log any checkbox-related elements for debugging
+      checkbox_elements = unique_elements.select { |e|
+        text = "#{e[:text]} #{e[:class]} #{e[:id]} #{e[:role]}".to_s.downcase
+        text.include?("own") || text.include?("check") || text.include?("wanted") || text.include?("collection")
+      }
+      if checkbox_elements.any?
+        Rails.logger.info "[TaskExecutor] Found #{checkbox_elements.count} collection-related elements:"
+        checkbox_elements.each { |e| Rails.logger.info "  - #{e.inspect}" }
+      end
+
+      unique_elements
     rescue => e
       Rails.logger.warn "Failed to extract elements: #{e.message}"
       []
