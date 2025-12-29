@@ -1,57 +1,175 @@
 <% content_for(:title) { "New Page" } %>
 
-<div class="max-w-lg">
-  <div class="mb-8">
-    <%= link_to dashboard_project_pages_path(@project), class: "btn-ghost text-sm" do %>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+<div class="max-w-2xl mx-auto">
+  <!-- Breadcrumb -->
+  <div class="mb-6">
+    <%= link_to dashboard_project_pages_path(@project), class: "inline-flex items-center gap-2 text-sm font-medium transition-colors", style: "color: var(--color-ink-500);" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/>
       </svg>
-      Back to Pages
+      <span>Back to Pages</span>
     <% end %>
   </div>
 
-  <h1 class="section-header mb-8">New Page</h1>
+  <!-- Main Card -->
+  <div class="rounded-2xl overflow-hidden" style="background: #fff; border: 1px solid var(--color-cream-200); box-shadow: 0 4px 24px -4px rgba(0,0,0,0.08);">
 
-  <%= form_with model: @page, url: dashboard_project_pages_path(@project), method: :post, class: "space-y-6" do |f| %>
-    <% if @page.errors.any? %>
-      <div class="alert alert-error">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-        </svg>
-        <ul class="list-disc list-inside">
-          <% @page.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
+    <!-- Header -->
+    <div class="px-8 pt-8 pb-6" style="border-bottom: 1px solid var(--color-cream-200); background: linear-gradient(to bottom, var(--color-cream-50), #fff);">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600)); box-shadow: 0 4px 12px -2px rgba(217, 119, 6, 0.3);">
+          <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="font-semibold" style="font-family: var(--font-serif); font-size: 1.5rem; color: var(--color-ink-950); letter-spacing: -0.02em;">Add New Page</h1>
+          <p class="mt-1" style="color: var(--color-ink-500); font-size: 0.9375rem;">Configure a page to capture visual snapshots from <span class="font-medium" style="color: var(--color-ink-700);"><%= @project.base_url %></span></p>
+        </div>
       </div>
+    </div>
+
+    <!-- Form -->
+    <%= form_with model: @page, url: dashboard_project_pages_path(@project), method: :post do |f| %>
+
+      <!-- Error Messages -->
+      <% if @page.errors.any? %>
+        <div class="mx-8 mt-6 p-4 rounded-xl flex items-start gap-3" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.15);">
+          <div class="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5" style="background: var(--color-error-500);">
+            <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-sm" style="color: var(--color-error-700);">Please fix the following errors:</p>
+            <ul class="mt-1 space-y-1" style="color: var(--color-error-600); font-size: 0.875rem;">
+              <% @page.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="p-8 space-y-6">
+
+        <!-- Basic Information Section -->
+        <div>
+          <h3 class="font-medium mb-4 flex items-center gap-2" style="color: var(--color-ink-800); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <span class="w-1.5 h-1.5 rounded-full" style="background: var(--color-primary-500);"></span>
+            Basic Information
+          </h3>
+
+          <div class="space-y-5">
+            <!-- Name Field -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <%= f.label :name, class: "block text-sm font-medium", style: "color: var(--color-ink-700);" %>
+                <span class="text-xs" style="color: var(--color-ink-400);">Required</span>
+              </div>
+              <%= f.text_field :name,
+                  class: "w-full px-4 py-3 rounded-xl text-[15px] transition-all focus:outline-none",
+                  style: "background: var(--color-cream-50); border: 1px solid var(--color-cream-200); color: var(--color-ink-900);",
+                  placeholder: "e.g., Homepage, Login Page, Dashboard",
+                  onfocus: "this.style.borderColor='var(--color-primary-500)'; this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.1)'; this.style.background='#fff';",
+                  onblur: "this.style.borderColor='var(--color-cream-200)'; this.style.boxShadow='none'; this.style.background='var(--color-cream-50)';" %>
+              <p class="mt-2 text-xs" style="color: var(--color-ink-400);">A friendly name to identify this page in reports</p>
+            </div>
+
+            <!-- Path Field -->
+            <div>
+              <div class="flex items-center justify-between mb-2">
+                <%= f.label :path, class: "block text-sm font-medium", style: "color: var(--color-ink-700);" %>
+                <span class="text-xs" style="color: var(--color-ink-400);">Required</span>
+              </div>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-mono" style="color: var(--color-ink-400);"><%= URI.parse(@project.base_url).host %></span>
+                <%= f.text_field :path,
+                    class: "w-full py-3 rounded-xl text-[15px] font-mono transition-all focus:outline-none",
+                    style: "background: var(--color-cream-50); border: 1px solid var(--color-cream-200); color: var(--color-ink-900); padding-left: #{URI.parse(@project.base_url).host.length * 0.55 + 1.5}rem; padding-right: 1rem;",
+                    placeholder: "/about",
+                    onfocus: "this.style.borderColor='var(--color-primary-500)'; this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.1)'; this.style.background='#fff';",
+                    onblur: "this.style.borderColor='var(--color-cream-200)'; this.style.boxShadow='none'; this.style.background='var(--color-cream-50)';" %>
+              </div>
+              <p class="mt-2 text-xs" style="color: var(--color-ink-400);">The URL path relative to your base URL</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div style="height: 1px; background: var(--color-cream-200);"></div>
+
+        <!-- Capture Settings Section -->
+        <div>
+          <h3 class="font-medium mb-4 flex items-center gap-2" style="color: var(--color-ink-800); font-size: 0.8125rem; text-transform: uppercase; letter-spacing: 0.05em;">
+            <span class="w-1.5 h-1.5 rounded-full" style="background: var(--color-ink-300);"></span>
+            Capture Settings
+            <span class="font-normal normal-case tracking-normal ml-1" style="color: var(--color-ink-400);">(Optional)</span>
+          </h3>
+
+          <div class="grid grid-cols-2 gap-5">
+            <!-- Wait For Selector -->
+            <div>
+              <%= f.label :wait_for, "Wait for Selector", class: "block text-sm font-medium mb-2", style: "color: var(--color-ink-700);" %>
+              <%= f.text_field :wait_for,
+                  class: "w-full px-4 py-3 rounded-xl text-[15px] font-mono transition-all focus:outline-none",
+                  style: "background: var(--color-cream-50); border: 1px solid var(--color-cream-200); color: var(--color-ink-900);",
+                  placeholder: "#main-content",
+                  onfocus: "this.style.borderColor='var(--color-primary-500)'; this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.1)'; this.style.background='#fff';",
+                  onblur: "this.style.borderColor='var(--color-cream-200)'; this.style.boxShadow='none'; this.style.background='var(--color-cream-50)';" %>
+              <p class="mt-2 text-xs" style="color: var(--color-ink-400);">CSS selector to wait for before capture</p>
+            </div>
+
+            <!-- Wait Time -->
+            <div>
+              <%= f.label :wait_ms, "Additional Wait", class: "block text-sm font-medium mb-2", style: "color: var(--color-ink-700);" %>
+              <div class="relative">
+                <%= f.number_field :wait_ms,
+                    min: 0, max: 30000, step: 100,
+                    class: "w-full px-4 py-3 rounded-xl text-[15px] transition-all focus:outline-none",
+                    style: "background: var(--color-cream-50); border: 1px solid var(--color-cream-200); color: var(--color-ink-900); padding-right: 3rem;",
+                    placeholder: "1000",
+                    onfocus: "this.style.borderColor='var(--color-primary-500)'; this.style.boxShadow='0 0 0 3px rgba(217,119,6,0.1)'; this.style.background='#fff';",
+                    onblur: "this.style.borderColor='var(--color-cream-200)'; this.style.boxShadow='none'; this.style.background='var(--color-cream-50)';" %>
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-medium" style="color: var(--color-ink-400);">ms</span>
+              </div>
+              <p class="mt-2 text-xs" style="color: var(--color-ink-400);">Extra wait time after page load</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Footer -->
+      <div class="px-8 py-5 flex items-center justify-between" style="background: var(--color-cream-50); border-top: 1px solid var(--color-cream-200);">
+        <p class="text-xs" style="color: var(--color-ink-400);">
+          <svg class="w-4 h-4 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/>
+          </svg>
+          You can edit these settings later
+        </p>
+        <div class="flex items-center gap-3">
+          <%= link_to "Cancel", dashboard_project_pages_path(@project), class: "px-5 py-2.5 rounded-full text-sm font-medium transition-all", style: "color: var(--color-ink-600); background: transparent; border: 1px solid var(--color-cream-300);", onmouseover: "this.style.background='var(--color-cream-100)'; this.style.borderColor='var(--color-cream-400)';", onmouseout: "this.style.background='transparent'; this.style.borderColor='var(--color-cream-300)';" %>
+          <%= f.submit "Create Page", class: "px-6 py-2.5 rounded-full text-sm font-medium text-white cursor-pointer transition-all", style: "background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600)); box-shadow: 0 2px 8px -2px rgba(217,119,6,0.4);", onmouseover: "this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px -2px rgba(217,119,6,0.5)';", onmouseout: "this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px -2px rgba(217,119,6,0.4)';" %>
+        </div>
+      </div>
+
     <% end %>
+  </div>
 
+  <!-- Help Card -->
+  <div class="mt-6 p-5 rounded-xl flex items-start gap-4" style="background: var(--color-cream-100); border: 1px solid var(--color-cream-200);">
+    <div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background: #fff; border: 1px solid var(--color-cream-200);">
+      <svg class="w-5 h-5" style="color: var(--color-ink-500);" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"/>
+      </svg>
+    </div>
     <div>
-      <%= f.label :name, class: "label" %>
-      <%= f.text_field :name, class: "input", placeholder: "Homepage" %>
+      <h4 class="font-medium text-sm" style="color: var(--color-ink-800);">Pro tip</h4>
+      <p class="mt-1 text-sm leading-relaxed" style="color: var(--color-ink-500);">
+        Use the "Wait for Selector" option when your page has dynamic content that loads after the initial page load.
+        This ensures Vision captures the page only after your key elements are visible.
+      </p>
     </div>
-
-    <div>
-      <%= f.label :path, class: "label" %>
-      <%= f.text_field :path, class: "input", placeholder: "/" %>
-      <p class="mt-2 text-xs text-stone-500">Relative path from base URL (<%= @project.base_url %>)</p>
-    </div>
-
-    <div>
-      <%= f.label :wait_for, "Wait For Selector", class: "label" %>
-      <%= f.text_field :wait_for, class: "input", placeholder: "#main-content" %>
-      <p class="mt-2 text-xs text-stone-500">CSS selector to wait for before capturing</p>
-    </div>
-
-    <div>
-      <%= f.label :wait_ms, "Wait Time (ms)", class: "label" %>
-      <%= f.number_field :wait_ms, min: 0, max: 30000, step: 100, class: "input w-32", placeholder: "1000" %>
-      <p class="mt-2 text-xs text-stone-500">Additional wait time after page load</p>
-    </div>
-
-    <div class="pt-4 flex gap-4">
-      <%= f.submit "Create Page", class: "btn-primary flex-1" %>
-      <%= link_to "Cancel", dashboard_project_pages_path(@project), class: "btn-secondary" %>
-    </div>
-  <% end %>
+  </div>
 </div>

@@ -4,7 +4,7 @@ module Dashboard
     before_action :set_page, only: [:show, :edit, :update, :destroy]
 
     def index
-      @pages = @project.pages.ordered
+      @pages = @project.pages.includes(:latest_snapshot).ordered
     end
 
     def show

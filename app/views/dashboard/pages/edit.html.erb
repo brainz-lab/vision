@@ -1,62 +1,370 @@
 <% content_for(:title) { "Edit #{@page.name}" } %>
 
-<div class="max-w-lg">
-  <div class="mb-8">
-    <%= link_to dashboard_project_page_path(@project, @page), class: "btn-ghost text-sm" do %>
-      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+<style>
+  :root {
+    --claude-orange: #D97757;
+    --claude-orange-light: #E8A68F;
+    --claude-orange-dark: #C4593D;
+    --claude-cream: #FBF8F3;
+    --claude-cream-dark: #F4EDE3;
+    --claude-brown: #1C1917;
+    --claude-brown-light: #44403C;
+    --claude-brown-muted: #78716C;
+    --claude-border: #E7E0D6;
+    --claude-success: #16A34A;
+    --claude-error: #DC2626;
+  }
+
+  .claude-input {
+    background: white;
+    border: 1px solid var(--claude-border);
+    border-radius: 12px;
+    padding: 14px 18px;
+    font-size: 15px;
+    color: var(--claude-brown);
+    transition: all 0.2s ease;
+    width: 100%;
+  }
+
+  .claude-input:focus {
+    outline: none;
+    border-color: var(--claude-orange);
+    box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.12);
+  }
+
+  .claude-input::placeholder {
+    color: var(--claude-brown-muted);
+  }
+
+  .claude-toggle {
+    position: relative;
+    width: 52px;
+    height: 28px;
+    background: #D1D5DB;
+    border-radius: 14px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .claude-toggle.active {
+    background: var(--claude-success);
+  }
+
+  .claude-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease;
+  }
+
+  .claude-toggle.active::after {
+    transform: translateX(24px);
+  }
+
+  .claude-btn-primary {
+    background: var(--claude-orange);
+    color: white;
+    border: none;
+    border-radius: 9999px;
+    padding: 12px 28px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .claude-btn-primary:hover {
+    background: var(--claude-orange-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(217, 119, 87, 0.3);
+  }
+
+  .claude-btn-secondary {
+    background: transparent;
+    color: var(--claude-brown-light);
+    border: 1px solid var(--claude-border);
+    border-radius: 9999px;
+    padding: 11px 24px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .claude-btn-secondary:hover {
+    background: var(--claude-cream-dark);
+    border-color: #D1CBC0;
+  }
+
+  .claude-card {
+    background: white;
+    border: 1px solid var(--claude-border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  .claude-section-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--claude-brown-muted);
+    margin-bottom: 16px;
+  }
+
+  .claude-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--claude-brown-light);
+    margin-bottom: 8px;
+  }
+
+  .claude-hint {
+    font-size: 13px;
+    color: var(--claude-brown-muted);
+    margin-top: 8px;
+  }
+
+  .claude-stat {
+    text-align: center;
+  }
+
+  .claude-stat-value {
+    font-family: var(--font-serif), Georgia, serif;
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--claude-brown);
+    letter-spacing: -0.02em;
+  }
+
+  .claude-stat-label {
+    font-size: 12px;
+    color: var(--claude-brown-muted);
+    margin-top: 4px;
+  }
+</style>
+
+<div class="max-w-2xl mx-auto">
+  <!-- Breadcrumb -->
+  <nav class="mb-8">
+    <%= link_to dashboard_project_page_path(@project, @page), class: "inline-flex items-center gap-2 text-sm font-medium transition-colors hover:opacity-70", style: "color: var(--claude-brown-muted);" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
       </svg>
-      Back to Page
+      Back to page
+    <% end %>
+  </nav>
+
+  <!-- Main Card -->
+  <div class="claude-card">
+    <!-- Header -->
+    <div class="px-8 py-8" style="background: linear-gradient(180deg, var(--claude-cream) 0%, white 100%); border-bottom: 1px solid var(--claude-border);">
+      <div class="flex items-center gap-5">
+        <!-- Icon -->
+        <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, var(--claude-orange) 0%, var(--claude-orange-dark) 100%); box-shadow: 0 6px 16px -4px rgba(217, 119, 87, 0.4);">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/>
+          </svg>
+        </div>
+
+        <div class="flex-1">
+          <div class="flex items-center gap-3">
+            <h1 style="font-family: var(--font-serif), Georgia, serif; font-size: 1.75rem; font-weight: 600; color: var(--claude-brown); letter-spacing: -0.025em;">
+              Edit Page
+            </h1>
+            <% if @page.enabled? %>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" style="background: rgba(22, 163, 74, 0.1); color: var(--claude-success);">
+                <span class="w-1.5 h-1.5 rounded-full" style="background: currentColor;"></span>
+                Active
+              </span>
+            <% else %>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium" style="background: var(--claude-cream-dark); color: var(--claude-brown-muted);">
+                <span class="w-1.5 h-1.5 rounded-full" style="background: currentColor;"></span>
+                Disabled
+              </span>
+            <% end %>
+          </div>
+          <p class="mt-2 font-mono text-sm" style="color: var(--claude-brown-muted);">
+            <%= @project.base_url %><%= @page.path %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <%= form_with model: @page, url: dashboard_project_page_path(@project, @page), method: :patch do |f| %>
+
+      <!-- Error Messages -->
+      <% if @page.errors.any? %>
+        <div class="mx-8 mt-6 p-5 rounded-xl flex items-start gap-4" style="background: rgba(220, 38, 38, 0.06); border: 1px solid rgba(220, 38, 38, 0.12);">
+          <div class="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0" style="background: var(--claude-error);">
+            <svg class="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </div>
+          <div>
+            <p class="font-medium text-sm" style="color: var(--claude-error);">Please fix the following:</p>
+            <ul class="mt-2 space-y-1 text-sm" style="color: #B91C1C;">
+              <% @page.errors.full_messages.each do |msg| %>
+                <li>&bull; <%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="p-8 space-y-8">
+        <!-- Basic Information -->
+        <section>
+          <h3 class="claude-section-title">Basic Information</h3>
+
+          <div class="space-y-6">
+            <!-- Name Field -->
+            <div>
+              <label class="claude-label">
+                Page Name
+                <span class="font-normal" style="color: var(--claude-brown-muted);">*</span>
+              </label>
+              <%= f.text_field :name, class: "claude-input", placeholder: "e.g., Homepage, Login Page" %>
+              <p class="claude-hint">A descriptive name to identify this page in your reports</p>
+            </div>
+
+            <!-- Path Field -->
+            <div>
+              <label class="claude-label">
+                URL Path
+                <span class="font-normal" style="color: var(--claude-brown-muted);">*</span>
+              </label>
+              <div class="relative">
+                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-mono" style="color: var(--claude-brown-muted);">
+                  <%= URI.parse(@project.base_url).host %>
+                </span>
+                <%= f.text_field :path,
+                    class: "claude-input font-mono",
+                    style: "padding-left: #{URI.parse(@project.base_url).host.length * 0.52 + 1.5}rem;",
+                    placeholder: "/about" %>
+              </div>
+              <p class="claude-hint">The path relative to your project's base URL</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Divider -->
+        <div style="height: 1px; background: var(--claude-border);"></div>
+
+        <!-- Capture Settings -->
+        <section>
+          <h3 class="claude-section-title">Capture Settings</h3>
+
+          <div class="grid grid-cols-2 gap-6">
+            <!-- Wait For Selector -->
+            <div>
+              <label class="claude-label">Wait for Selector</label>
+              <%= f.text_field :wait_for, class: "claude-input font-mono", placeholder: "#main-content" %>
+              <p class="claude-hint">CSS selector to wait for</p>
+            </div>
+
+            <!-- Wait Time -->
+            <div>
+              <label class="claude-label">Additional Wait</label>
+              <div class="relative">
+                <%= f.number_field :wait_ms, min: 0, max: 30000, step: 100, class: "claude-input", style: "padding-right: 3.5rem;", placeholder: "0" %>
+                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-medium" style="color: var(--claude-brown-muted);">ms</span>
+              </div>
+              <p class="claude-hint">Extra time after page load</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Divider -->
+        <div style="height: 1px; background: var(--claude-border);"></div>
+
+        <!-- Status -->
+        <section>
+          <h3 class="claude-section-title">Status</h3>
+
+          <label class="flex items-center gap-4 p-5 rounded-xl cursor-pointer transition-all" style="background: var(--claude-cream); border: 1px solid transparent;" onmouseover="this.style.borderColor='var(--claude-border)';" onmouseout="this.style.borderColor='transparent';">
+            <div class="flex-1">
+              <span class="block text-sm font-medium" style="color: var(--claude-brown);">Enable this page</span>
+              <span class="block text-sm mt-1" style="color: var(--claude-brown-muted);">When disabled, this page will be skipped during test runs</span>
+            </div>
+            <div class="relative">
+              <%= f.check_box :enabled, class: "sr-only peer", id: "enabled_toggle" %>
+              <div class="claude-toggle peer-checked:active" onclick="this.classList.toggle('active')"></div>
+            </div>
+          </label>
+        </section>
+      </div>
+
+      <!-- Footer -->
+      <div class="px-8 py-6 flex items-center justify-between" style="background: var(--claude-cream); border-top: 1px solid var(--claude-border);">
+        <div>
+          <%= link_to dashboard_project_page_path(@project, @page),
+              data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this page? This action cannot be undone." },
+              class: "inline-flex items-center gap-2 text-sm font-medium transition-all rounded-lg px-3 py-2 -ml-3",
+              style: "color: var(--claude-error);",
+              onmouseover: "this.style.background='rgba(220,38,38,0.08)';",
+              onmouseout: "this.style.background='transparent';" do %>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.75">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"/>
+            </svg>
+            Delete page
+          <% end %>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <%= link_to "Cancel", dashboard_project_page_path(@project, @page), class: "claude-btn-secondary" %>
+          <%= f.submit "Save Changes", class: "claude-btn-primary" %>
+        </div>
+      </div>
     <% end %>
   </div>
 
-  <h1 class="section-header mb-8">Edit Page</h1>
-
-  <%= form_with model: @page, url: dashboard_project_page_path(@project, @page), method: :patch, class: "space-y-6" do |f| %>
-    <% if @page.errors.any? %>
-      <div class="alert alert-error">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
-        </svg>
-        <ul class="list-disc list-inside">
-          <% @page.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
-          <% end %>
-        </ul>
+  <!-- Stats -->
+  <div class="mt-6 p-6 rounded-2xl" style="background: var(--claude-cream); border: 1px solid var(--claude-border);">
+    <div class="grid grid-cols-3 gap-8">
+      <div class="claude-stat">
+        <p class="claude-stat-value"><%= @page.baselines_count %></p>
+        <p class="claude-stat-label">Baselines</p>
       </div>
-    <% end %>
-
-    <div>
-      <%= f.label :name, class: "label" %>
-      <%= f.text_field :name, class: "input" %>
+      <div class="claude-stat" style="border-left: 1px solid var(--claude-border); border-right: 1px solid var(--claude-border);">
+        <p class="claude-stat-value"><%= @page.snapshots.count %></p>
+        <p class="claude-stat-label">Snapshots</p>
+      </div>
+      <div class="claude-stat">
+        <% if @page.latest_snapshot %>
+          <p class="claude-stat-value" style="font-size: 16px; padding-top: 6px;"><%= time_ago_in_words(@page.latest_snapshot.created_at) %></p>
+        <% else %>
+          <p class="claude-stat-value" style="font-size: 16px; padding-top: 6px; color: var(--claude-brown-muted);">Never</p>
+        <% end %>
+        <p class="claude-stat-label">Last Captured</p>
+      </div>
     </div>
-
-    <div>
-      <%= f.label :path, class: "label" %>
-      <%= f.text_field :path, class: "input", placeholder: "/about" %>
-      <p class="mt-2 text-xs text-stone-500">Relative path from base URL</p>
-    </div>
-
-    <div>
-      <%= f.label :wait_for, "Wait For Selector", class: "label" %>
-      <%= f.text_field :wait_for, class: "input", placeholder: "#main-content" %>
-      <p class="mt-2 text-xs text-stone-500">CSS selector to wait for before capturing</p>
-    </div>
-
-    <div>
-      <%= f.label :wait_ms, "Wait Time (ms)", class: "label" %>
-      <%= f.number_field :wait_ms, min: 0, max: 30000, step: 100, class: "input w-32", placeholder: "1000" %>
-      <p class="mt-2 text-xs text-stone-500">Additional wait time after page load</p>
-    </div>
-
-    <div class="flex items-center gap-3">
-      <%= f.check_box :enabled, class: "rounded border-stone-300 text-amber-600 focus:ring-amber-500" %>
-      <%= f.label :enabled, "Enabled", class: "text-sm font-medium text-stone-900" %>
-    </div>
-
-    <div class="pt-4 flex gap-4">
-      <%= f.submit "Save Changes", class: "btn-primary flex-1" %>
-      <%= link_to "Cancel", dashboard_project_page_path(@project, @page), class: "btn-secondary" %>
-    </div>
-  <% end %>
+  </div>
 </div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const checkbox = document.getElementById('enabled_toggle');
+    const toggle = checkbox.nextElementSibling;
+
+    // Initialize toggle state
+    if (checkbox.checked) {
+      toggle.classList.add('active');
+    }
+
+    // Handle toggle click
+    toggle.addEventListener('click', function() {
+      checkbox.checked = !checkbox.checked;
+    });
+  });
+</script>

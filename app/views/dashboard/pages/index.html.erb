@@ -36,11 +36,11 @@
                 <%= page.path %>
               </td>
               <td class="text-stone-600">
-                <%= page.baselines.count %>
+                <%= page.baselines_count %>
               </td>
               <td class="text-stone-600">
-                <% if page.snapshots.any? %>
-                  <%= time_ago_in_words(page.snapshots.recent.first.created_at) %> ago
+                <% if page.latest_snapshot %>
+                  <%= time_ago_in_words(page.latest_snapshot.created_at) %> ago
                 <% else %>
                   <span class="text-stone-400">Never</span>
                 <% end %>

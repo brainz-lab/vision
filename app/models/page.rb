@@ -3,6 +3,7 @@ class Page < ApplicationRecord
 
   has_many :baselines, dependent: :destroy
   has_many :snapshots, dependent: :destroy
+  has_one :latest_snapshot, -> { order(Arel.sql("COALESCE(captured_at, created_at) DESC")) }, class_name: "Snapshot"
 
   validates :name, presence: true
   validates :path, presence: true

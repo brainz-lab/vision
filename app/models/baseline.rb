@@ -1,5 +1,5 @@
 class Baseline < ApplicationRecord
-  belongs_to :page
+  belongs_to :page, counter_cache: true
   belongs_to :browser_config
 
   has_many :comparisons, dependent: :destroy
