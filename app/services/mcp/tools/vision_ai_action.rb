@@ -48,7 +48,12 @@ module Mcp
         url = args[:url]
         keep_session = args.fetch(:keep_session, false)
 
-        # Get or create session
+        # Use worker pool for quick one-off AI actions (no session_id, not keeping session)
+        if session_id.blank? && !keep_session
+          return execute_with_worker_pool(instruction, url, args[:model])
+        end
+
+        # For persistent sessions, use BrowserSessionManager
         manager = BrowserSessionManager.new(project)
 
         if session_id.present?
@@ -116,6 +121,48 @@ module Mcp
         error("Session not found: #{session_id}")
       rescue => e
         error("Failed to execute AI action: #{e.message}")
+      end
+
+      private
+
+      # Execute AI action using worker pool for fast, stateless operations
+      def execute_with_worker_pool(instruction, url, model)
+        raise ArgumentError, "url is required for new AI actions" unless url.present?
+
+        result = nil
+
+        VisionWorkerPool.with_worker do |worker|
+          # Navigate to URL
+          worker.navigate(worker.session_id, url)
+          sleep(0.5) # Wait for page load
+
+          # Get LLM
+          llm = LlmProviders::Factory.for_project(
+            project,
+            model: model || project.default_llm_model
+          )
+
+          # Execute the AI action using the worker as browser
+          executor = Ai::ActionExecutor.new(
+            browser: worker,
+            session_id: worker.session_id,
+            llm: llm,
+            project: project
+          )
+
+          result = executor.execute(instruction)
+        end
+
+        success({
+          success: result[:success] != false,
+          action: result[:action],
+          selector: result[:selector],
+          value: result[:value],
+          url: result[:url],
+          reasoning: result[:reasoning],
+          error: result[:error],
+          pooled: true  # Indicates worker pool was used
+        })
       end
     end
   end

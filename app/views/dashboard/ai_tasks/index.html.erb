@@ -3,76 +3,74 @@
 <div class="space-y-8">
   <div class="flex items-center justify-between">
     <div>
-      <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;">AI Tasks</h1>
-      <p class="mt-1 text-[13px]" style="color: #8B8780;">Autonomous browser automation tasks</p>
+      <h1 class="section-header">AI Tasks</h1>
+      <p class="section-subheader">Autonomous browser automation tasks</p>
     </div>
   </div>
 
   <% if @tasks.any? %>
-    <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <table class="min-w-full">
+    <div class="card overflow-hidden">
+      <table class="table">
         <thead>
-          <tr style="border-bottom: 1px solid #E8E5E0;">
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Task</th>
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Status</th>
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Model</th>
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Steps</th>
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Tokens</th>
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Duration</th>
-            <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Created</th>
+          <tr>
+            <th>Task</th>
+            <th>Status</th>
+            <th>Model</th>
+            <th>Steps</th>
+            <th>Tokens</th>
+            <th>Duration</th>
+            <th>Created</th>
           </tr>
         </thead>
         <tbody>
-          <% @tasks.each_with_index do |task, index| %>
-            <tr style="<%= index < @tasks.size - 1 ? 'border-bottom: 1px solid #E8E5E0;' : '' %>" class="hover:bg-[#FAF9F7] transition-colors">
-              <td class="px-5 py-4">
+          <% @tasks.each do |task| %>
+            <tr class="hover:bg-stone-50 transition-colors">
+              <td>
                 <%= link_to dashboard_project_ai_task_path(@project, task), class: "block" do %>
-                  <p class="text-[14px] font-medium truncate max-w-md" style="color: #1A1A1A;"><%= task.instruction.truncate(60) %></p>
+                  <p class="font-medium truncate max-w-md text-stone-900"><%= task.instruction.truncate(60) %></p>
                   <% if task.start_url.present? %>
-                    <p class="text-[12px] mt-0.5 truncate max-w-md" style="color: #8B8780;"><%= task.start_url.truncate(50) %></p>
+                    <p class="text-xs mt-0.5 truncate max-w-md text-stone-500"><%= task.start_url.truncate(50) %></p>
                   <% end %>
                 <% end %>
               </td>
-              <td class="px-5 py-4">
+              <td>
                 <% case task.status %>
                 <% when 'pending' %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #F0EFED; color: #6B6760;">Pending</span>
+                  <span class="badge badge-neutral">Pending</span>
                 <% when 'running' %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #DBEAFE; color: #1E40AF;">Running</span>
+                  <span class="badge badge-info">Running</span>
                 <% when 'completed' %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #D1FAE5; color: #065F46;">Completed</span>
+                  <span class="badge badge-success">Completed</span>
                 <% when 'stopped' %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #FEF3C7; color: #92400E;">Stopped</span>
-                <% when 'timeout' %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #FEE2E2; color: #991B1B;">Timeout</span>
-                <% when 'error' %>
-                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #FEE2E2; color: #991B1B;">Error</span>
+                  <span class="badge badge-warning">Stopped</span>
+                <% when 'timeout', 'error' %>
+                  <span class="badge badge-error"><%= task.status.capitalize %></span>
                 <% end %>
               </td>
-              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+              <td class="text-stone-600">
                 <%= task.model %>
               </td>
-              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+              <td class="text-stone-600">
                 <%= task.steps_executed %>/<%= task.max_steps %>
               </td>
-              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+              <td class="text-stone-600">
                 <% if task.total_tokens > 0 %>
                   <%= number_with_delimiter(task.total_tokens) %>
-                  <span class="text-[11px]" style="color: #8B8780;">
+                  <span class="text-xs text-stone-500">
                     (<%= number_with_delimiter(task.total_input_tokens || 0) %>/<%= number_with_delimiter(task.total_output_tokens || 0) %>)
                   </span>
                 <% else %>
                   -
                 <% end %>
               </td>
-              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+              <td class="text-stone-600">
                 <% if task.duration_ms %>
                   <%= (task.duration_ms / 1000.0).round(1) %>s
                 <% else %>
                   -
                 <% end %>
               </td>
-              <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+              <td class="text-stone-600">
                 <%= time_ago_in_words(task.created_at) %> ago
               </td>
             </tr>
@@ -81,13 +79,15 @@
       </table>
     </div>
   <% else %>
-    <div class="text-center py-16 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="space-y-3">
-        <svg class="mx-auto w-12 h-12" style="color: #C4C1BC;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-        </svg>
-        <p class="text-[15px]" style="color: #6B6760;">No AI tasks yet</p>
-        <p class="text-[13px]" style="color: #8B8780;">Tasks are created via MCP tools or the API</p>
+    <div class="card">
+      <div class="empty-state py-16">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-gradient-to-br from-amber-100 to-stone-200">
+          <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <h3 class="empty-state-title">No AI tasks yet</h3>
+        <p class="empty-state-description">Tasks are created via MCP tools or the API</p>
       </div>
     </div>
   <% end %>

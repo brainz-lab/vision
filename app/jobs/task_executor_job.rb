@@ -32,6 +32,9 @@ class TaskExecutorJob < ApplicationJob
       # Set up progress callbacks
       setup_callbacks(executor, task)
 
+      # Set up credential login if configured
+      setup_credential_login(executor, task)
+
       # Execute the task
       executor.execute!
     end
@@ -120,5 +123,50 @@ class TaskExecutorJob < ApplicationJob
     )
   rescue => e
     Rails.logger.warn "Failed to broadcast complete: #{e.message}"
+  end
+
+  # Set up credential login callback if task has auto_login enabled
+  def setup_credential_login(executor, task)
+    return unless task.metadata&.dig("auto_login")
+
+    credential_id = task.metadata&.dig("credential_id")
+    return unless credential_id
+
+    credential = Credential.find_by(id: credential_id)
+    return unless credential
+
+    executor.before_execute do |browser, session|
+      perform_credential_login(task, credential, browser, session)
+    end
+  end
+
+  def perform_credential_login(task, credential, browser, session)
+    session_id = session&.provider_session_id
+
+    return unless session_id
+
+    injector = Ai::CredentialInjector.new(
+      browser: browser,
+      session_id: session_id,
+      project: task.project
+    )
+
+    result = injector.login(credential, navigate: true, submit: true)
+
+    Rails.logger.info "Credential login result: #{result}"
+
+    # Record login step in task
+    task.steps.create!(
+      position: 0,
+      action: "credential_login",
+      selector: nil,
+      value: credential.name,
+      action_data: { credential_name: credential.name, credential_type: credential.credential_type },
+      success: result[:success],
+      error_message: result[:error],
+      reasoning: "Automatic login using stored credential"
+    )
+  rescue => e
+    Rails.logger.error "Credential login failed: #{e.message}"
   end
 end

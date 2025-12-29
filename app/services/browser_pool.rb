@@ -2,6 +2,7 @@
 # to efficiently share browser resources across multiple screenshot captures.
 
 require 'connection_pool'
+require 'playwright'
 
 class BrowserPool
   POOL_SIZE = ENV.fetch('BROWSER_POOL_SIZE', 5).to_i
@@ -49,22 +50,25 @@ class BrowserPool
     end
 
     def create_browser_context(browser_config)
-      playwright = Playwright.create(playwright_cli_executable_path: find_playwright_path)
+      execution = Playwright.create(playwright_cli_executable_path: find_playwright_path)
+      playwright = execution.playwright
       browser = playwright.send(browser_config.browser.to_sym).launch(
         headless: true,
         args: ['--no-sandbox', '--disable-setuid-sandbox']
       )
 
-      browser.new_context(
+      context_options = {
         viewport: {
           width: browser_config.width,
           height: browser_config.height
-        },
-        device_scale_factor: browser_config.device_scale_factor || 1.0,
-        is_mobile: browser_config.is_mobile || false,
-        has_touch: browser_config.has_touch || false,
-        user_agent: browser_config.user_agent
-      )
+        }
+      }
+      context_options[:deviceScaleFactor] = browser_config.device_scale_factor if browser_config.device_scale_factor
+      context_options[:isMobile] = browser_config.is_mobile if browser_config.is_mobile
+      context_options[:hasTouch] = browser_config.has_touch if browser_config.has_touch
+      context_options[:userAgent] = browser_config.user_agent if browser_config.user_agent
+
+      browser.new_context(**context_options)
     end
 
     def find_playwright_path

@@ -6,7 +6,7 @@ class TaskStep < ApplicationRecord
   has_one_attached :screenshot
 
   # Action types
-  ACTIONS = %w[click type fill navigate scroll scroll_into_view hover select wait press extract done].freeze
+  ACTIONS = %w[click type fill navigate scroll scroll_into_view hover select wait press extract done screenshot credential_login goto go_to_url].freeze
 
   # Validations
   validates :position, presence: true, numericality: { greater_than_or_equal_to: 0 }

@@ -3,15 +3,29 @@
 module Ai
   # Core AI task executor that orchestrates browser automation
   # Main execution loop: capture state -> LLM decision -> execute action -> repeat
+  #
+  # Supports two modes:
+  # 1. Injected browser (from VisionWorkerPool) - pre-warmed, fast, for sync MCP calls
+  # 2. Self-created browser (for background jobs) - creates own session
+  #
+  # Usage with worker pool:
+  #   VisionWorkerPool.with_worker do |worker|
+  #     executor = Ai::TaskExecutor.new(task, browser: worker)
+  #     executor.execute!
+  #   end
+  #
   class TaskExecutor
     MAX_CONSECUTIVE_FAILURES = 5  # Increased from 3 for more resilience
     MAX_RETRIES_PER_ACTION = 2
 
     attr_reader :task, :project, :llm, :browser, :session
 
-    def initialize(task)
+    # @param task [AiTask] The task to execute
+    # @param browser [VisionWorker, BrowserProviders::Base, nil] Optional pre-warmed browser
+    def initialize(task, browser: nil)
       @task = task
       @project = task.project
+      @injected_browser = browser  # Pre-warmed worker from pool
       @callbacks = { step: [], progress: [], complete: [] }
       @consecutive_failures = 0
       @last_error = nil
@@ -92,7 +106,15 @@ module Ai
 
           # Ask LLM for next action
           decision = decide_next_action(state)
-          Rails.logger.info "[TaskExecutor] Decision: #{decision[:action][:type]} - #{decision[:action][:selector]&.truncate(50) || decision[:action][:value]}"
+          action = decision[:action]
+          action_info = if action[:ref]
+            "#{action[:ref]} -> (#{action[:x]}, #{action[:y]})"
+          elsif action[:x] && action[:y]
+            "coords(#{action[:x]}, #{action[:y]})"
+          else
+            action[:selector]&.truncate(50) || action[:value]
+          end
+          Rails.logger.info "[TaskExecutor] Decision: #{action[:type]} - #{action_info}"
           Rails.logger.info "[TaskExecutor] Reasoning: #{decision[:reasoning]&.truncate(100)}"
 
           # Check if task is complete
@@ -169,29 +191,74 @@ module Ai
       # Initialize LLM provider
       @llm = LlmProviders::Factory.for_project(project, model: task.model)
 
-      # Initialize browser provider
-      @browser = BrowserProviders::Factory.for_project(project, provider_override: task.browser_provider)
+      if @injected_browser
+        # Use pre-warmed worker from VisionWorkerPool
+        @browser = @injected_browser
 
-      # Create browser session
-      session_result = @browser.create_session(
-        viewport: task.viewport,
-        headless: true
-      )
+        # Configure viewport if needed
+        @browser.create_session(viewport: task.viewport) if @browser.respond_to?(:create_session)
 
-      @session = project.browser_sessions.create!(
-        provider_session_id: session_result[:session_id],
-        browser_provider: task.browser_provider,
-        status: "active",
-        start_url: task.start_url,
-        viewport: task.viewport,
-        metadata: session_result.except(:session_id, :provider)
-      )
+        # Create a lightweight session wrapper for compatibility
+        # Pooled workers don't persist session to DB
+        @session = PooledSession.new(
+          provider_session_id: @browser.session_id,
+          browser_provider: "pool_worker",
+          start_url: task.start_url,
+          viewport: task.viewport
+        )
 
-      # Link session to task for isolation tracking
-      task.update!(browser_session: @session)
+        Rails.logger.info "[TaskExecutor] Using pooled worker #{@browser.session_id}"
+      else
+        # Create own browser (for background jobs)
+        @browser = BrowserProviders::Factory.for_project(project, provider_override: task.browser_provider)
+
+        session_result = @browser.create_session(
+          viewport: task.viewport,
+          headless: true
+        )
+
+        @session = project.browser_sessions.create!(
+          provider_session_id: session_result[:session_id],
+          browser_provider: task.browser_provider,
+          status: "active",
+          start_url: task.start_url,
+          viewport: task.viewport,
+          metadata: session_result.except(:session_id, :provider)
+        )
+
+        # Link session to task for isolation tracking
+        task.update!(browser_session: @session)
+
+        Rails.logger.info "[TaskExecutor] Created browser session #{@session.id}"
+      end
+    end
+
+    # Lightweight session wrapper for pooled workers
+    # Implements the minimal interface needed by TaskExecutor without DB persistence
+    class PooledSession
+      attr_reader :provider_session_id, :browser_provider, :start_url, :viewport, :current_url
+
+      def initialize(provider_session_id:, browser_provider:, start_url:, viewport:)
+        @provider_session_id = provider_session_id
+        @browser_provider = browser_provider
+        @start_url = start_url
+        @viewport = viewport
+        @current_url = start_url
+      end
+
+      def update_state!(url:)
+        @current_url = url
+      end
+
+      def close!
+        # No-op for pooled sessions - worker handles cleanup
+      end
     end
 
     def cleanup!
+      # Don't cleanup injected browsers - the pool handles that
+      return if @injected_browser
+
       if @session && @browser
         begin
           @browser.close_session(@session.provider_session_id)
@@ -204,14 +271,23 @@ module Ai
 
     def capture_state
       screenshot_result = @browser.screenshot(@session.provider_session_id, full_page: false)
-      html = @browser.page_content(@session.provider_session_id, format: :html)
+
+      # Extract elements with refs and bounding boxes (preferred method)
+      refs_result = @browser.extract_elements_with_refs(@session.provider_session_id)
+      @element_refs = refs_result[:elements]  # Store for ref resolution
+      viewport = refs_result[:viewport]
+
+      # Log element extraction for debugging
+      checkbox_refs = @element_refs.select { |el| el[:type] == "checkbox" }
+      Rails.logger.info "[TaskExecutor] Extracted #{@element_refs.count} elements (#{checkbox_refs.count} checkboxes)"
+      checkbox_refs.each { |chk| Rails.logger.info "[TaskExecutor] Checkbox: #{chk[:ref]} - \"#{chk[:text]}\" at (#{chk[:x]}, #{chk[:y]})" }
 
       {
         url: current_url,
         title: @browser.current_title(@session.provider_session_id),
         screenshot: screenshot_result[:data],
-        html: html,
-        interactive_elements: extract_interactive_elements(html)
+        elements_with_refs: @element_refs,
+        viewport: viewport
       }
     end
 
@@ -239,7 +315,16 @@ module Ai
     def build_action_prompt(state)
       # Use cached steps to avoid N+1 query - get last 5 from cache
       previous_steps = @cached_steps.last(5).map do |s|
-        "- #{s[:action]}: #{s[:selector] || s[:value]} (#{s[:success] ? 'success' : 'failed'})"
+        ref_or_target = s[:ref] || s[:selector] || s[:value]
+        "- #{s[:action]}: #{ref_or_target} (#{s[:success] ? 'success' : 'failed'})"
+      end.join("\n")
+
+      viewport = state[:viewport] || { width: 1280, height: 720 }
+
+      # Format elements with refs for the prompt
+      elements_list = (state[:elements_with_refs] || []).first(40).map do |el|
+        checked_indicator = el[:checked] ? " ✓" : ""
+        "#{el[:ref]}: \"#{el[:text].to_s.truncate(30)}\"#{checked_indicator} at (#{el[:x]}, #{el[:y]})"
       end.join("\n")
 
       <<~PROMPT
@@ -249,51 +334,38 @@ module Ai
         CURRENT STATE:
         URL: #{state[:url]}
         Title: #{state[:title]}
-        Steps taken: #{@steps_executed_count} / #{task.max_steps} max
+        Viewport: #{viewport[:width]}x#{viewport[:height]}
+        Steps: #{@steps_executed_count}/#{task.max_steps}
 
         #{previous_steps.present? ? "Recent actions:\n#{previous_steps}" : ""}
 
-        INTERACTIVE ELEMENTS (index. tag[id/class] - text):
-        #{state[:interactive_elements].first(40).map { |e|
-          id_class = [e[:id], e[:class]].compact.join(" ").truncate(30)
-          "#{e[:index]}. #{e[:tag]}#{id_class.present? ? "[#{id_class}]" : ""} - #{e[:text].to_s.truncate(40)}"
-        }.join("\n")}
+        INTERACTIVE ELEMENTS (ref: "text" at coordinates):
+        #{elements_list}
 
-        RESPOND WITH JSON ONLY:
+        RESPOND WITH JSON:
         {
-          "thinking": "brief reasoning about what you see and what to do",
+          "thinking": "what you see and your plan",
           "action": {
-            "type": "click|type|fill|scroll|wait|press",
-            "selector": "CSS selector (e.g., '#submit', 'button:has-text(\"Login\")')",
-            "value": "for type/fill/scroll actions"
+            "type": "click|type|scroll|wait",
+            "ref": "BTN1",
+            "value": "text to type or scroll direction"
           },
           "complete": false,
           "result": null
         }
 
+        HOW TO ACT:
+        - To click: Use "ref" to specify which element (e.g., "ref": "BTN5" or "ref": "CHK1")
+        - To type: Use "ref" for the input + "value" for text (e.g., "ref": "IN1", "value": "hello")
+        - To scroll: Use "value": "page_down" or "page_up"
+        - Refs: BTN=button, LNK=link, IN=input, CHK=checkbox, SEL=select
+
         RULES:
-        1. FOCUS ON THE TASK - Do not click random links or navigation
-        2. STAY ON THIS PAGE unless the task explicitly requires navigation
-        3. Look for checkboxes, buttons, or forms related to the task
-        4. If you see an "I own this" checkbox or "Mark as owned" button, click it
-        5. After clicking a checkbox/button that completes the task, set complete=true
-        6. Do NOT click on other set links, random sets, or navigation menus
-
-        SELECTOR SYNTAX:
-        - Use Playwright selectors: button:has-text("Submit"), a:has-text("Link")
-        - NEVER use :contains() - use :has-text() instead
-        - For inputs: input[name="email"], input#id, input.class
-        - Keep selectors specific to avoid clicking wrong elements
-
-        SCROLL OPTIONS:
-        - "page_down": scroll down one screen
-        - "page_up": scroll up one screen
-        - scroll_into_view: scroll element into view (needs selector)
-
-        COMPLETION:
-        - Set complete=true when the task action is done (e.g., checkbox checked, button clicked)
-        - Set complete=true if you've searched the page and the element doesn't exist
-        - Provide result describing what was accomplished
+        1. Use the element refs provided - they map to exact screen coordinates
+        2. Stay focused on the task - don't click unrelated elements
+        3. Set complete=true when done, with result describing what happened
+        4. If element not found after scrolling, set complete=true with "not found" result
+        5. Look at the screenshot to verify element locations match the refs
       PROMPT
     end
 
@@ -306,7 +378,20 @@ module Ai
 
       action = data[:action]&.symbolize_keys || { type: "wait", value: "1000" }
 
-      # Normalize selector to fix common LLM mistakes
+      # Resolve ref to coordinates if present
+      if action[:ref].present?
+        resolved = resolve_ref(action[:ref])
+        if resolved
+          action[:x] = resolved[:x]
+          action[:y] = resolved[:y]
+          action[:resolved_text] = resolved[:text]
+          Rails.logger.info "[TaskExecutor] Resolved #{action[:ref]} to (#{action[:x]}, #{action[:y]}) - \"#{resolved[:text]}\""
+        else
+          Rails.logger.warn "[TaskExecutor] Could not resolve ref: #{action[:ref]}"
+        end
+      end
+
+      # Normalize selector to fix common LLM mistakes (fallback)
       if action[:selector].present?
         action[:selector] = normalize_selector(action[:selector])
       end
@@ -321,6 +406,21 @@ module Ai
     rescue JSON::ParserError => e
       Rails.logger.warn "Failed to parse LLM response: #{e.message}"
       { complete: false, action: { type: "wait", value: "1000" }, reasoning: "JSON parse error" }
+    end
+
+    # Resolve a ref (like BTN1, CHK2) to its coordinates
+    def resolve_ref(ref)
+      return nil unless @element_refs.present?
+
+      element = @element_refs.find { |el| el[:ref].to_s.upcase == ref.to_s.upcase }
+      return nil unless element
+
+      {
+        x: element[:x],
+        y: element[:y],
+        text: element[:text],
+        type: element[:type]
+      }
     end
 
     # Normalize selector to fix common LLM mistakes
@@ -365,11 +465,17 @@ module Ai
             sleep((action[:value].to_i.positive? ? action[:value].to_i : 1000) / 1000.0)
             { success: true }
           else
+            # Build options hash with coordinates if provided
+            options = {}
+            options[:x] = action[:x].to_f if action[:x].present?
+            options[:y] = action[:y].to_f if action[:y].present?
+
             @browser.perform_action(
               @session.provider_session_id,
               action: action[:type],
               selector: action[:selector],
-              value: action[:value]
+              value: action[:value],
+              **options
             )
           end
 
@@ -540,9 +646,14 @@ module Ai
       selectors = [
         "a", "button", "input", "select", "textarea",
         "[role='button']", "[role='checkbox']", "[role='switch']", "[role='link']",
-        "[onclick]", "[tabindex]", "[data-action]",
+        "[onclick]", "[tabindex]", "[data-action]", "[data-toggle]",
         "label[for]", ".checkbox", ".toggle", ".btn",
-        "[class*='checkbox']", "[class*='toggle']", "[class*='button']"
+        "[class*='checkbox']", "[class*='toggle']", "[class*='button']",
+        # Brickset and common site-specific selectors
+        "[class*='own']", "[class*='want']", "[class*='have']",
+        "[id*='own']", "[id*='want']", "[id*='collection']",
+        "i[class*='fa-']", "span[class*='icon']", ".actionlink",
+        "[class*='action']", "[class*='tick']", "[class*='check']"
       ].join(", ")
 
       doc.css(selectors).each_with_index do |el, idx|

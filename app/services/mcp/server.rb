@@ -10,6 +10,7 @@ module Mcp
 
       # AI browser automation tools
       'vision_task' => Tools::VisionTask,
+      'vision_agent' => Tools::VisionAgent,  # Conversational agent with step-by-step reasoning
       'vision_ai_action' => Tools::VisionAiAction,
       'vision_perform' => Tools::VisionPerform,
       'vision_extract' => Tools::VisionExtract,

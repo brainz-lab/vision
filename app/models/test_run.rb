@@ -1,5 +1,5 @@
 class TestRun < ApplicationRecord
-  belongs_to :project
+  belongs_to :project, counter_cache: true
 
   has_many :snapshots, dependent: :destroy
   has_many :comparisons, dependent: :destroy

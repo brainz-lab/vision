@@ -3,8 +3,8 @@
 <div class="space-y-8">
   <div>
     <div class="mb-2">
-      <%= link_to dashboard_project_test_runs_path(@project), class: "inline-flex items-center text-[13px] font-medium", style: "color: #8B8780;" do %>
-        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <%= link_to dashboard_project_test_runs_path(@project), class: "btn-ghost text-sm" do %>
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
         </svg>
         Back to Test Runs
@@ -12,96 +12,96 @@
     </div>
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-[22px] font-semibold tracking-tight" style="color: #1A1A1A;">
+        <h1 class="section-header">
           Test Run #<%= @test_run.id.to_s[0..7] %>
         </h1>
         <% if @test_run.name.present? %>
-          <p class="mt-1 text-[13px]" style="color: #8B8780;"><%= @test_run.name %></p>
+          <p class="section-subheader"><%= @test_run.name %></p>
         <% end %>
       </div>
       <% case @test_run.status %>
       <% when 'pending' %>
-        <span class="px-3 py-1 rounded-full text-[12px] font-medium" style="background: #F0EFED; color: #6B6760;">Pending</span>
+        <span class="badge badge-neutral">Pending</span>
       <% when 'running' %>
-        <span class="px-3 py-1 rounded-full text-[12px] font-medium" style="background: #DBEAFE; color: #1E40AF;">Running</span>
+        <span class="badge badge-info">Running</span>
       <% when 'completed' %>
-        <span class="px-3 py-1 rounded-full text-[12px] font-medium" style="background: #D1FAE5; color: #065F46;">Completed</span>
+        <span class="badge badge-success">Completed</span>
       <% when 'failed' %>
-        <span class="px-3 py-1 rounded-full text-[12px] font-medium" style="background: #FEE2E2; color: #991B1B;">Failed</span>
+        <span class="badge badge-error">Failed</span>
       <% end %>
     </div>
   </div>
 
   <!-- Stats -->
   <div class="grid grid-cols-4 gap-4">
-    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[28px] font-semibold" style="color: #1A1A1A;"><%= @comparisons.count %></div>
-      <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Total</div>
+    <div class="stat-card text-center">
+      <div class="stat-value"><%= @comparisons.count %></div>
+      <div class="stat-label">Total</div>
     </div>
-    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[28px] font-semibold" style="color: #059669;"><%= @comparisons.select { |c| c.status == 'passed' }.count %></div>
-      <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Passed</div>
+    <div class="stat-card text-center">
+      <div class="stat-value text-green-600"><%= @comparisons.select { |c| c.status == 'passed' }.count %></div>
+      <div class="stat-label">Passed</div>
     </div>
-    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[28px] font-semibold" style="color: #DC2626;"><%= @comparisons.select { |c| c.status == 'failed' }.count %></div>
-      <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Failed</div>
+    <div class="stat-card text-center">
+      <div class="stat-value text-red-600"><%= @comparisons.select { |c| c.status == 'failed' }.count %></div>
+      <div class="stat-label">Failed</div>
     </div>
-    <div class="rounded-xl p-4 text-center card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[28px] font-semibold" style="color: #D97706;"><%= @comparisons.select { |c| c.status == 'pending' }.count %></div>
-      <div class="text-[12px] font-medium uppercase tracking-wider" style="color: #8B8780;">Pending</div>
+    <div class="stat-card text-center">
+      <div class="stat-value text-amber-600"><%= @comparisons.select { |c| c.status == 'pending' }.count %></div>
+      <div class="stat-label">Pending</div>
     </div>
   </div>
 
   <!-- Comparisons -->
   <div class="space-y-4">
-    <h2 class="text-[15px] font-semibold" style="color: #1A1A1A;">Comparisons</h2>
+    <h2 class="text-[15px] font-semibold text-stone-900">Comparisons</h2>
 
     <% if @comparisons.any? %>
-      <div class="rounded-xl overflow-hidden card" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-        <table class="min-w-full">
+      <div class="card overflow-hidden">
+        <table class="table">
           <thead>
-            <tr style="border-bottom: 1px solid #E8E5E0;">
-              <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Page</th>
-              <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Status</th>
-              <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Diff %</th>
-              <th class="px-5 py-3 text-left text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;">Browser</th>
-              <th class="px-5 py-3 text-right text-[11px] font-medium uppercase tracking-wider" style="color: #8B8780;"></th>
+            <tr>
+              <th>Page</th>
+              <th>Status</th>
+              <th>Diff %</th>
+              <th>Browser</th>
+              <th class="text-right"></th>
             </tr>
           </thead>
           <tbody>
-            <% @comparisons.each_with_index do |comparison, index| %>
-              <tr style="<%= index < @comparisons.size - 1 ? 'border-bottom: 1px solid #E8E5E0;' : '' %>">
-                <td class="px-5 py-4">
-                  <%= link_to comparison.page&.name || 'Unknown', dashboard_project_comparison_path(@project, comparison), class: "text-[14px] font-medium hover:underline", style: "color: #1A1A1A;" %>
+            <% @comparisons.each do |comparison| %>
+              <tr>
+                <td>
+                  <%= link_to comparison.page&.name || 'Unknown', dashboard_project_comparison_path(@project, comparison), class: "font-medium text-stone-900 hover:text-amber-600" %>
                 </td>
-                <td class="px-5 py-4">
+                <td>
                   <% case comparison.status %>
                   <% when 'passed' %>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #D1FAE5; color: #065F46;">Passed</span>
+                    <span class="badge badge-success">Passed</span>
                   <% when 'failed' %>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #FEE2E2; color: #991B1B;">Failed</span>
+                    <span class="badge badge-error">Failed</span>
                   <% when 'pending' %>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #F0EFED; color: #6B6760;">Pending</span>
+                    <span class="badge badge-neutral">Pending</span>
                   <% when 'approved' %>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #DBEAFE; color: #1E40AF;">Approved</span>
+                    <span class="badge badge-info">Approved</span>
                   <% when 'rejected' %>
-                    <span class="px-2 py-0.5 rounded-full text-[11px] font-medium" style="background: #FFEDD5; color: #9A3412;">Rejected</span>
+                    <span class="badge badge-warning">Rejected</span>
                   <% end %>
                 </td>
-                <td class="px-5 py-4 text-[13px]">
+                <td>
                   <% if comparison.diff_percentage.present? %>
-                    <span style="color: <%= comparison.diff_percentage > 1 ? '#DC2626' : '#6B6760' %>;">
+                    <span class="<%= comparison.diff_percentage > 1 ? 'text-red-600' : 'text-stone-600' %>">
                       <%= number_to_percentage(comparison.diff_percentage, precision: 2) %>
                     </span>
                   <% else %>
-                    <span style="color: #C4C0B8;">-</span>
+                    <span class="text-stone-400">-</span>
                   <% end %>
                 </td>
-                <td class="px-5 py-4 text-[13px]" style="color: #6B6760;">
+                <td class="text-stone-600">
                   <%= comparison.snapshot&.browser_config&.browser || 'chromium' %>
                 </td>
-                <td class="px-5 py-4 text-right">
-                  <%= link_to "View", dashboard_project_comparison_path(@project, comparison), class: "text-[13px] font-medium", style: "color: #8B8780;" %>
+                <td class="text-right">
+                  <%= link_to "View", dashboard_project_comparison_path(@project, comparison), class: "btn-ghost btn-sm" %>
                 </td>
               </tr>
             <% end %>
@@ -109,8 +109,10 @@
         </table>
       </div>
     <% else %>
-      <div class="text-center py-12 rounded-xl" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-        <p class="text-[13px]" style="color: #8B8780;">No comparisons yet</p>
+      <div class="card">
+        <div class="empty-state py-12">
+          <p class="empty-state-description">No comparisons yet</p>
+        </div>
       </div>
     <% end %>
   </div>

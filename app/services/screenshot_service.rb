@@ -24,7 +24,7 @@ class ScreenshotService
     BrowserPool.with_browser(@browser_config) do |browser_page|
       # Navigate to page
       url = determine_url
-      browser_page.goto(url, wait_until: 'networkidle')
+      browser_page.goto(url, waitUntil: 'networkidle')
 
       # Wait for page readiness
       wait_for_ready(browser_page)
@@ -36,7 +36,7 @@ class ScreenshotService
       apply_element_modifications(browser_page)
 
       # Capture screenshot
-      screenshot_data = browser_page.screenshot(full_page: true, type: 'png')
+      screenshot_data = browser_page.screenshot(fullPage: true, type: 'png')
 
       # Calculate dimensions
       dimensions = get_page_dimensions(browser_page)

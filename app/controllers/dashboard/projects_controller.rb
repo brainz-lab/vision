@@ -3,7 +3,9 @@ module Dashboard
     before_action :set_project, only: [:show, :edit, :update, :settings]
 
     def index
-      @projects = Project.all.order(created_at: :desc)
+      # Load projects eagerly to prevent separate EXISTS query from .any? check
+      # Counter cache columns (pages_count, test_runs_count) eliminate N+1 queries
+      @projects = Project.order(created_at: :desc).load
     end
 
     def show

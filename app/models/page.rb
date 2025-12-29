@@ -1,5 +1,5 @@
 class Page < ApplicationRecord
-  belongs_to :project
+  belongs_to :project, counter_cache: true
 
   has_many :baselines, dependent: :destroy
   has_many :snapshots, dependent: :destroy

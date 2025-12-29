@@ -15,20 +15,24 @@ module Ai
     attr_reader :browser, :session_id, :project
 
     # Common login field selectors for fallback
+    # Note: ASP.NET sites use ctl00$ prefixes, order matters - specific first
     USERNAME_SELECTORS = [
       'input#fldEmail',
+      'input[id*="username"]',    # Matches ASP.NET IDs like ctl00_mainContent_username
+      'input[name*="username"]',  # Matches ASP.NET names like ctl00$mainContent$username
+      'input#username',
+      'input[name="username"]',
       'input[name="email"]',
       'input[type="email"]',
       'input#email',
-      'input#username',
-      'input[name="username"]',
       'input[name="user"]',
-      'input[name="login"]',
-      'input[type="text"]:first-of-type'
+      'input[name="login"]'
     ].freeze
 
     PASSWORD_SELECTORS = [
       'input#fldPassword',
+      'input[id*="password"]',    # Matches ASP.NET IDs like ctl00_mainContent_password
+      'input[name*="password"]',  # Matches ASP.NET names like ctl00$mainContent$password
       'input[type="password"]',
       'input[name="password"]',
       'input[name="pass"]',
@@ -51,6 +55,22 @@ module Ai
       @project = project
     end
 
+    # Common consent dialog selectors to dismiss before login
+    CONSENT_SELECTORS = [
+      '#accept-btn',           # Brickset/Quantcast style
+      'button#agree-btn',
+      'button:has-text("AGREE")',
+      'button:has-text("Accept")',
+      'button:has-text("Accept all")',
+      'button:has-text("Accept All")',
+      'button:has-text("I agree")',
+      '.cmp-agree-button',
+      '[data-testid="accept-cookies"]',
+      '.cookie-accept',
+      '#onetrust-accept-btn-handler',
+      '.accept-cookies-button'
+    ].freeze
+
     # Perform a full login flow using stored credentials
     # @param credential [Credential] The credential to use
     # @param options [Hash] Additional options
@@ -67,6 +87,9 @@ module Ai
         @browser.navigate(@session_id, selectors[:login_url])
         wait_for_page_load
       end
+
+      # Dismiss any consent dialogs first
+      dismiss_consent_dialogs
 
       # Try configured selectors first, then fallback to common ones
       username_filled = smart_fill_field(:username, selectors[:username_field], creds[:username])
@@ -183,6 +206,35 @@ module Ai
 
     private
 
+    # Dismiss common consent/cookie dialogs that may block login forms
+    def dismiss_consent_dialogs
+      Rails.logger.info "[CredentialInjector] Checking for consent dialogs..."
+
+      CONSENT_SELECTORS.each do |selector|
+        begin
+          if element_exists?(selector)
+            Rails.logger.info "[CredentialInjector] Found consent button: #{selector}"
+            result = @browser.perform_action(
+              @session_id,
+              action: :click,
+              selector: selector
+            )
+
+            if result[:success] != false
+              Rails.logger.info "[CredentialInjector] Dismissed consent dialog with: #{selector}"
+              sleep(1) # Wait for dialog to close
+              return true
+            end
+          end
+        rescue => e
+          Rails.logger.debug "[CredentialInjector] Consent selector #{selector} failed: #{e.message}"
+        end
+      end
+
+      Rails.logger.info "[CredentialInjector] No consent dialog found or dismissed"
+      false
+    end
+
     # Smart fill that tries multiple selectors
     def smart_fill_field(field_type, primary_selector, value)
       return false unless value.present?
@@ -199,19 +251,20 @@ module Ai
         next if selector.blank?
 
         begin
-          # Check if element exists first
-          if element_exists?(selector)
-            result = @browser.perform_action(
-              @session_id,
-              action: :fill,
-              selector: selector,
-              value: value
-            )
+          # Try to fill the element directly - Playwright will tell us if it doesn't exist
+          Rails.logger.debug "[CredentialInjector] Trying #{field_type} selector: #{selector}"
+          result = @browser.perform_action(
+            @session_id,
+            action: :fill,
+            selector: selector,
+            value: value
+          )
 
-            if result[:success] != false
-              Rails.logger.info "[CredentialInjector] Successfully filled #{field_type} using selector: #{selector}"
-              return true
-            end
+          if result[:success] != false
+            Rails.logger.info "[CredentialInjector] Successfully filled #{field_type} using selector: #{selector}"
+            return true
+          else
+            Rails.logger.debug "[CredentialInjector] Selector #{selector} returned: #{result.inspect}"
           end
         rescue => e
           Rails.logger.debug "[CredentialInjector] Selector #{selector} failed: #{e.message}"
@@ -301,7 +354,9 @@ module Ai
     end
 
     def wait_for_navigation
-      sleep(3)
+      Rails.logger.info "[CredentialInjector] Waiting 5 seconds for navigation..."
+      sleep(5)  # Give more time for login redirects
+      Rails.logger.info "[CredentialInjector] Wait complete"
     end
 
     def verify_login(credential, options)
@@ -315,9 +370,17 @@ module Ai
       login_url = credential.login_selectors[:login_url]
       still_on_login = login_url.present? && current_url.include?(URI.parse(login_url).path)
 
-      # Check for error messages
-      has_error = page_html.match?(/error|invalid|incorrect|failed/i) &&
-                  page_html.match?(/password|login|credential|authentication/i)
+      # Check for specific error messages (be more restrictive to avoid false positives)
+      error_patterns = [
+        /invalid\s+(password|email|credentials)/i,
+        /incorrect\s+(password|email|login)/i,
+        /login\s+failed/i,
+        /authentication\s+failed/i,
+        /wrong\s+(password|email)/i,
+        /error.*password/i,
+        /password.*error/i
+      ]
+      has_error = error_patterns.any? { |pattern| page_html.match?(pattern) }
 
       # Check for success indicators (common logged-in elements)
       success_patterns = credential.metadata&.dig("success_patterns") || []

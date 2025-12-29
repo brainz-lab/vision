@@ -6,7 +6,15 @@ default: &default
 development:
   <<: *default
   workers:
-    - queues: "*"
+    # AI Tasks - Each process has its own browser (1 thread per process)
+    # In dev, run 2 browser workers for parallel task execution
+    - queues: [ai_tasks]
+      threads: 1
+      processes: <%= ENV.fetch("AI_TASK_WORKERS", 2) %>
+      polling_interval: 0.1
+
+    # Other queues
+    - queues: [screenshots, comparisons, default]
       threads: 3
       processes: 1
       polling_interval: 0.1
@@ -22,6 +30,14 @@ test:
 production:
   <<: *default
   workers:
+    # AI Tasks - Dedicated browser workers
+    # Each process runs a single browser instance for isolation
+    # IMPORTANT: Use 1 thread per process - browsers are not thread-safe
+    - queues: [ai_tasks]
+      threads: 1
+      processes: <%= ENV.fetch("AI_TASK_WORKERS", 4) %>
+      polling_interval: 0.1
+
     # Screenshot capture - resource intensive, limited concurrency
     - queues: [screenshots]
       threads: <%= ENV.fetch("SCREENSHOT_WORKER_THREADS", 2) %>

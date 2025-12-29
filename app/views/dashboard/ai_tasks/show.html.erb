@@ -3,11 +3,11 @@
 <div class="space-y-6">
   <!-- Breadcrumb & Header -->
   <div>
-    <%= link_to dashboard_project_ai_tasks_path(@project), class: "inline-flex items-center gap-1.5 text-[13px] mb-4 group", style: "color: #8B8780;" do %>
-      <svg class="w-4 h-4 transition-transform group-hover:-translate-x-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <%= link_to dashboard_project_ai_tasks_path(@project), class: "btn-ghost text-sm mb-4" do %>
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/>
       </svg>
-      <span class="group-hover:underline">All Tasks</span>
+      All Tasks
     <% end %>
 
     <div class="flex items-start justify-between gap-6">
@@ -16,38 +16,38 @@
         <div class="flex items-center gap-3 mb-3">
           <% case @task.status %>
           <% when 'pending' %>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium" style="background: #F5F3EF; color: #6B6760;">
-              <span class="w-2 h-2 rounded-full animate-pulse" style="background: #A8A29E;"></span>
+            <span class="badge badge-neutral">
+              <span class="w-2 h-2 rounded-full animate-pulse bg-stone-400"></span>
               Pending
             </span>
           <% when 'running' %>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium" style="background: #EFF6FF; color: #1D4ED8;">
-              <span class="w-2 h-2 rounded-full animate-pulse" style="background: #3B82F6;"></span>
+            <span class="badge badge-info">
+              <span class="w-2 h-2 rounded-full animate-pulse bg-blue-500"></span>
               Running
             </span>
           <% when 'completed' %>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium" style="background: #ECFDF5; color: #047857;">
+            <span class="badge badge-success">
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
               </svg>
               Completed
             </span>
           <% when 'stopped' %>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium" style="background: #FFFBEB; color: #B45309;">
+            <span class="badge badge-warning">
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8 7a1 1 0 00-1 1v4a1 1 0 001 1h4a1 1 0 001-1V8a1 1 0 00-1-1H8z" clip-rule="evenodd"/>
               </svg>
               Stopped
             </span>
           <% when 'timeout' %>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium" style="background: #FEF2F2; color: #B91C1C;">
+            <span class="badge badge-error">
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
               </svg>
               Timeout
             </span>
           <% when 'error' %>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-medium" style="background: #FEF2F2; color: #B91C1C;">
+            <span class="badge badge-error">
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
               </svg>
@@ -55,17 +55,17 @@
             </span>
           <% end %>
 
-          <div class="flex items-center gap-2 text-[12px]" style="color: #8B8780;">
-            <span class="px-2 py-0.5 rounded" style="background: #F5F3EF;"><%= @task.model %></span>
-            <span class="px-2 py-0.5 rounded" style="background: #F5F3EF;"><%= @task.browser_provider %></span>
+          <div class="flex items-center gap-2 text-xs" style="color: var(--color-ink-500);">
+            <span class="badge badge-neutral"><%= @task.model %></span>
+            <span class="badge badge-neutral"><%= @task.browser_provider %></span>
           </div>
         </div>
 
         <!-- Task Instruction -->
-        <h1 class="text-[20px] font-semibold tracking-tight leading-snug" style="color: #1A1A1A;"><%= @task.instruction %></h1>
+        <h1 class="section-header text-xl"><%= @task.instruction %></h1>
 
         <% if @task.start_url.present? %>
-          <p class="mt-2 text-[13px] truncate" style="color: #8B8780;">
+          <p class="section-subheader text-sm truncate">
             <svg class="w-3.5 h-3.5 inline-block mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
             </svg>
@@ -77,9 +77,7 @@
       <!-- Action Buttons -->
       <div class="flex items-center gap-2 flex-shrink-0">
         <% if @task.screenshots.attached? %>
-          <button onclick="openReplayModal()"
-              class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
-              style="background: #1A1A1A; color: white; border: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+          <button onclick="openReplayModal()" class="btn-secondary">
             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
             </svg>
@@ -89,8 +87,7 @@
         <%= button_to retry_dashboard_project_ai_task_path(@project, @task),
             method: :post,
             form: { data: { turbo_confirm: "Run this task again with the same parameters?" } },
-            class: "inline-flex items-center gap-2 px-4 py-2.5 rounded-xl text-[13px] font-medium transition-all cursor-pointer btn-primary hover:scale-[1.02] active:scale-[0.98]",
-            style: "color: white; border: none;" do %>
+            class: "btn-primary" do %>
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
@@ -102,39 +99,39 @@
 
   <!-- Quick Stats Bar -->
   <div class="grid grid-cols-4 gap-4">
-    <div class="rounded-xl p-4" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[11px] uppercase tracking-wider mb-1" style="color: #8B8780;">Duration</div>
-      <div class="text-[18px] font-semibold" style="color: #1A1A1A;">
+    <div class="stat-card">
+      <div class="stat-label">Duration</div>
+      <div class="stat-value text-lg">
         <% if @task.duration_ms %>
-          <%= (@task.duration_ms / 1000.0).round(1) %><span class="text-[13px] font-normal ml-0.5">s</span>
+          <%= (@task.duration_ms / 1000.0).round(1) %><span class="text-sm font-normal ml-0.5">s</span>
         <% else %>
-          <span style="color: #C4C1BC;">—</span>
+          <span style="color: var(--color-ink-300);">—</span>
         <% end %>
       </div>
     </div>
-    <div class="rounded-xl p-4" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[11px] uppercase tracking-wider mb-1" style="color: #8B8780;">Steps</div>
-      <div class="text-[18px] font-semibold" style="color: #1A1A1A;">
-        <%= @task.steps_executed %><span class="text-[13px] font-normal" style="color: #8B8780;"> / <%= @task.max_steps %></span>
+    <div class="stat-card">
+      <div class="stat-label">Steps</div>
+      <div class="stat-value text-lg">
+        <%= @task.steps_executed %><span class="text-sm font-normal" style="color: var(--color-ink-500);"> / <%= @task.max_steps %></span>
       </div>
     </div>
-    <div class="rounded-xl p-4" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[11px] uppercase tracking-wider mb-1" style="color: #8B8780;">Tokens</div>
-      <div class="text-[18px] font-semibold" style="color: #1A1A1A;">
+    <div class="stat-card">
+      <div class="stat-label">Tokens</div>
+      <div class="stat-value text-lg">
         <% if @task.total_tokens > 0 %>
           <%= number_with_delimiter(@task.total_tokens) %>
         <% else %>
-          <span style="color: #C4C1BC;">—</span>
+          <span style="color: var(--color-ink-300);">—</span>
         <% end %>
       </div>
     </div>
-    <div class="rounded-xl p-4" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-      <div class="text-[11px] uppercase tracking-wider mb-1" style="color: #8B8780;">Screenshots</div>
-      <div class="text-[18px] font-semibold" style="color: #1A1A1A;">
+    <div class="stat-card">
+      <div class="stat-label">Screenshots</div>
+      <div class="stat-value text-lg">
         <% if @task.screenshots.attached? %>
           <%= @task.screenshots.count %>
         <% else %>
-          <span style="color: #C4C1BC;">0</span>
+          <span style="color: var(--color-ink-300);">0</span>
         <% end %>
       </div>
     </div>

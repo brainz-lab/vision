@@ -6,6 +6,11 @@ module Mcp
     class VisionTask < Base
       DESCRIPTION = "Execute an autonomous browser task with AI. The AI agent will navigate, click, type, and extract data to complete your instruction. Supports credential injection for authenticated tasks via Vault integration."
 
+      # Thresholds for auto-async mode (smart hybrid)
+      # Tasks exceeding these thresholds run async automatically
+      AUTO_ASYNC_MAX_STEPS = 50      # Tasks with > 50 steps run async
+      AUTO_ASYNC_TIMEOUT = 300       # Tasks with > 300s (5 min) timeout run async
+
       SCHEMA = {
         type: "object",
         properties: {
@@ -58,8 +63,7 @@ module Mcp
           },
           wait_for_completion: {
             type: "boolean",
-            default: true,
-            description: "Wait for task completion (sync) or return immediately (async)"
+            description: "Wait for task completion (sync) or return immediately (async). Auto-determined based on task complexity if not specified."
           }
         },
         required: %w[instruction]
@@ -68,9 +72,20 @@ module Mcp
       def call(args)
         instruction = args[:instruction]
         start_url = args[:start_url]
-        wait = args.fetch(:wait_for_completion, true)
         credential_name = args[:credential]
         auto_login = args.fetch(:auto_login, true)
+
+        # Smart hybrid: determine sync vs async based on task complexity
+        max_steps = args[:max_steps] || 30
+        timeout_seconds = args[:timeout_seconds] || 300
+
+        wait = if args.key?(:wait_for_completion)
+          args[:wait_for_completion]  # Explicit override
+        else
+          # Auto-async for large tasks
+          should_run_async = max_steps > AUTO_ASYNC_MAX_STEPS || timeout_seconds > AUTO_ASYNC_TIMEOUT
+          !should_run_async
+        end
 
         # Look up credential if specified
         credential = nil
@@ -95,29 +110,34 @@ module Mcp
           start_url: start_url,
           model: args[:model] || project.default_llm_model,
           browser_provider: args[:browser_provider] || project.default_browser_provider,
-          max_steps: args[:max_steps] || 30,
-          timeout_seconds: args[:timeout_seconds] || 300,
+          max_steps: max_steps,
+          timeout_seconds: timeout_seconds,
           metadata: {
             extraction_schema: args[:extraction_schema],
             credential_id: credential&.id,
             auto_login: auto_login && credential.present?,
-            original_instruction: instruction
+            original_instruction: instruction,
+            execution_mode: wait ? "sync" : "async",
+            auto_async: !args.key?(:wait_for_completion) && !wait
           }.compact,
           viewport: { width: 1280, height: 720 }
         )
 
         if wait
-          # Execute synchronously for MCP
-          executor = Ai::TaskExecutor.new(task)
+          # Execute synchronously using worker pool for immediate response
+          # The pool provides pre-warmed browsers to eliminate cold-start delays
+          VisionWorkerPool.with_worker do |worker|
+            executor = Ai::TaskExecutor.new(task, browser: worker)
 
-          # Register pre-execution callback for credential login
-          if credential && auto_login
-            executor.before_execute do |browser, session|
-              perform_credential_login(task, credential, browser, session)
+            # Register pre-execution callback for credential login
+            if credential && auto_login
+              executor.before_execute do |browser, session|
+                perform_credential_login(task, credential, browser, session)
+              end
             end
-          end
 
-          executor.execute!
+            executor.execute!
+          end
 
           task.reload
 
@@ -137,11 +157,22 @@ module Mcp
           # Queue for async execution
           TaskExecutorJob.perform_later(task.id)
 
+          # Determine reason for async execution
+          async_reason = if !args.key?(:wait_for_completion)
+            reasons = []
+            reasons << "max_steps > #{AUTO_ASYNC_MAX_STEPS}" if max_steps > AUTO_ASYNC_MAX_STEPS
+            reasons << "timeout > #{AUTO_ASYNC_TIMEOUT}s" if timeout_seconds > AUTO_ASYNC_TIMEOUT
+            "Auto-async: #{reasons.join(', ')}"
+          else
+            "Explicitly requested"
+          end
+
           success({
             task_id: task.id,
             status: "queued",
             instruction: task.instruction,
             credential_used: credential&.name,
+            async_reason: async_reason,
             message: "Task queued for execution. Poll /api/v1/tasks/#{task.id} for status."
           })
         end
@@ -165,7 +196,7 @@ module Mcp
           project: project
         )
 
-        result = injector.login(credential, navigate: false, submit: true)
+        result = injector.login(credential, navigate: true, submit: true)
 
         Rails.logger.info "Credential login result: #{result}"
 

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "playwright"
+
 module BrowserProviders
   # Browserbase cloud browser provider
   # https://browserbase.com
@@ -58,10 +60,12 @@ module BrowserProviders
       connect_url = session_info["connectUrl"]
 
       # Create Playwright connection
-      playwright = Playwright.create(playwright_cli_executable_path: find_playwright_path)
+      execution = Playwright.create(playwright_cli_executable_path: find_playwright_path)
+      playwright = execution.playwright
       browser = playwright.chromium.connect_over_cdp(connect_url)
 
       {
+        execution: execution,
         playwright: playwright,
         browser: browser,
         page: browser.contexts.first&.pages&.first || browser.new_page
@@ -74,7 +78,7 @@ module BrowserProviders
       connection = get_or_create_connection(session_id)
       page = connection[:page]
 
-      page.goto(url, wait_until: "networkidle")
+      page.goto(url, waitUntil: "networkidle")
 
       {
         url: page.url,
@@ -123,7 +127,7 @@ module BrowserProviders
       page = connection[:page]
 
       data = page.screenshot(
-        full_page: options.fetch(:full_page, true),
+        fullPage: options.fetch(:full_page, true),
         type: "png"
       )
 

@@ -34,9 +34,9 @@ module BrowserProviders
       log_action(:create_session, session_id: session_id, viewport: viewport)
 
       # Create playwright instance and browser context
-      # Note: Playwright.create returns an Execution object, access @playwright for the API
+      # Note: Playwright.create returns an Execution object, use .playwright for the API
       execution = ::Playwright.create(playwright_cli_executable_path: find_playwright_path)
-      playwright = execution.instance_variable_get(:@playwright)
+      playwright = execution.playwright
 
       browser_type = options[:browser]&.to_sym || :chromium
 
@@ -96,6 +96,10 @@ module BrowserProviders
 
       page.goto(url, waitUntil: "networkidle")
 
+      # Wait for any remaining JavaScript to finish rendering
+      page.wait_for_load_state("networkidle")
+      sleep(1) # Brief extra wait for late-loading dynamic content
+
       {
         url: page.url,
         title: page.title
@@ -110,12 +114,26 @@ module BrowserProviders
       log_action(:perform_action, session_id: session_id, action: action, selector: selector)
 
       case action.to_sym
+      when :click_at, :click_coordinates
+        # Coordinate-based clicking - click at specific x,y position
+        x = options[:x] || value&.dig(:x) || (value.is_a?(Array) ? value[0] : nil)
+        y = options[:y] || value&.dig(:y) || (value.is_a?(Array) ? value[1] : nil)
+        raise ArgumentError, "click_at requires x and y coordinates" unless x && y
+
+        Rails.logger.info "[Local] Clicking at coordinates: (#{x}, #{y})"
+        page.mouse.click(x.to_f, y.to_f)
       when :click
-        # Scroll element into view first to improve reliability
-        if selector
+        # Check if coordinates are provided (preferred method)
+        if options[:x] && options[:y]
+          Rails.logger.info "[Local] Clicking at coordinates: (#{options[:x]}, #{options[:y]})"
+          page.mouse.click(options[:x].to_f, options[:y].to_f)
+        elsif selector.present?
+          # Fallback: Scroll element into view first to improve reliability
           scroll_into_view_if_needed(page, selector)
+          page.click(selector, **options.slice(:timeout, :button, :modifiers, :position))
+        else
+          raise ArgumentError, "click requires either coordinates (x, y) or a selector"
         end
-        page.click(selector, **options.slice(:timeout, :button, :modifiers, :position))
       when :type
         page.type(selector, value.to_s, **options.slice(:timeout, :delay))
       when :fill
@@ -212,6 +230,165 @@ module BrowserProviders
 
     def current_title(session_id)
       get_page(session_id).title
+    end
+
+    # Extract interactive elements with their bounding boxes for AI reference
+    # Returns elements with refs like BTN1, IN1, LNK1 and their coordinates
+    def extract_elements_with_refs(session_id)
+      page = get_page(session_id)
+      viewport = page.viewport_size
+
+      elements = []
+      counters = { btn: 0, in: 0, lnk: 0, chk: 0, sel: 0, other: 0 }
+
+      # JavaScript to extract all interactive elements with their bounding boxes
+      script = <<~JS
+        (() => {
+          const results = [];
+          // Expanded selectors to catch custom checkboxes, toggles, and interactive elements
+          const selectors = [
+            'a', 'button', 'input', 'select', 'textarea',
+            '[role="button"]', '[role="checkbox"]', '[role="switch"]', '[role="link"]', '[role="menuitem"]',
+            '[onclick]', '[data-action]', '[data-toggle]',
+            '[class*="btn"]', '[class*="button"]', '[class*="checkbox"]', '[class*="toggle"]', '[class*="check"]',
+            'label[for]', 'label.checkbox', 'label.toggle',
+            '.clickable', '.interactive', '.selectable',
+            'span[onclick]', 'div[onclick]', 'li[onclick]',
+            // Common custom checkbox patterns
+            '.form-check', '.custom-checkbox', '.custom-control',
+            'i.fa-check', 'i.fa-square', 'i.fa-check-square',
+            // Brickset-specific patterns
+            '.tags li', '.actionlist li', '.want', '.own', '.have'
+          ].join(', ');
+
+          const elements = document.querySelectorAll(selectors);
+
+          elements.forEach((el, idx) => {
+            const rect = el.getBoundingClientRect();
+            const style = window.getComputedStyle(el);
+
+            // Skip hidden or off-screen elements
+            if (rect.width === 0 || rect.height === 0) return;
+            if (style.display === 'none' || style.visibility === 'hidden') return;
+            if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+            if (rect.right < 0 || rect.left > window.innerWidth) return;
+
+            // Get text content
+            let text = el.innerText || el.value || el.placeholder || el.getAttribute('aria-label') || el.title || '';
+            text = text.trim().substring(0, 50);
+
+            // Determine element type
+            const tag = el.tagName.toLowerCase();
+            const type = el.type || '';
+            const role = el.getAttribute('role') || '';
+            const classList = el.classList ? el.classList.toString().toLowerCase() : '';
+            const id = (el.id || '').toLowerCase();
+
+            let elementType = 'other';
+
+            // Check for checkbox-like elements (including custom implementations)
+            const isCheckboxLike = (
+              role === 'checkbox' ||
+              role === 'switch' ||
+              (tag === 'input' && type === 'checkbox') ||
+              classList.includes('checkbox') ||
+              classList.includes('check') ||
+              classList.includes('toggle') ||
+              classList.includes('own') ||
+              classList.includes('want') ||
+              classList.includes('have') ||
+              id.includes('own') ||
+              id.includes('want') ||
+              text.toLowerCase().includes('own') ||
+              text.toLowerCase().includes('want')
+            );
+
+            if (isCheckboxLike) {
+              elementType = 'checkbox';
+            } else if (tag === 'button' || role === 'button' || classList.includes('btn')) {
+              elementType = 'button';
+            } else if (tag === 'a' || role === 'link') {
+              elementType = 'link';
+            } else if (tag === 'input' || tag === 'textarea') {
+              elementType = 'input';
+            } else if (tag === 'select') {
+              elementType = 'select';
+            }
+
+            // Check if element appears "checked" or "active"
+            const isChecked = el.checked ||
+              classList.includes('active') ||
+              classList.includes('checked') ||
+              classList.includes('selected') ||
+              el.getAttribute('aria-checked') === 'true';
+
+            results.push({
+              tag: tag,
+              type: type,
+              elementType: elementType,
+              text: text,
+              x: Math.round(rect.left + rect.width / 2),
+              y: Math.round(rect.top + rect.height / 2),
+              width: Math.round(rect.width),
+              height: Math.round(rect.height),
+              id: el.id || null,
+              className: el.className ? el.className.toString().substring(0, 50) : null,
+              checked: isChecked
+            });
+          });
+
+          return results;
+        })()
+      JS
+
+      raw_elements = page.evaluate(script)
+
+      # Assign refs and build final list
+      raw_elements.each do |el|
+        # Generate ref based on element type
+        ref = case el["elementType"]
+        when "button"
+          counters[:btn] += 1
+          "BTN#{counters[:btn]}"
+        when "input"
+          counters[:in] += 1
+          "IN#{counters[:in]}"
+        when "link"
+          counters[:lnk] += 1
+          "LNK#{counters[:lnk]}"
+        when "checkbox"
+          counters[:chk] += 1
+          "CHK#{counters[:chk]}"
+        when "select"
+          counters[:sel] += 1
+          "SEL#{counters[:sel]}"
+        else
+          counters[:other] += 1
+          "EL#{counters[:other]}"
+        end
+
+        elements << {
+          ref: ref,
+          type: el["elementType"],
+          tag: el["tag"],
+          text: el["text"],
+          x: el["x"],
+          y: el["y"],
+          width: el["width"],
+          height: el["height"],
+          id: el["id"],
+          class: el["className"],
+          checked: el["checked"]
+        }
+      end
+
+      {
+        elements: elements,
+        viewport: viewport
+      }
+    rescue => e
+      log_error(:extract_elements_with_refs, e)
+      { elements: [], viewport: { width: 1280, height: 720 } }
     end
 
     def evaluate(session_id, script)

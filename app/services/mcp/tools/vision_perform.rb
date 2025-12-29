@@ -62,7 +62,12 @@ module Mcp
         # Validate required parameters
         validate_params!(action, selector, value)
 
-        # Get or create session
+        # Use worker pool for quick one-off actions (no session_id, not keeping session)
+        if session_id.blank? && !keep_session
+          return execute_with_worker_pool(action, selector, value, url, wait_after)
+        end
+
+        # For persistent sessions, use BrowserSessionManager
         manager = BrowserSessionManager.new(project)
 
         if session_id.present?
@@ -129,6 +134,71 @@ module Mcp
         error(e.message)
       rescue => e
         error("Failed to perform action: #{e.message}")
+      end
+
+      # Execute action using worker pool for fast, stateless operations
+      def execute_with_worker_pool(action, selector, value, url, wait_after)
+        start_url = action == :navigate ? value : url
+        raise ArgumentError, "url is required for new actions" unless start_url.present?
+
+        result = nil
+        new_url = nil
+
+        VisionWorkerPool.with_worker do |worker|
+          # Navigate to start URL
+          worker.navigate(worker.session_id, start_url)
+
+          # Execute the action
+          result = execute_action_on_worker(worker, action, selector, value)
+
+          # Wait if requested
+          sleep(wait_after / 1000.0) if wait_after > 0
+
+          # Get final URL
+          new_url = worker.current_url(worker.session_id) rescue nil
+        end
+
+        success({
+          success: result[:success] != false,
+          action: action.to_s,
+          selector: selector,
+          value: value,
+          url: new_url,
+          error: result[:error],
+          pooled: true  # Indicates worker pool was used
+        })
+      end
+
+      def execute_action_on_worker(worker, action, selector, value)
+        session_id = worker.session_id
+
+        case action
+        when :navigate
+          worker.navigate(session_id, value)
+        when :click
+          worker.perform_action(session_id, action: :click, selector: selector)
+        when :fill, :type
+          worker.perform_action(session_id, action: :fill, selector: selector, value: value)
+        when :select
+          worker.perform_action(session_id, action: :select, selector: selector, value: value)
+        when :hover
+          worker.perform_action(session_id, action: :hover, selector: selector)
+        when :scroll
+          worker.perform_action(session_id, action: :scroll, value: value || "down")
+        when :wait
+          sleep((value || 1000).to_i / 1000.0)
+          { success: true }
+        when :press
+          worker.perform_action(session_id, action: :press, value: value)
+        when :clear
+          worker.perform_action(session_id, action: :clear, selector: selector)
+        when :check
+          worker.perform_action(session_id, action: :check, selector: selector)
+        when :uncheck
+          worker.perform_action(session_id, action: :uncheck, selector: selector)
+        else
+          { success: false, error: "Unknown action: #{action}" }
+        end
       end
 
       private
