@@ -72,3 +72,5 @@
 # Local development
 .byebug_history
 .irb_history
+# Test coverage
+coverage/
