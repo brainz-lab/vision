@@ -1,6 +1,6 @@
 module Dashboard
   class ProjectsController < BaseController
-    before_action :set_project, only: [:show, :edit, :update, :settings]
+    before_action :set_project, only: [ :show, :edit, :update, :settings ]
 
     def index
       # Load projects eagerly to prevent separate EXISTS query from .any? check
@@ -21,7 +21,7 @@ module Dashboard
       @project.platform_project_id ||= "vis_#{SecureRandom.hex(8)}"
 
       if @project.save
-        redirect_to dashboard_project_pages_path(@project), notice: 'Project created'
+        redirect_to dashboard_project_pages_path(@project), notice: "Project created"
       else
         render :new, status: :unprocessable_entity
       end
@@ -32,7 +32,7 @@ module Dashboard
 
     def update
       if @project.update(project_params)
-        redirect_to dashboard_project_pages_path(@project), notice: 'Project updated'
+        redirect_to dashboard_project_pages_path(@project), notice: "Project updated"
       else
         render :edit, status: :unprocessable_entity
       end

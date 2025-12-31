@@ -3,19 +3,19 @@
 
 Rails.application.config.to_prepare do
   # Ensure the screenshots bucket exists in MinIO (development)
-  if Rails.env.development? && ENV['AWS_ENDPOINT'].present?
-    require 'aws-sdk-s3'
+  if Rails.env.development? && ENV["AWS_ENDPOINT"].present?
+    require "aws-sdk-s3"
 
     begin
       s3 = Aws::S3::Client.new(
-        access_key_id: ENV.fetch('AWS_ACCESS_KEY_ID', 'minioadmin'),
-        secret_access_key: ENV.fetch('AWS_SECRET_ACCESS_KEY', 'minioadmin'),
-        region: ENV.fetch('AWS_REGION', 'us-east-1'),
-        endpoint: ENV.fetch('AWS_ENDPOINT', 'http://minio:9000'),
+        access_key_id: ENV.fetch("AWS_ACCESS_KEY_ID", "minioadmin"),
+        secret_access_key: ENV.fetch("AWS_SECRET_ACCESS_KEY", "minioadmin"),
+        region: ENV.fetch("AWS_REGION", "us-east-1"),
+        endpoint: ENV.fetch("AWS_ENDPOINT", "http://minio:9000"),
         force_path_style: true
       )
 
-      bucket_name = ENV.fetch('AWS_BUCKET', 'vision-screenshots')
+      bucket_name = ENV.fetch("AWS_BUCKET", "vision-screenshots")
 
       begin
         s3.head_bucket(bucket: bucket_name)

@@ -17,11 +17,11 @@ class TestCase < ApplicationRecord
   end
 
   def screenshot_steps
-    steps&.select { |step| step['action'] == 'screenshot' } || []
+    steps&.select { |step| step["action"] == "screenshot" } || []
   end
 
   def navigation_steps
-    steps&.select { |step| step['action'] == 'navigate' } || []
+    steps&.select { |step| step["action"] == "navigate" } || []
   end
 
   private
@@ -30,7 +30,7 @@ class TestCase < ApplicationRecord
     return if steps.blank?
 
     unless steps.is_a?(Array)
-      errors.add(:steps, 'must be an array')
+      errors.add(:steps, "must be an array")
       return
     end
 
@@ -40,7 +40,7 @@ class TestCase < ApplicationRecord
         next
       end
 
-      action = step['action']
+      action = step["action"]
       unless action.present? && VALID_ACTIONS.include?(action)
         errors.add(:steps, "step #{index + 1} has invalid action '#{action}'")
       end

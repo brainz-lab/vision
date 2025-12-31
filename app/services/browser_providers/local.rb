@@ -42,7 +42,7 @@ module BrowserProviders
 
       browser = playwright.send(browser_type).launch(
         headless: options.fetch(:headless, true),
-        args: ["--no-sandbox", "--disable-setuid-sandbox"]
+        args: [ "--no-sandbox", "--disable-setuid-sandbox" ]
       )
 
       context_options = {

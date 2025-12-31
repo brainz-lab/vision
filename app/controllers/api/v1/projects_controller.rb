@@ -1,7 +1,7 @@
 module Api
   module V1
     class ProjectsController < ActionController::API
-      before_action :authenticate_master_key!, only: [:provision]
+      before_action :authenticate_master_key!, only: [ :provision ]
 
       # POST /api/v1/projects/provision
       # Auto-provision a project (called by SDK)

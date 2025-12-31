@@ -38,12 +38,12 @@ module Mcp
     # JSON-RPC compatible endpoint
     def rpc
       method = params[:method]
-      tool_name = method&.gsub('tools/', '')
+      tool_name = method&.gsub("tools/", "")
 
       case params[:method]
-      when 'tools/list'
+      when "tools/list"
         render json: {
-          jsonrpc: '2.0',
+          jsonrpc: "2.0",
           id: params[:id],
           result: {
             tools: Mcp::Server::TOOLS.map do |name, tool_class|
@@ -61,7 +61,7 @@ module Mcp
 
         unless tool_class
           render json: {
-            jsonrpc: '2.0',
+            jsonrpc: "2.0",
             id: params[:id],
             error: { code: -32601, message: "Unknown tool: #{tool_name}" }
           }
@@ -73,20 +73,20 @@ module Mcp
         result = tool.call(arguments.to_unsafe_h.symbolize_keys)
 
         render json: {
-          jsonrpc: '2.0',
+          jsonrpc: "2.0",
           id: params[:id],
-          result: { content: [{ type: 'text', text: result.to_json }] }
+          result: { content: [ { type: "text", text: result.to_json } ] }
         }
       else
         render json: {
-          jsonrpc: '2.0',
+          jsonrpc: "2.0",
           id: params[:id],
           error: { code: -32601, message: "Unknown method: #{params[:method]}" }
         }
       end
     rescue => e
       render json: {
-        jsonrpc: '2.0',
+        jsonrpc: "2.0",
         id: params[:id],
         error: { code: -32603, message: e.message }
       }
@@ -137,9 +137,9 @@ module Mcp
     end
 
     def extract_api_key
-      auth_header = request.headers['Authorization']
-      return auth_header.sub(/^Bearer\s+/, '') if auth_header&.start_with?('Bearer ')
-      request.headers['X-API-Key'] || params[:api_key]
+      auth_header = request.headers["Authorization"]
+      return auth_header.sub(/^Bearer\s+/, "") if auth_header&.start_with?("Bearer ")
+      request.headers["X-API-Key"] || params[:api_key]
     end
 
     def tool_params

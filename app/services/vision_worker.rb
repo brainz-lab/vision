@@ -406,7 +406,7 @@ class VisionWorker
     @playwright = @execution.playwright
     @browser = @playwright.chromium.launch(
       headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
+      args: [ "--no-sandbox", "--disable-setuid-sandbox" ]
     )
     @viewport = DEFAULT_VIEWPORT.dup
     @context = @browser.new_context(viewport: { width: @viewport[:width], height: @viewport[:height] })

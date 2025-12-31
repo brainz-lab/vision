@@ -129,9 +129,9 @@ class BrowserSessionManager
   private
 
   def build_fallback_list(preferred)
-    return [preferred] unless project.fallback_providers_enabled?
+    return [ preferred ] unless project.fallback_providers_enabled?
 
-    list = [preferred]
+    list = [ preferred ]
 
     FALLBACK_ORDER.each do |provider|
       next if provider == preferred

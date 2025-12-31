@@ -3,19 +3,19 @@ module Mcp
     class VisionApprove < Base
       DESCRIPTION = "Approve visual changes and update baseline"
       SCHEMA = {
-        type: 'object',
+        type: "object",
         properties: {
           comparison_id: {
-            type: 'string',
-            description: 'Comparison ID to approve'
+            type: "string",
+            description: "Comparison ID to approve"
           },
           update_baseline: {
-            type: 'boolean',
+            type: "boolean",
             default: true,
-            description: 'Update baseline with new screenshot'
+            description: "Update baseline with new screenshot"
           }
         },
-        required: ['comparison_id']
+        required: [ "comparison_id" ]
       }.freeze
 
       def call(args)
@@ -25,9 +25,9 @@ module Mcp
 
         return error("Comparison not found") unless comparison
 
-        if comparison.review_status == 'approved'
+        if comparison.review_status == "approved"
           return success({
-            message: 'Already approved',
+            message: "Already approved",
             comparison_id: comparison.id
           })
         end
@@ -38,7 +38,7 @@ module Mcp
           comparison.snapshot.promote_to_baseline!
         end
 
-        comparison.approve!('mcp@vision.brainzlab.ai')
+        comparison.approve!("mcp@vision.brainzlab.ai")
 
         success({
           approved: true,

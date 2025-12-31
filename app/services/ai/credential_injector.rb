@@ -17,30 +17,30 @@ module Ai
     # Common login field selectors for fallback
     # Note: ASP.NET sites use ctl00$ prefixes, order matters - specific first
     USERNAME_SELECTORS = [
-      'input#fldEmail',
+      "input#fldEmail",
       'input[id*="username"]',    # Matches ASP.NET IDs like ctl00_mainContent_username
       'input[name*="username"]',  # Matches ASP.NET names like ctl00$mainContent$username
-      'input#username',
+      "input#username",
       'input[name="username"]',
       'input[name="email"]',
       'input[type="email"]',
-      'input#email',
+      "input#email",
       'input[name="user"]',
       'input[name="login"]'
     ].freeze
 
     PASSWORD_SELECTORS = [
-      'input#fldPassword',
+      "input#fldPassword",
       'input[id*="password"]',    # Matches ASP.NET IDs like ctl00_mainContent_password
       'input[name*="password"]',  # Matches ASP.NET names like ctl00$mainContent$password
       'input[type="password"]',
       'input[name="password"]',
       'input[name="pass"]',
-      'input#password'
+      "input#password"
     ].freeze
 
     SUBMIT_SELECTORS = [
-      'button.btn-primary',
+      "button.btn-primary",
       'button[type="submit"]',
       'input[type="submit"]',
       'button:has-text("Sign in")',
@@ -57,18 +57,18 @@ module Ai
 
     # Common consent dialog selectors to dismiss before login
     CONSENT_SELECTORS = [
-      '#accept-btn',           # Brickset/Quantcast style
-      'button#agree-btn',
+      "#accept-btn",           # Brickset/Quantcast style
+      "button#agree-btn",
       'button:has-text("AGREE")',
       'button:has-text("Accept")',
       'button:has-text("Accept all")',
       'button:has-text("Accept All")',
       'button:has-text("I agree")',
-      '.cmp-agree-button',
+      ".cmp-agree-button",
       '[data-testid="accept-cookies"]',
-      '.cookie-accept',
-      '#onetrust-accept-btn-handler',
-      '.accept-cookies-button'
+      ".cookie-accept",
+      "#onetrust-accept-btn-handler",
+      ".accept-cookies-button"
     ].freeze
 
     # Perform a full login flow using stored credentials
@@ -240,7 +240,7 @@ module Ai
       return false unless value.present?
 
       # Build list of selectors to try
-      selectors_to_try = [primary_selector].compact
+      selectors_to_try = [ primary_selector ].compact
       selectors_to_try += case field_type
       when :username then USERNAME_SELECTORS
       when :password then PASSWORD_SELECTORS
@@ -277,7 +277,7 @@ module Ai
 
     # Smart submit that tries multiple selectors
     def smart_submit_form(primary_selector)
-      selectors_to_try = [primary_selector].compact + SUBMIT_SELECTORS
+      selectors_to_try = [ primary_selector ].compact + SUBMIT_SELECTORS
 
       selectors_to_try.uniq.each do |selector|
         next if selector.blank?

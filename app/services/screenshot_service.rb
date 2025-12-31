@@ -24,7 +24,7 @@ class ScreenshotService
     BrowserPool.with_browser(@browser_config) do |browser_page|
       # Navigate to page
       url = determine_url
-      browser_page.goto(url, waitUntil: 'networkidle')
+      browser_page.goto(url, waitUntil: "networkidle")
 
       # Wait for page readiness
       wait_for_ready(browser_page)
@@ -36,7 +36,7 @@ class ScreenshotService
       apply_element_modifications(browser_page)
 
       # Capture screenshot
-      screenshot_data = browser_page.screenshot(fullPage: true, type: 'png')
+      screenshot_data = browser_page.screenshot(fullPage: true, type: "png")
 
       # Calculate dimensions
       dimensions = get_page_dimensions(browser_page)
@@ -49,7 +49,7 @@ class ScreenshotService
   private
 
   def determine_url
-    @snapshot&.environment == 'staging' ? @page.staging_url : @page.full_url
+    @snapshot&.environment == "staging" ? @page.staging_url : @page.full_url
   end
 
   def wait_for_ready(browser_page)
@@ -57,8 +57,8 @@ class ScreenshotService
 
     # Custom wait selector
     if @page.wait_for.present?
-      selector = @page.wait_for['selector']
-      timeout = @page.wait_for['timeout'] || 10_000
+      selector = @page.wait_for["selector"]
+      timeout = @page.wait_for["timeout"] || 10_000
       browser_page.wait_for_selector(selector, timeout: timeout) rescue nil
     end
 
@@ -74,19 +74,19 @@ class ScreenshotService
   end
 
   def execute_action(browser_page, action)
-    case action['type']
-    when 'click'
-      browser_page.click(action['selector']) rescue nil
-    when 'scroll'
+    case action["type"]
+    when "click"
+      browser_page.click(action["selector"]) rescue nil
+    when "scroll"
       browser_page.evaluate("window.scrollTo(0, #{action['y']})")
-    when 'wait'
-      sleep(action['ms'] / 1000.0)
-    when 'type', 'fill'
-      browser_page.fill(action['selector'], action['text']) rescue nil
-    when 'hover'
-      browser_page.hover(action['selector']) rescue nil
-    when 'select'
-      browser_page.select_option(action['selector'], action['value']) rescue nil
+    when "wait"
+      sleep(action["ms"] / 1000.0)
+    when "type", "fill"
+      browser_page.fill(action["selector"], action["text"]) rescue nil
+    when "hover"
+      browser_page.hover(action["selector"]) rescue nil
+    when "select"
+      browser_page.select_option(action["selector"], action["value"]) rescue nil
     end
   end
 
@@ -139,21 +139,21 @@ class ScreenshotService
       @snapshot.screenshot.attach(
         io: StringIO.new(screenshot_data),
         filename: "screenshot_#{@snapshot.id}.png",
-        content_type: 'image/png'
+        content_type: "image/png"
       )
 
       @snapshot.thumbnail.attach(
         io: StringIO.new(thumbnail_data),
         filename: "thumbnail_#{@snapshot.id}.png",
-        content_type: 'image/png'
+        content_type: "image/png"
       )
 
       @snapshot.update!(
-        status: 'captured',
+        status: "captured",
         captured_at: Time.current,
         capture_duration_ms: duration_ms,
-        width: dimensions['width'],
-        height: dimensions['height'],
+        width: dimensions["width"],
+        height: dimensions["height"],
         file_size: screenshot_data.bytesize
       )
 
@@ -162,25 +162,25 @@ class ScreenshotService
       # Create new snapshot
       snapshot = @page.snapshots.new(
         browser_config: @browser_config,
-        status: 'captured',
+        status: "captured",
         captured_at: Time.current,
         capture_duration_ms: duration_ms,
-        width: dimensions['width'],
-        height: dimensions['height'],
+        width: dimensions["width"],
+        height: dimensions["height"],
         file_size: screenshot_data.bytesize,
-        triggered_by: 'api'
+        triggered_by: "api"
       )
 
       snapshot.screenshot.attach(
         io: StringIO.new(screenshot_data),
         filename: "screenshot_#{SecureRandom.uuid}.png",
-        content_type: 'image/png'
+        content_type: "image/png"
       )
 
       snapshot.thumbnail.attach(
         io: StringIO.new(thumbnail_data),
         filename: "thumbnail_#{SecureRandom.uuid}.png",
-        content_type: 'image/png'
+        content_type: "image/png"
       )
 
       snapshot.save!
@@ -190,7 +190,7 @@ class ScreenshotService
 
   def create_thumbnail(screenshot_data)
     image = MiniMagick::Image.read(screenshot_data)
-    image.resize('400x')
+    image.resize("400x")
     image.to_blob
   end
 end

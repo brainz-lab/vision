@@ -26,8 +26,8 @@ class CreateComparisons < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:test_run_id, :status]
-      t.index [:review_status]
+      t.index [ :test_run_id, :status ]
+      t.index [ :review_status ]
     end
   end
 end

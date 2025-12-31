@@ -1,7 +1,7 @@
 module Dashboard
   class AiTasksController < BaseController
     before_action :set_project
-    before_action :set_task, only: [:show, :retry_task]
+    before_action :set_task, only: [ :show, :retry_task ]
 
     def index
       @tasks = @project.ai_tasks.order(created_at: :desc).limit(50)

@@ -31,7 +31,7 @@ class TestRunner
           commit_sha: @test_run.commit_sha,
           environment: @test_run.environment,
           triggered_by: @test_run.triggered_by,
-          status: 'pending'
+          status: "pending"
         )
 
         # Queue the capture job
@@ -44,16 +44,16 @@ class TestRunner
 
   def self.run_for_project!(project, **options)
     test_run = project.test_runs.create!(
-      branch: options[:branch] || 'main',
+      branch: options[:branch] || "main",
       commit_sha: options[:commit_sha],
       commit_message: options[:commit_message],
-      environment: options[:environment] || 'staging',
-      triggered_by: options[:triggered_by] || 'api',
+      environment: options[:environment] || "staging",
+      triggered_by: options[:triggered_by] || "api",
       trigger_source: options[:trigger_source],
       pr_number: options[:pr_number],
       pr_url: options[:pr_url],
-      base_branch: options[:base_branch] || 'main',
-      status: 'pending'
+      base_branch: options[:base_branch] || "main",
+      status: "pending"
     )
 
     new(test_run).run!

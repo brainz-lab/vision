@@ -1,7 +1,7 @@
 module Api
   module V1
     class PagesController < BaseController
-      before_action :set_page, only: [:show, :update, :destroy]
+      before_action :set_page, only: [ :show, :update, :destroy ]
 
       # GET /api/v1/pages
       def index
@@ -52,9 +52,9 @@ module Api
       def page_params
         params.permit(
           :name, :path, :slug, :wait_ms, :enabled, :position,
-          viewport: [:width, :height],
-          wait_for: [:selector, :timeout],
-          actions: [:type, :selector, :y, :ms, :text, :value],
+          viewport: [ :width, :height ],
+          wait_for: [ :selector, :timeout ],
+          actions: [ :type, :selector, :y, :ms, :text, :value ],
           hide_selectors: [],
           mask_selectors: []
         )

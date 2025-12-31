@@ -24,8 +24,8 @@ class CreateTestCases < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:project_id, :enabled]
-      t.index [:project_id, :name]
+      t.index [ :project_id, :enabled ]
+      t.index [ :project_id, :name ]
     end
   end
 end

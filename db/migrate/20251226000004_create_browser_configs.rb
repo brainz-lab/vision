@@ -17,8 +17,8 @@ class CreateBrowserConfigs < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:project_id, :browser]
-      t.index [:project_id, :enabled]
+      t.index [ :project_id, :browser ]
+      t.index [ :project_id, :enabled ]
     end
   end
 end

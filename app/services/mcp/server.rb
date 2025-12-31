@@ -2,21 +2,21 @@ module Mcp
   class Server
     TOOLS = {
       # Visual regression testing tools
-      'vision_capture' => Tools::VisionCapture,
-      'vision_compare' => Tools::VisionCompare,
-      'vision_test' => Tools::VisionTest,
-      'vision_approve' => Tools::VisionApprove,
-      'vision_list_failures' => Tools::VisionListFailures,
+      "vision_capture" => Tools::VisionCapture,
+      "vision_compare" => Tools::VisionCompare,
+      "vision_test" => Tools::VisionTest,
+      "vision_approve" => Tools::VisionApprove,
+      "vision_list_failures" => Tools::VisionListFailures,
 
       # AI browser automation tools
-      'vision_task' => Tools::VisionTask,
-      'vision_agent' => Tools::VisionAgent,  # Conversational agent with step-by-step reasoning
-      'vision_ai_action' => Tools::VisionAiAction,
-      'vision_perform' => Tools::VisionPerform,
-      'vision_extract' => Tools::VisionExtract,
+      "vision_task" => Tools::VisionTask,
+      "vision_agent" => Tools::VisionAgent,  # Conversational agent with step-by-step reasoning
+      "vision_ai_action" => Tools::VisionAiAction,
+      "vision_perform" => Tools::VisionPerform,
+      "vision_extract" => Tools::VisionExtract,
 
       # Credential management (Vault integration)
-      'vision_credential' => Tools::VisionCredential
+      "vision_credential" => Tools::VisionCredential
     }.freeze
 
     attr_reader :project

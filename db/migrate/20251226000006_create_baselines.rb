@@ -23,8 +23,8 @@ class CreateBaselines < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:page_id, :browser_config_id, :branch, :active], name: 'idx_baselines_lookup'
-      t.index [:page_id, :active]
+      t.index [ :page_id, :browser_config_id, :branch, :active ], name: 'idx_baselines_lookup'
+      t.index [ :page_id, :active ]
     end
   end
 end

@@ -26,8 +26,8 @@ class CreateTaskSteps < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:ai_task_id, :position]
-      t.index [:ai_task_id, :success]
+      t.index [ :ai_task_id, :position ]
+      t.index [ :ai_task_id, :success ]
     end
   end
 end

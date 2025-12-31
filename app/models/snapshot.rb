@@ -10,7 +10,7 @@ class Snapshot < ApplicationRecord
   validates :status, inclusion: { in: %w[pending captured comparing compared error] }
 
   scope :recent, -> { order(Arel.sql("COALESCE(captured_at, created_at) DESC")) }
-  scope :captured, -> { where(status: 'captured') }
+  scope :captured, -> { where(status: "captured") }
   scope :for_branch, ->(branch) { where(branch: branch) }
 
   def project
@@ -29,24 +29,24 @@ class Snapshot < ApplicationRecord
 
   def mark_captured!(duration_ms: nil)
     update!(
-      status: 'captured',
+      status: "captured",
       captured_at: Time.current,
       capture_duration_ms: duration_ms
     )
   end
 
   def mark_comparing!
-    update!(status: 'comparing')
+    update!(status: "comparing")
   end
 
   def mark_compared!
-    update!(status: 'compared')
+    update!(status: "compared")
   end
 
   def mark_error!(message = nil)
     update!(
-      status: 'error',
-      metadata: metadata.merge('error' => message)
+      status: "error",
+      metadata: metadata.merge("error" => message)
     )
   end
 
@@ -57,7 +57,7 @@ class Snapshot < ApplicationRecord
     baseline = Baseline.new(
       page: page,
       browser_config: browser_config,
-      branch: branch || 'main',
+      branch: branch || "main",
       commit_sha: commit_sha,
       environment: environment,
       width: width,
@@ -86,6 +86,6 @@ class Snapshot < ApplicationRecord
 
   def branch_for_baseline
     # PRs compare to base branch, otherwise use main
-    test_run&.base_branch || 'main'
+    test_run&.base_branch || "main"
   end
 end

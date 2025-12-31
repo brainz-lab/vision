@@ -61,13 +61,13 @@ module LlmProviders
       encoded_data = format == :base64 ? image_data : Base64.strict_encode64(image_data)
       data_url = "data:image/png;base64,#{encoded_data}"
 
-      messages = [{
+      messages = [ {
         role: "user",
         content: [
           { type: "image_url", image_url: { url: data_url } },
           { type: "text", text: prompt }
         ]
-      }]
+      } ]
 
       body = {
         model: resolve_model,

@@ -25,8 +25,8 @@ class CreateActionCacheEntries < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:project_id, :url_pattern, :action_type]
-      t.index [:project_id, :instruction_hash]
+      t.index [ :project_id, :url_pattern, :action_type ]
+      t.index [ :project_id, :instruction_hash ]
       t.index :expires_at
       t.index :last_used_at
     end

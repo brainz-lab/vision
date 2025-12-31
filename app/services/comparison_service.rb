@@ -26,7 +26,7 @@ class ComparisonService
 
       # Determine status
       within_threshold = result[:diff_percentage] <= (@threshold * 100)
-      status = within_threshold ? 'passed' : 'failed'
+      status = within_threshold ? "passed" : "failed"
 
       # Create comparison record
       comparison = Comparison.new(
@@ -39,7 +39,7 @@ class ComparisonService
         threshold_used: @threshold,
         within_threshold: within_threshold,
         comparison_duration_ms: ((Time.current - started_at) * 1000).to_i,
-        review_status: status == 'failed' ? 'pending' : nil
+        review_status: status == "failed" ? "pending" : nil
       )
 
       # Attach diff image if there are differences
@@ -47,7 +47,7 @@ class ComparisonService
         comparison.diff_image.attach(
           io: StringIO.new(result[:diff_image]),
           filename: "diff_#{@snapshot.id}.png",
-          content_type: 'image/png'
+          content_type: "image/png"
         )
       end
 
@@ -69,7 +69,7 @@ class ComparisonService
         baseline: @baseline,
         snapshot: @snapshot,
         test_run: @snapshot.test_run,
-        status: 'error',
+        status: "error",
         comparison_duration_ms: ((Time.current - started_at) * 1000).to_i
       )
 
@@ -96,11 +96,11 @@ class ComparisonService
     return unless @snapshot.test_run
 
     case comparison.status
-    when 'passed'
+    when "passed"
       @snapshot.test_run.increment!(:passed_count)
-    when 'failed'
+    when "failed"
       @snapshot.test_run.increment!(:failed_count)
-    when 'error'
+    when "error"
       @snapshot.test_run.increment!(:error_count)
     end
 

@@ -3,7 +3,7 @@ module Mcp
     class Base
       DESCRIPTION = "Base tool class"
       SCHEMA = {
-        type: 'object',
+        type: "object",
         properties: {}
       }.freeze
 

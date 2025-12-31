@@ -13,9 +13,9 @@ class DiffService
   def diff
     # Create temporary files for ImageMagick comparison
     Dir.mktmpdir do |tmpdir|
-      img1_path = File.join(tmpdir, 'image1.png')
-      img2_path = File.join(tmpdir, 'image2.png')
-      diff_path = File.join(tmpdir, 'diff.png')
+      img1_path = File.join(tmpdir, "image1.png")
+      img2_path = File.join(tmpdir, "image2.png")
+      diff_path = File.join(tmpdir, "diff.png")
 
       # Write images to temp files
       File.binwrite(img1_path, @image1_data)
@@ -54,8 +54,8 @@ class DiffService
     return if dim1 == dim2
 
     # Resize both images to the larger dimensions
-    max_width = [dim1[:width], dim2[:width]].max
-    max_height = [dim1[:height], dim2[:height]].max
+    max_width = [ dim1[:width], dim2[:width] ].max
+    max_height = [ dim1[:height], dim2[:height] ].max
 
     resize_image(img1_path, max_width, max_height)
     resize_image(img2_path, max_width, max_height)
@@ -80,14 +80,14 @@ class DiffService
     # and generates a diff image highlighting the differences
 
     # Fuzz factor for color tolerance (0-100%)
-    fuzz = options[:fuzz] || '5%'
+    fuzz = options[:fuzz] || "5%"
 
     # Create a composite diff image
     MiniMagick::Tool::Compare.new do |compare|
-      compare.metric('AE')  # Absolute Error count
+      compare.metric("AE")  # Absolute Error count
       compare.fuzz(fuzz)
-      compare.highlight_color('red')
-      compare.lowlight_color('white')
+      compare.highlight_color("red")
+      compare.lowlight_color("white")
       compare << img1_path
       compare << img2_path
       compare << diff_path

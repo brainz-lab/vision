@@ -3,39 +3,39 @@ module Mcp
     class VisionCapture < Base
       DESCRIPTION = "Capture a screenshot of a URL"
       SCHEMA = {
-        type: 'object',
+        type: "object",
         properties: {
           url: {
-            type: 'string',
-            description: 'URL to capture'
+            type: "string",
+            description: "URL to capture"
           },
           name: {
-            type: 'string',
-            description: 'Name for the page (for organizing)'
+            type: "string",
+            description: "Name for the page (for organizing)"
           },
           viewport: {
-            type: 'string',
-            enum: ['desktop', 'mobile', 'tablet'],
-            default: 'desktop',
-            description: 'Viewport size preset'
+            type: "string",
+            enum: [ "desktop", "mobile", "tablet" ],
+            default: "desktop",
+            description: "Viewport size preset"
           },
           full_page: {
-            type: 'boolean',
+            type: "boolean",
             default: true,
-            description: 'Capture full page or just viewport'
+            description: "Capture full page or just viewport"
           }
         },
-        required: ['url']
+        required: [ "url" ]
       }.freeze
 
       def call(args)
         url = args[:url]
         name = args[:name] || extract_page_name(url)
-        viewport = args[:viewport] || 'desktop'
+        viewport = args[:viewport] || "desktop"
 
         # Find or create page
         uri = URI.parse(url)
-        path = uri.path.presence || '/'
+        path = uri.path.presence || "/"
 
         page = project.pages.find_or_create_by!(path: path) do |p|
           p.name = name
@@ -48,8 +48,8 @@ module Mcp
         # Create and capture snapshot
         snapshot = page.snapshots.create!(
           browser_config: browser_config,
-          triggered_by: 'mcp',
-          status: 'pending'
+          triggered_by: "mcp",
+          status: "pending"
         )
 
         # Capture synchronously for MCP
@@ -71,18 +71,18 @@ module Mcp
 
       def extract_page_name(url)
         uri = URI.parse(url)
-        path = uri.path.presence || '/'
-        path == '/' ? 'Homepage' : path.split('/').last&.titleize || 'Page'
+        path = uri.path.presence || "/"
+        path == "/" ? "Homepage" : path.split("/").last&.titleize || "Page"
       end
 
       def find_browser_config(viewport)
         case viewport
-        when 'mobile'
+        when "mobile"
           project.browser_configs.find_by(is_mobile: true) ||
-            project.browser_configs.create!(browser: 'chromium', name: 'Mobile', width: 375, height: 812, is_mobile: true, has_touch: true)
-        when 'tablet'
+            project.browser_configs.create!(browser: "chromium", name: "Mobile", width: 375, height: 812, is_mobile: true, has_touch: true)
+        when "tablet"
           project.browser_configs.find_by(width: 768..1024) ||
-            project.browser_configs.create!(browser: 'chromium', name: 'Tablet', width: 768, height: 1024)
+            project.browser_configs.create!(browser: "chromium", name: "Tablet", width: 768, height: 1024)
         else
           project.browser_configs.find_by(is_mobile: false) ||
             project.browser_configs.first

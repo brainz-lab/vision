@@ -11,7 +11,7 @@ class TestRunChannel < ApplicationCable::Channel
   # Broadcast methods for real-time updates
   def self.broadcast_progress(test_run)
     broadcast_to(test_run, {
-      type: 'progress',
+      type: "progress",
       summary: test_run.summary,
       progress: test_run.progress,
       status: test_run.status
@@ -20,7 +20,7 @@ class TestRunChannel < ApplicationCable::Channel
 
   def self.broadcast_comparison(test_run, comparison)
     broadcast_to(test_run, {
-      type: 'comparison',
+      type: "comparison",
       comparison: {
         id: comparison.id,
         page_name: comparison.page.name,
@@ -32,7 +32,7 @@ class TestRunChannel < ApplicationCable::Channel
 
   def self.broadcast_complete(test_run)
     broadcast_to(test_run, {
-      type: 'complete',
+      type: "complete",
       status: test_run.status,
       summary: test_run.summary,
       duration_ms: test_run.duration_ms

@@ -24,7 +24,7 @@ class Page < ApplicationRecord
     URI.join(project.staging_url, path).to_s
   end
 
-  def current_baseline(browser_config, branch: 'main')
+  def current_baseline(browser_config, branch: "main")
     baselines.where(browser_config: browser_config, branch: branch, active: true).first
   end
 

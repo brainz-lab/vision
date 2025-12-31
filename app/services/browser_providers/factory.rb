@@ -43,7 +43,7 @@ module BrowserProviders
       # List cloud providers only
       # @return [Array<String>] Cloud provider names
       def cloud_providers
-        PROVIDERS.keys - ["local"]
+        PROVIDERS.keys - [ "local" ]
       end
 
       # Check if a provider is available

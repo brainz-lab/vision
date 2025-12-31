@@ -1,7 +1,7 @@
 module Dashboard
   class PagesController < BaseController
     before_action :set_project
-    before_action :set_page, only: [:show, :edit, :update, :destroy]
+    before_action :set_page, only: [ :show, :edit, :update, :destroy ]
 
     def index
       @pages = @project.pages.includes(:latest_snapshot).ordered
@@ -20,7 +20,7 @@ module Dashboard
       @page = @project.pages.build(page_params)
 
       if @page.save
-        redirect_to dashboard_project_page_path(@project, @page), notice: 'Page created'
+        redirect_to dashboard_project_page_path(@project, @page), notice: "Page created"
       else
         render :new, status: :unprocessable_entity
       end
@@ -31,7 +31,7 @@ module Dashboard
 
     def update
       if @page.update(page_params)
-        redirect_to dashboard_project_page_path(@project, @page), notice: 'Page updated'
+        redirect_to dashboard_project_page_path(@project, @page), notice: "Page updated"
       else
         render :edit, status: :unprocessable_entity
       end
@@ -39,7 +39,7 @@ module Dashboard
 
     def destroy
       @page.destroy
-      redirect_to dashboard_project_pages_path(@project), notice: 'Page deleted'
+      redirect_to dashboard_project_pages_path(@project), notice: "Page deleted"
     end
 
     private
@@ -52,7 +52,7 @@ module Dashboard
       params.require(:page).permit(
         :name, :path, :wait_for, :wait_ms,
         :hide_selectors, :mask_selectors, :enabled,
-        viewport: [:width, :height]
+        viewport: [ :width, :height ]
       )
     end
   end

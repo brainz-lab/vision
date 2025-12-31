@@ -29,7 +29,7 @@ module Mcp
             description: "Maximum steps before stopping (default: 20)"
           }
         },
-        required: ["instruction"]
+        required: [ "instruction" ]
       }.freeze
 
       def call(args)

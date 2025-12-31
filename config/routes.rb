@@ -3,24 +3,24 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       # Projects (auto-provisioning)
-      post 'projects/provision', to: 'projects#provision'
-      get 'projects/lookup', to: 'projects#lookup'
+      post "projects/provision", to: "projects#provision"
+      get "projects/lookup", to: "projects#lookup"
 
       # Pages
-      resources :pages, only: [:index, :show, :create, :update, :destroy]
+      resources :pages, only: [ :index, :show, :create, :update, :destroy ]
 
       # Browser configs
-      resources :browser_configs, only: [:index, :show, :create, :update, :destroy]
+      resources :browser_configs, only: [ :index, :show, :create, :update, :destroy ]
 
       # Snapshots
-      resources :snapshots, only: [:index, :show, :create] do
+      resources :snapshots, only: [ :index, :show, :create ] do
         member do
           post :compare
         end
       end
 
       # Baselines
-      resources :baselines, only: [:index, :show] do
+      resources :baselines, only: [ :index, :show ] do
         member do
           post :approve
           post :reject
@@ -28,7 +28,7 @@ Rails.application.routes.draw do
       end
 
       # Comparisons
-      resources :comparisons, only: [:index, :show] do
+      resources :comparisons, only: [ :index, :show ] do
         member do
           post :approve
           post :reject
@@ -37,13 +37,13 @@ Rails.application.routes.draw do
       end
 
       # Test runs
-      resources :test_runs, only: [:index, :show, :create]
+      resources :test_runs, only: [ :index, :show, :create ]
 
       # Test cases
-      resources :test_cases, only: [:index, :show, :create, :update, :destroy]
+      resources :test_cases, only: [ :index, :show, :create, :update, :destroy ]
 
       # AI Tasks
-      resources :tasks, only: [:index, :show, :create] do
+      resources :tasks, only: [ :index, :show, :create ] do
         member do
           post :stop
           get :steps
@@ -51,7 +51,7 @@ Rails.application.routes.draw do
       end
 
       # Browser Sessions
-      resources :sessions, only: [:index, :show, :create, :destroy] do
+      resources :sessions, only: [ :index, :show, :create, :destroy ] do
         member do
           post :ai        # page.ai() - AI-powered action
           post :perform   # page.perform() - direct action
@@ -62,7 +62,7 @@ Rails.application.routes.draw do
       end
 
       # Credentials (Vault integration)
-      resources :credentials, only: [:index, :show, :create, :update, :destroy] do
+      resources :credentials, only: [ :index, :show, :create, :update, :destroy ] do
         member do
           post :test  # Test credential fetch from Vault
         end
@@ -72,29 +72,29 @@ Rails.application.routes.draw do
 
   # MCP Server
   namespace :mcp do
-    get 'tools', to: 'tools#index'
-    post 'tools/:name', to: 'tools#call'
-    post 'rpc', to: 'tools#rpc'
+    get "tools", to: "tools#index"
+    post "tools/:name", to: "tools#call"
+    post "rpc", to: "tools#rpc"
   end
 
   # SSO from Platform
-  get 'sso/callback', to: 'sso#callback'
+  get "sso/callback", to: "sso#callback"
 
   # Dashboard
   namespace :dashboard do
-    root to: 'projects#index'
+    root to: "projects#index"
 
-    resources :projects, only: [:index, :show, :new, :create, :edit, :update] do
-      resources :pages, only: [:index, :show, :new, :create, :edit, :update, :destroy]
-      resources :test_runs, only: [:index, :show, :create]
-      resources :baselines, only: [:index, :show]
-      resources :comparisons, only: [:index, :show] do
+    resources :projects, only: [ :index, :show, :new, :create, :edit, :update ] do
+      resources :pages, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
+      resources :test_runs, only: [ :index, :show, :create ]
+      resources :baselines, only: [ :index, :show ]
+      resources :comparisons, only: [ :index, :show ] do
         member do
           post :approve
           post :reject
         end
       end
-      resources :ai_tasks, only: [:index, :show] do
+      resources :ai_tasks, only: [ :index, :show ] do
         member do
           post :retry, action: :retry_task
         end
@@ -106,10 +106,10 @@ Rails.application.routes.draw do
   end
 
   # Health check
-  get 'up' => 'rails/health#show', as: :rails_health_check
+  get "up" => "rails/health#show", as: :rails_health_check
 
   # WebSocket
-  mount ActionCable.server => '/cable'
+  mount ActionCable.server => "/cable"
 
-  root 'dashboard/projects#index'
+  root "dashboard/projects#index"
 end

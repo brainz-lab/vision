@@ -37,8 +37,8 @@ class CreateAiTasks < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:project_id, :status]
-      t.index [:project_id, :created_at]
+      t.index [ :project_id, :status ]
+      t.index [ :project_id, :created_at ]
       t.index :status
       t.index :triggered_by
     end

@@ -58,8 +58,8 @@ class HttpClient
         max: MAX_RETRIES,
         interval: RETRY_INTERVAL,
         backoff_factor: RETRY_BACKOFF,
-        retry_statuses: [429, 500, 502, 503, 504],
-        methods: [:get, :post, :put, :delete]
+        retry_statuses: [ 429, 500, 502, 503, 504 ],
+        methods: [ :get, :post, :put, :delete ]
       }
       conn.options.timeout = @timeout
       conn.options.open_timeout = @open_timeout

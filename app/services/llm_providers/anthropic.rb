@@ -75,7 +75,7 @@ module LlmProviders
 
       encoded_data = format == :base64 ? image_data : Base64.strict_encode64(image_data)
 
-      messages = [{
+      messages = [ {
         role: "user",
         content: [
           {
@@ -91,7 +91,7 @@ module LlmProviders
             text: prompt
           }
         ]
-      }]
+      } ]
 
       body = {
         model: resolve_model,
@@ -113,11 +113,11 @@ module LlmProviders
       log_request(:extract_structured, schema_name: schema[:title] || "unnamed")
 
       # Use tool_use for structured output
-      tools = [{
+      tools = [ {
         name: "extract_data",
         description: "Extract structured data from the content",
         input_schema: schema
-      }]
+      } ]
 
       body = {
         model: resolve_model,

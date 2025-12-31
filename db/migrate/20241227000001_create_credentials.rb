@@ -28,7 +28,7 @@ class CreateCredentials < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :credentials, [:project_id, :name], unique: true
+    add_index :credentials, [ :project_id, :name ], unique: true
     add_index :credentials, :vault_path
     add_index :credentials, :service_url
     add_index :credentials, :active

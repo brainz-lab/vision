@@ -58,7 +58,7 @@ class ActionCacheEntry < ApplicationRecord
 
       # Group entries by unique key to handle duplicates within the same batch
       grouped = entries.group_by do |entry|
-        [url_to_pattern(entry[:url]), entry[:action].to_s]
+        [ url_to_pattern(entry[:url]), entry[:action].to_s ]
       end
 
       # Build records for upsert, merging duplicates
@@ -84,19 +84,19 @@ class ActionCacheEntry < ApplicationRecord
       # We use find_or_create pattern with update to handle the increment
       ActiveRecord::Base.transaction do
         # First, find all existing entries in a single query
-        existing_keys = records.map { |r| [r[:project_id], r[:url_pattern], r[:action_type], r[:instruction_hash]] }
+        existing_keys = records.map { |r| [ r[:project_id], r[:url_pattern], r[:action_type], r[:instruction_hash] ] }
 
         existing_entries = where(project_id: project.id)
           .where(url_pattern: records.map { |r| r[:url_pattern] })
           .where(action_type: records.map { |r| r[:action_type] })
           .where(instruction_hash: instruction_hash)
-          .index_by { |e| [e.project_id, e.url_pattern, e.action_type, e.instruction_hash] }
+          .index_by { |e| [ e.project_id, e.url_pattern, e.action_type, e.instruction_hash ] }
 
         updates = []
         inserts = []
 
         records.each do |record|
-          key = [record[:project_id], record[:url_pattern], record[:action_type], record[:instruction_hash]]
+          key = [ record[:project_id], record[:url_pattern], record[:action_type], record[:instruction_hash] ]
           if (existing = existing_entries[key])
             updates << {
               id: existing.id,
@@ -119,8 +119,8 @@ class ActionCacheEntry < ApplicationRecord
         # Batch update existing records using a single UPDATE with CASE
         if updates.any?
           ids = updates.map { |u| u[:id] }
-          success_counts = updates.map { |u| [u[:id], u[:success_count]] }.to_h
-          action_data_map = updates.map { |u| [u[:id], u[:action_data]] }.to_h
+          success_counts = updates.map { |u| [ u[:id], u[:success_count] ] }.to_h
+          action_data_map = updates.map { |u| [ u[:id], u[:action_data] ] }.to_h
 
           # Build CASE statement for success_count
           success_case = "CASE id " + updates.map { |u|
@@ -213,7 +213,7 @@ class ActionCacheEntry < ApplicationRecord
 
     now = Time.current
     where(id: entry_ids).update_all(
-      ["success_count = success_count + 1, last_used_at = ?, updated_at = ?", now, now]
+      [ "success_count = success_count + 1, last_used_at = ?, updated_at = ?", now, now ]
     )
   end
 
@@ -223,7 +223,7 @@ class ActionCacheEntry < ApplicationRecord
 
     now = Time.current
     where(id: entry_ids).update_all(
-      ["failure_count = failure_count + 1, updated_at = ?", now]
+      [ "failure_count = failure_count + 1, updated_at = ?", now ]
     )
 
     # Check for entries that need invalidation

@@ -8,7 +8,7 @@ class SsoController < ApplicationController
     return_to = params[:return_to] || dashboard_root_path
 
     if token.blank?
-      redirect_to safe_return_to(return_to), alert: 'SSO token missing'
+      redirect_to safe_return_to(return_to), alert: "SSO token missing"
       return
     end
 
@@ -20,9 +20,9 @@ class SsoController < ApplicationController
       session[:user_email] = result[:email]
       session[:project_id] = result[:project_id]
 
-      redirect_to safe_return_to(return_to), allow_other_host: true, notice: 'Signed in successfully'
+      redirect_to safe_return_to(return_to), allow_other_host: true, notice: "Signed in successfully"
     else
-      redirect_to safe_return_to(return_to), alert: 'SSO authentication failed'
+      redirect_to safe_return_to(return_to), alert: "SSO authentication failed"
     end
   end
 
@@ -40,10 +40,10 @@ class SsoController < ApplicationController
 
     # Allow trusted hosts
     trusted_hosts = [
-      'brainzlab.ai',
-      'vision.brainzlab.ai',
-      'platform.brainzlab.ai',
-      'localhost'
+      "brainzlab.ai",
+      "vision.brainzlab.ai",
+      "platform.brainzlab.ai",
+      "localhost"
     ]
 
     if trusted_hosts.any? { |host| uri.host == host || uri.host&.end_with?(".#{host}") }
@@ -61,9 +61,9 @@ class SsoController < ApplicationController
     if Rails.env.development?
       {
         valid: true,
-        user_id: 'dev_user',
-        email: 'dev@brainzlab.ai',
-        project_id: 'dev_project'
+        user_id: "dev_user",
+        email: "dev@brainzlab.ai",
+        project_id: "dev_project"
       }
     else
       # Make request to Platform to validate token

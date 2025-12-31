@@ -28,9 +28,9 @@ class CreateSnapshots < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:page_id, :captured_at]
-      t.index [:test_run_id, :page_id]
-      t.index [:test_run_id, :status]
+      t.index [ :page_id, :captured_at ]
+      t.index [ :test_run_id, :page_id ]
+      t.index [ :test_run_id, :status ]
     end
   end
 end

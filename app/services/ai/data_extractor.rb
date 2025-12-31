@@ -38,7 +38,7 @@ module Ai
 
       if schema
         # Use structured output
-        messages = [{ role: "user", content: prompt }]
+        messages = [ { role: "user", content: prompt } ]
         @llm.extract_structured(messages: messages, schema: schema)
       else
         # Use vision for free-form extraction
@@ -70,10 +70,10 @@ module Ai
       PROMPT
 
       if schema
-        messages = [{ role: "user", content: prompt }]
+        messages = [ { role: "user", content: prompt } ]
         @llm.extract_structured(messages: messages, schema: schema)
       else
-        response = @llm.complete(messages: [{ role: "user", content: prompt }])
+        response = @llm.complete(messages: [ { role: "user", content: prompt } ])
         parse_extraction_response(response[:text])
       end
     end

@@ -3,21 +3,21 @@ module Mcp
     class VisionTest < Base
       DESCRIPTION = "Run visual regression test for all pages"
       SCHEMA = {
-        type: 'object',
+        type: "object",
         properties: {
           branch: {
-            type: 'string',
-            description: 'Git branch name'
+            type: "string",
+            description: "Git branch name"
           },
           pages: {
-            type: 'array',
-            items: { type: 'string' },
-            description: 'Specific page names/slugs to test (optional, tests all if omitted)'
+            type: "array",
+            items: { type: "string" },
+            description: "Specific page names/slugs to test (optional, tests all if omitted)"
           },
           environment: {
-            type: 'string',
-            enum: ['staging', 'production'],
-            default: 'staging'
+            type: "string",
+            enum: [ "staging", "production" ],
+            default: "staging"
           }
         }
       }.freeze
@@ -27,10 +27,10 @@ module Mcp
       def call(args)
         # Create test run
         test_run = project.test_runs.create!(
-          branch: args[:branch] || 'main',
-          environment: args[:environment] || 'staging',
-          triggered_by: 'mcp',
-          status: 'pending'
+          branch: args[:branch] || "main",
+          environment: args[:environment] || "staging",
+          triggered_by: "mcp",
+          status: "pending"
         )
 
         # Get pages to test
@@ -48,11 +48,11 @@ module Mcp
         test_run.update!(total_pages: total, pending_count: total)
 
         if total.zero?
-          test_run.update!(status: 'passed')
+          test_run.update!(status: "passed")
           return success({
             test_run_id: test_run.id,
-            status: 'passed',
-            message: 'No pages configured for testing',
+            status: "passed",
+            message: "No pages configured for testing",
             summary: test_run.summary
           })
         end
@@ -91,8 +91,8 @@ module Mcp
           test_run: test_run,
           branch: test_run.branch,
           environment: test_run.environment,
-          triggered_by: 'mcp',
-          status: 'pending'
+          triggered_by: "mcp",
+          status: "pending"
         )
 
         # Capture screenshot

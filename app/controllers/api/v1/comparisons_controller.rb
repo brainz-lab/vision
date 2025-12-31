@@ -16,7 +16,7 @@ module Api
         )
 
         render json: {
-          message: 'Comparison approved',
+          message: "Comparison approved",
           baseline_updated: params[:update_baseline] == true,
           comparison: serialize_comparison(@comparison)
         }
@@ -27,7 +27,7 @@ module Api
         @comparison.reject!(current_user_email, notes: params[:notes])
 
         render json: {
-          message: 'Comparison rejected',
+          message: "Comparison rejected",
           comparison: serialize_comparison(@comparison)
         }
       end
@@ -38,7 +38,7 @@ module Api
         @comparison.approve!(current_user_email)
 
         render json: {
-          message: 'Baseline updated',
+          message: "Baseline updated",
           comparison: serialize_comparison(@comparison)
         }
       end
@@ -53,7 +53,7 @@ module Api
 
       def current_user_email
         # In a real implementation, this would come from the authenticated user
-        params[:user_email] || @key_info[:user_email] || 'api@vision.brainzlab.ai'
+        params[:user_email] || @key_info[:user_email] || "api@vision.brainzlab.ai"
       end
 
       def serialize_comparison(comparison)

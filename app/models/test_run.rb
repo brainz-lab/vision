@@ -12,23 +12,23 @@ class TestRun < ApplicationRecord
   scope :in_progress, -> { where(status: %w[pending running]) }
 
   def pending?
-    status == 'pending'
+    status == "pending"
   end
 
   def running?
-    status == 'running'
+    status == "running"
   end
 
   def passed?
-    status == 'passed'
+    status == "passed"
   end
 
   def failed?
-    status == 'failed'
+    status == "failed"
   end
 
   def error?
-    status == 'error'
+    status == "error"
   end
 
   def completed?
@@ -37,7 +37,7 @@ class TestRun < ApplicationRecord
 
   def start!
     update!(
-      status: 'running',
+      status: "running",
       started_at: Time.current
     )
   end
@@ -55,15 +55,15 @@ class TestRun < ApplicationRecord
   end
 
   def pass!
-    update!(status: 'passed')
+    update!(status: "passed")
   end
 
   def fail!
-    update!(status: 'failed')
+    update!(status: "failed")
   end
 
   def error!(message = nil)
-    update!(status: 'error')
+    update!(status: "error")
   end
 
   def summary
@@ -94,11 +94,11 @@ class TestRun < ApplicationRecord
 
   def determine_final_status
     if error_count.positive?
-      'error'
+      "error"
     elsif failed_count.positive?
-      'failed'
+      "failed"
     else
-      'passed'
+      "passed"
     end
   end
 

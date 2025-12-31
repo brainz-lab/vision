@@ -1,12 +1,12 @@
 # BrowserPool manages Playwright browser instances using connection pooling
 # to efficiently share browser resources across multiple screenshot captures.
 
-require 'connection_pool'
-require 'playwright'
+require "connection_pool"
+require "playwright"
 
 class BrowserPool
-  POOL_SIZE = ENV.fetch('BROWSER_POOL_SIZE', 5).to_i
-  POOL_TIMEOUT = ENV.fetch('BROWSER_POOL_TIMEOUT', 30).to_i
+  POOL_SIZE = ENV.fetch("BROWSER_POOL_SIZE", 5).to_i
+  POOL_TIMEOUT = ENV.fetch("BROWSER_POOL_TIMEOUT", 30).to_i
 
   class << self
     def with_browser(browser_config, &block)
@@ -54,7 +54,7 @@ class BrowserPool
       playwright = execution.playwright
       browser = playwright.send(browser_config.browser.to_sym).launch(
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: [ "--no-sandbox", "--disable-setuid-sandbox" ]
       )
 
       context_options = {
@@ -74,12 +74,12 @@ class BrowserPool
     def find_playwright_path
       # Try to find npx playwright in various locations
       paths = [
-        'npx playwright',
-        '/usr/local/bin/npx playwright',
-        File.join(ENV['HOME'], '.npm-global/bin/npx playwright')
+        "npx playwright",
+        "/usr/local/bin/npx playwright",
+        File.join(ENV["HOME"], ".npm-global/bin/npx playwright")
       ]
 
-      paths.find { |path| system("which #{path.split.first} > /dev/null 2>&1") } || 'npx playwright'
+      paths.find { |path| system("which #{path.split.first} > /dev/null 2>&1") } || "npx playwright"
     end
   end
 end

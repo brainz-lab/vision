@@ -124,7 +124,7 @@ module Ai
       # @return [String] Formatted element list
       def format_for_prompt(elements, max_elements: 40)
         elements.first(max_elements).map do |el|
-          parts = ["#{el[:index]}. #{el[:tag]}"]
+          parts = [ "#{el[:index]}. #{el[:tag]}" ]
 
           if el[:type].present?
             parts << "[#{el[:type]}]"

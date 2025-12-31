@@ -18,7 +18,7 @@ module DashboardHelper
 
   # Navigation helpers for sidebar
   def nav_active?(path_pattern)
-    if path_pattern == '/settings'
+    if path_pattern == "/settings"
       request.path.match?(%r{/projects/[^/]+/settings$})
     else
       request.path.include?(path_pattern)

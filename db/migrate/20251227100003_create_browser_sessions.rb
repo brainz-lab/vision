@@ -27,7 +27,7 @@ class CreateBrowserSessions < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:project_id, :status]
+      t.index [ :project_id, :status ]
       t.index :provider_session_id, unique: true
       t.index :status
       t.index :expires_at

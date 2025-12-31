@@ -1,7 +1,7 @@
 module Dashboard
   class TestRunsController < BaseController
     before_action :set_project
-    before_action :set_test_run, only: [:show]
+    before_action :set_test_run, only: [ :show ]
 
     def index
       @test_runs = @project.test_runs.recent.limit(50)
@@ -14,13 +14,13 @@ module Dashboard
     def create
       @test_run = @project.test_runs.build(
         name: params[:name] || "Test Run #{Time.current.strftime('%Y-%m-%d %H:%M')}",
-        status: 'pending'
+        status: "pending"
       )
 
       if @test_run.save
-        redirect_to dashboard_project_test_run_path(@project, @test_run), notice: 'Test run started'
+        redirect_to dashboard_project_test_run_path(@project, @test_run), notice: "Test run started"
       else
-        redirect_to dashboard_project_test_runs_path(@project), alert: 'Failed to create test run'
+        redirect_to dashboard_project_test_runs_path(@project), alert: "Failed to create test run"
       end
     end
 

@@ -1,8 +1,8 @@
 module Api
   module V1
     class SnapshotsController < BaseController
-      before_action :set_page, only: [:index, :create]
-      before_action :set_snapshot, only: [:show, :compare]
+      before_action :set_page, only: [ :index, :create ]
+      before_action :set_snapshot, only: [ :show, :compare ]
 
       # GET /api/v1/snapshots
       def index
@@ -33,9 +33,9 @@ module Api
           browser_config: browser_config,
           branch: params[:branch],
           commit_sha: params[:commit_sha],
-          environment: params[:environment] || 'staging',
-          triggered_by: 'api',
-          status: 'pending'
+          environment: params[:environment] || "staging",
+          triggered_by: "api",
+          status: "pending"
         )
 
         if snapshot.save
@@ -51,8 +51,8 @@ module Api
 
       # POST /api/v1/snapshots/:id/compare
       def compare
-        if @snapshot.status != 'captured'
-          render json: { error: 'Snapshot not yet captured' }, status: :unprocessable_entity
+        if @snapshot.status != "captured"
+          render json: { error: "Snapshot not yet captured" }, status: :unprocessable_entity
           return
         end
 
@@ -60,7 +60,7 @@ module Api
         CompareScreenshotsJob.perform_later(@snapshot.id)
 
         render json: {
-          message: 'Comparison queued',
+          message: "Comparison queued",
           snapshot_id: @snapshot.id
         }
       end
@@ -78,7 +78,7 @@ module Api
       def find_or_create_page
         if params[:url]
           uri = URI.parse(params[:url])
-          path = uri.path.presence || '/'
+          path = uri.path.presence || "/"
           name = params[:name] || path
 
           current_project.pages.find_or_create_by!(path: path) do |page|

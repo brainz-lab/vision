@@ -18,20 +18,20 @@ module Ai
       'button:has-text("Allow all")',
       'button:has-text("Allow All")',
       'button:has-text("Consent")',
-      'button#onetrust-accept-btn-handler',
-      'button.accept-cookies',
-      'button.cookie-accept',
+      "button#onetrust-accept-btn-handler",
+      "button.accept-cookies",
+      "button.cookie-accept",
       'button[data-testid="accept-cookies"]',
-      'button.js-accept-cookies',
+      "button.js-accept-cookies",
       # Close buttons on consent dialogs
       '[aria-label="Close cookie banner"]',
-      '.cookie-banner button.close',
-      '.cookie-notice button.close',
-      '.gdpr-banner button.close',
+      ".cookie-banner button.close",
+      ".cookie-notice button.close",
+      ".gdpr-banner button.close",
       # Specific frameworks
-      '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll',
-      '#didomi-notice-agree-button',
-      '.fc-button.fc-cta-consent',
+      "#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll",
+      "#didomi-notice-agree-button",
+      ".fc-button.fc-cta-consent",
       '.qc-cmp2-summary-buttons button[mode="primary"]'
     ].freeze
 
@@ -39,23 +39,23 @@ module Ai
     POPUP_CLOSE_SELECTORS = [
       'button[aria-label="Close"]',
       'button[aria-label="Dismiss"]',
-      'button.modal-close',
-      'button.popup-close',
+      "button.modal-close",
+      "button.popup-close",
       '[class*="close-button"]',
       '[class*="close-modal"]',
       '[class*="dismiss"]',
-      '.modal-header button.close',
-      '.dialog-close',
+      ".modal-header button.close",
+      ".dialog-close",
       '[data-dismiss="modal"]',
-      'button.close-btn',
+      "button.close-btn",
       '[aria-label="close"]'
     ].freeze
 
     # Overlay/backdrop selectors that might block clicks
     OVERLAY_SELECTORS = [
-      '.modal-backdrop',
-      '.overlay',
-      '.popup-overlay',
+      ".modal-backdrop",
+      ".overlay",
+      ".popup-overlay",
       '[class*="backdrop"]'
     ].freeze
 

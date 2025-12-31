@@ -60,23 +60,23 @@ module Api
       def check_feature_access!
         unless @key_info.dig(:features, :vision)
           render json: {
-            error: 'Vision is not included in your plan',
-            upgrade_url: 'https://brainzlab.ai/pricing'
+            error: "Vision is not included in your plan",
+            upgrade_url: "https://brainzlab.ai/pricing"
           }, status: :forbidden
         end
       end
 
       def extract_api_key
-        auth_header = request.headers['Authorization']
-        return auth_header.sub(/^Bearer\s+/, '') if auth_header&.start_with?('Bearer ')
-        request.headers['X-API-Key'] || params[:api_key]
+        auth_header = request.headers["Authorization"]
+        return auth_header.sub(/^Bearer\s+/, "") if auth_header&.start_with?("Bearer ")
+        request.headers["X-API-Key"] || params[:api_key]
       end
 
       def track_usage!(count = 1)
         PlatformClient.track_usage(
           project_id: @key_info[:project_id],
-          product: 'vision',
-          metric: 'snapshots',
+          product: "vision",
+          metric: "snapshots",
           count: count
         )
       end

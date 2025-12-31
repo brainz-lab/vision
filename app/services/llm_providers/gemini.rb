@@ -31,7 +31,7 @@ module LlmProviders
       # Extract system instruction if present
       system_msg = messages.find { |m| m[:role] == "system" }
       if system_msg
-        body[:systemInstruction] = { parts: [{ text: system_msg[:content] }] }
+        body[:systemInstruction] = { parts: [ { text: system_msg[:content] } ] }
         body[:contents] = body[:contents].reject { |m| m[:role] == "system" }
       end
 
@@ -70,7 +70,7 @@ module LlmProviders
       encoded_data = format == :base64 ? image_data : Base64.strict_encode64(image_data)
 
       body = {
-        contents: [{
+        contents: [ {
           parts: [
             {
               inlineData: {
@@ -80,7 +80,7 @@ module LlmProviders
             },
             { text: prompt }
           ]
-        }]
+        } ]
       }
 
       response = make_request("generateContent", body)
@@ -153,13 +153,13 @@ module LlmProviders
 
         {
           role: role,
-          parts: [{ text: msg[:content] }]
+          parts: [ { text: msg[:content] } ]
         }
       end
     end
 
     def format_tools(tools)
-      [{
+      [ {
         functionDeclarations: tools.map do |tool|
           {
             name: tool[:name],
@@ -167,7 +167,7 @@ module LlmProviders
             parameters: tool[:schema] || tool[:parameters]
           }
         end
-      }]
+      } ]
     end
 
     def parse_response(response)
@@ -178,10 +178,10 @@ module LlmProviders
       if content["functionCall"]
         {
           text: nil,
-          tool_calls: [{
+          tool_calls: [ {
             name: content.dig("functionCall", "name"),
             input: content.dig("functionCall", "args")
-          }],
+          } ],
           stop_reason: candidate["finishReason"],
           usage: response["usageMetadata"]
         }

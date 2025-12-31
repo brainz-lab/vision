@@ -84,7 +84,7 @@ module Ai
         # Check if stuck
         if stuck?
           emit(:thought, type: :stuck, message: "I seem to be stuck - same state for #{MAX_SAME_STATE} steps")
-          answer = ask_user!(type: :stuck, options: ["Keep trying", "Give me a hint", "Stop"])
+          answer = ask_user!(type: :stuck, options: [ "Keep trying", "Give me a hint", "Stop" ])
           break if answer == :stop
         end
 
@@ -310,12 +310,12 @@ module Ai
       if context[:type] == :stuck
         {
           message: "I seem to be stuck. What should I do?",
-          options: context[:options] || ["Keep trying", "Give me a hint", "Stop"]
+          options: context[:options] || [ "Keep trying", "Give me a hint", "Stop" ]
         }
       else
         {
           message: "I'm not sure what to do next. #{context[:thinking]}",
-          options: ["Try option 1", "Try option 2", "Let me describe more", "Stop"]
+          options: [ "Try option 1", "Try option 2", "Let me describe more", "Stop" ]
         }
       end
     end

@@ -3,25 +3,25 @@ module Mcp
     class VisionCompare < Base
       DESCRIPTION = "Compare current page state to baseline"
       SCHEMA = {
-        type: 'object',
+        type: "object",
         properties: {
           page: {
-            type: 'string',
-            description: 'Page name, slug, or path'
+            type: "string",
+            description: "Page name, slug, or path"
           },
           url: {
-            type: 'string',
-            description: 'URL to capture and compare (alternative to page)'
+            type: "string",
+            description: "URL to capture and compare (alternative to page)"
           },
           threshold: {
-            type: 'number',
-            description: 'Diff threshold (0.01 = 1%)',
+            type: "number",
+            description: "Diff threshold (0.01 = 1%)",
             default: 0.01
           },
           viewport: {
-            type: 'string',
-            enum: ['desktop', 'mobile'],
-            default: 'desktop'
+            type: "string",
+            enum: [ "desktop", "mobile" ],
+            default: "desktop"
           }
         }
       }.freeze
@@ -39,8 +39,8 @@ module Mcp
         # Capture current state
         snapshot = page.snapshots.create!(
           browser_config: browser_config,
-          triggered_by: 'mcp',
-          status: 'pending'
+          triggered_by: "mcp",
+          status: "pending"
         )
 
         ScreenshotService.new(snapshot).capture
@@ -49,7 +49,7 @@ module Mcp
           # No baseline - create one
           snapshot.promote_to_baseline!
           return success({
-            status: 'baseline_created',
+            status: "baseline_created",
             message: "No baseline existed. Created new baseline from current screenshot.",
             snapshot_id: snapshot.id,
             screenshot_url: snapshot.screenshot_url
@@ -83,7 +83,7 @@ module Mcp
       def find_page(args)
         if args[:url]
           uri = URI.parse(args[:url])
-          path = uri.path.presence || '/'
+          path = uri.path.presence || "/"
           project.pages.find_by(path: path)
         elsif args[:page]
           project.pages.find_by(slug: args[:page]) ||
@@ -96,7 +96,7 @@ module Mcp
 
       def find_browser_config(viewport)
         case viewport
-        when 'mobile'
+        when "mobile"
           project.browser_configs.find_by(is_mobile: true) || project.browser_configs.first
         else
           project.browser_configs.find_by(is_mobile: false) || project.browser_configs.first

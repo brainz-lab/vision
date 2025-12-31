@@ -7,7 +7,7 @@ class CompareScreenshotsJob < ApplicationJob
     # Get the baseline
     baseline = snapshot.page.current_baseline(
       snapshot.browser_config,
-      branch: snapshot.test_run&.base_branch || 'main'
+      branch: snapshot.test_run&.base_branch || "main"
     )
 
     unless baseline

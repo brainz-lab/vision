@@ -3,7 +3,7 @@
 module Api
   module V1
     class CredentialsController < BaseController
-      before_action :set_credential, only: [:show, :update, :destroy, :test]
+      before_action :set_credential, only: [ :show, :update, :destroy, :test ]
 
       # GET /api/v1/credentials
       # List all credentials for the project (never returns actual values)

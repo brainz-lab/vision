@@ -3,16 +3,16 @@ module Mcp
     class VisionListFailures < Base
       DESCRIPTION = "List failed visual comparisons that need review"
       SCHEMA = {
-        type: 'object',
+        type: "object",
         properties: {
           test_run_id: {
-            type: 'string',
-            description: 'Filter by test run ID (optional)'
+            type: "string",
+            description: "Filter by test run ID (optional)"
           },
           limit: {
-            type: 'integer',
+            type: "integer",
             default: 20,
-            description: 'Maximum number of results'
+            description: "Maximum number of results"
           }
         }
       }.freeze
@@ -20,8 +20,8 @@ module Mcp
       def call(args)
         comparisons = Comparison.joins(snapshot: { page: :project })
                                .where(projects: { id: project.id })
-                               .where(status: 'failed')
-                               .where(review_status: 'pending')
+                               .where(status: "failed")
+                               .where(review_status: "pending")
                                .order(created_at: :desc)
 
         if args[:test_run_id]

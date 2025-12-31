@@ -432,8 +432,8 @@ module Ai
       normalized = selector.gsub(/:contains\((['"])(.*?)\1\)/, ':has-text(\1\2\1)')
 
       # Fix other common issues
-      normalized = normalized.gsub(/:visible/, '') # :visible is not valid
-      normalized = normalized.gsub(/\s+$/, '')     # Trim trailing whitespace
+      normalized = normalized.gsub(/:visible/, "") # :visible is not valid
+      normalized = normalized.gsub(/\s+$/, "")     # Trim trailing whitespace
 
       if normalized != selector
         Rails.logger.info "[TaskExecutor] Normalized selector: #{selector} -> #{normalized}"
@@ -683,7 +683,7 @@ module Ai
         }
       end
 
-      unique_elements = elements.uniq { |e| [e[:tag], e[:text], e[:id]].compact.join("-") }
+      unique_elements = elements.uniq { |e| [ e[:tag], e[:text], e[:id] ].compact.join("-") }
 
       # Log any checkbox-related elements for debugging
       checkbox_elements = unique_elements.select { |e|

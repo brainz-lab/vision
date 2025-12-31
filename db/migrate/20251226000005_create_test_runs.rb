@@ -35,10 +35,10 @@ class CreateTestRuns < ActiveRecord::Migration[8.0]
 
       t.timestamps
 
-      t.index [:project_id, :created_at]
-      t.index [:project_id, :branch]
-      t.index [:project_id, :pr_number]
-      t.index [:project_id, :status]
+      t.index [ :project_id, :created_at ]
+      t.index [ :project_id, :branch ]
+      t.index [ :project_id, :pr_number ]
+      t.index [ :project_id, :status ]
     end
   end
 end

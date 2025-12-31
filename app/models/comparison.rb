@@ -7,11 +7,11 @@ class Comparison < ApplicationRecord
 
   validates :status, presence: true, inclusion: { in: %w[pending passed failed error] }
 
-  scope :passed, -> { where(status: 'passed') }
-  scope :failed, -> { where(status: 'failed') }
-  scope :pending_review, -> { where(review_status: 'pending') }
-  scope :approved, -> { where(review_status: 'approved') }
-  scope :rejected, -> { where(review_status: 'rejected') }
+  scope :passed, -> { where(status: "passed") }
+  scope :failed, -> { where(status: "failed") }
+  scope :pending_review, -> { where(review_status: "pending") }
+  scope :approved, -> { where(review_status: "approved") }
+  scope :rejected, -> { where(review_status: "rejected") }
 
   def project
     snapshot.page.project
@@ -22,23 +22,23 @@ class Comparison < ApplicationRecord
   end
 
   def passed?
-    status == 'passed'
+    status == "passed"
   end
 
   def failed?
-    status == 'failed'
+    status == "failed"
   end
 
   def pending?
-    status == 'pending'
+    status == "pending"
   end
 
   def error?
-    status == 'error'
+    status == "error"
   end
 
   def needs_review?
-    review_status == 'pending' && failed?
+    review_status == "pending" && failed?
   end
 
   def diff_image_url
@@ -49,7 +49,7 @@ class Comparison < ApplicationRecord
   def approve!(user_email, update_baseline: false)
     transaction do
       update!(
-        review_status: 'approved',
+        review_status: "approved",
         reviewed_at: Time.current,
         reviewed_by: user_email
       )
@@ -69,7 +69,7 @@ class Comparison < ApplicationRecord
 
   def reject!(user_email, notes: nil)
     update!(
-      review_status: 'rejected',
+      review_status: "rejected",
       reviewed_at: Time.current,
       reviewed_by: user_email,
       review_notes: notes

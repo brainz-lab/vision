@@ -1,7 +1,7 @@
 module Api
   module V1
     class BrowserConfigsController < BaseController
-      before_action :set_browser_config, only: [:show, :update, :destroy]
+      before_action :set_browser_config, only: [ :show, :update, :destroy ]
 
       # GET /api/v1/browser_configs
       def index

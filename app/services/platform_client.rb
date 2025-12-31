@@ -6,14 +6,14 @@ class PlatformClient
     def validate_key(raw_key)
       return invalid_response unless raw_key.present?
 
-      response = make_request('/api/v1/keys/validate', { key: raw_key })
+      response = make_request("/api/v1/keys/validate", { key: raw_key })
 
       if response[:valid]
         {
           valid: true,
           project_id: response[:project_id],
           project_name: response[:project_name],
-          environment: response[:environment] || 'production',
+          environment: response[:environment] || "production",
           features: response[:features] || { vision: true },
           limits: response[:limits] || {}
         }
@@ -27,8 +27,8 @@ class PlatformClient
         {
           valid: true,
           project_id: "dev_#{raw_key.first(8)}",
-          project_name: 'Development Project',
-          environment: 'development',
+          project_name: "Development Project",
+          environment: "development",
           features: { vision: true },
           limits: {}
         }
@@ -39,7 +39,7 @@ class PlatformClient
 
     def track_usage(project_id:, product:, metric:, count:)
       Thread.new do
-        make_request('/api/v1/usage/track', {
+        make_request("/api/v1/usage/track", {
           project_id: project_id,
           product: product,
           metric: metric,
@@ -59,13 +59,13 @@ class PlatformClient
     def make_request(path, body)
       uri = URI.parse("#{platform_url}#{path}")
       http = Net::HTTP.new(uri.host, uri.port)
-      http.use_ssl = uri.scheme == 'https'
+      http.use_ssl = uri.scheme == "https"
       http.open_timeout = 5
       http.read_timeout = 10
 
       request = Net::HTTP::Post.new(uri.path)
-      request['Content-Type'] = 'application/json'
-      request['X-Service-Key'] = service_key if service_key.present?
+      request["Content-Type"] = "application/json"
+      request["X-Service-Key"] = service_key if service_key.present?
       request.body = body.to_json
 
       response = http.request(request)
@@ -79,11 +79,11 @@ class PlatformClient
     end
 
     def platform_url
-      ENV.fetch('BRAINZLAB_PLATFORM_URL', 'http://platform:3000')
+      ENV.fetch("BRAINZLAB_PLATFORM_URL", "http://platform:3000")
     end
 
     def service_key
-      ENV['SERVICE_KEY']
+      ENV["SERVICE_KEY"]
     end
   end
 end

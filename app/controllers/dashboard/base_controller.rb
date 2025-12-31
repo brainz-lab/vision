@@ -1,6 +1,6 @@
 module Dashboard
   class BaseController < ApplicationController
-    layout 'dashboard'
+    layout "dashboard"
 
     helper_method :current_project
 

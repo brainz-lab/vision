@@ -1,7 +1,7 @@
 module Api
   module V1
     class TestRunsController < BaseController
-      before_action :set_test_run, only: [:show]
+      before_action :set_test_run, only: [ :show ]
 
       # GET /api/v1/test_runs
       def index
@@ -34,12 +34,12 @@ module Api
           branch: params[:branch],
           commit_sha: params[:commit_sha],
           commit_message: params[:commit_message],
-          environment: params[:environment] || 'staging',
-          triggered_by: params[:triggered_by] || 'api',
+          environment: params[:environment] || "staging",
+          triggered_by: params[:triggered_by] || "api",
           trigger_source: params[:trigger_source],
           pr_number: params[:pr_number],
           pr_url: params[:pr_url],
-          base_branch: params[:base_branch] || 'main'
+          base_branch: params[:base_branch] || "main"
         )
 
         track_usage!(test_run.total_pages)
