@@ -1,0 +1,82 @@
+# Test fixtures for Snapshot model
+
+pending_snapshot:
+  page: homepage
+  browser_config: chrome_desktop
+  test_run: running_run
+  status: pending
+  branch: feature/new-feature
+  environment: production
+
+captured_snapshot:
+  page: homepage
+  browser_config: chrome_desktop
+  test_run: passed_run
+  status: captured
+  branch: main
+  width: 1280
+  height: 2400
+  file_size: 152000
+  captured_at: <%= Time.current - 1.minute %>
+  capture_duration_ms: 3500
+  environment: production
+
+comparing_snapshot:
+  page: login_page
+  browser_config: chrome_desktop
+  test_run: running_run
+  status: comparing
+  branch: feature/new-feature
+  width: 1280
+  height: 800
+  file_size: 48000
+  captured_at: <%= Time.current - 30.seconds %>
+  capture_duration_ms: 2000
+  environment: production
+
+compared_snapshot:
+  page: homepage
+  browser_config: chrome_desktop
+  test_run: passed_run
+  status: compared
+  branch: main
+  width: 1280
+  height: 2400
+  file_size: 151000
+  captured_at: <%= Time.current - 2.minutes %>
+  capture_duration_ms: 3200
+  environment: production
+
+error_snapshot:
+  page: dashboard
+  browser_config: chrome_desktop
+  test_run: error_run
+  status: error
+  branch: main
+  environment: production
+  metadata:
+    error: "Failed to navigate: timeout"
+
+mobile_snapshot:
+  page: homepage
+  browser_config: chrome_mobile
+  test_run: running_run
+  status: captured
+  branch: feature/new-feature
+  width: 375
+  height: 2000
+  file_size: 75000
+  captured_at: <%= Time.current - 20.seconds %>
+  capture_duration_ms: 2800
+  environment: production
+
+staging_snapshot:
+  page: homepage
+  browser_config: chrome_desktop
+  status: captured
+  branch: main
+  width: 1280
+  height: 2400
+  file_size: 150000
+  captured_at: <%= Time.current - 5.minutes %>
+  environment: staging

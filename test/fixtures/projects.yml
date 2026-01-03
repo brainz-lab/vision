@@ -1,0 +1,33 @@
+# Test fixtures for Project model
+
+main_project:
+  platform_project_id: plt_test_main_project
+  name: Main Test Project
+  base_url: https://example.com
+  staging_url: https://staging.example.com
+  environment: production
+  settings:
+    threshold: 0.01
+    default_viewport:
+      width: 1280
+      height: 720
+    wait_before_capture: 500
+    hide_selectors: []
+    mask_selectors: []
+    ai:
+      enabled: true
+      default_model: claude-sonnet-4
+      default_browser_provider: local
+      max_steps: 25
+      timeout_seconds: 300
+
+secondary_project:
+  platform_project_id: plt_test_secondary
+  name: Secondary Project
+  base_url: https://secondary.example.com
+  environment: staging
+  settings:
+    threshold: 0.05
+    default_viewport:
+      width: 1024
+      height: 768

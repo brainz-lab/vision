@@ -1,0 +1,73 @@
+# Test fixtures for Baseline model
+
+homepage_baseline:
+  page: homepage
+  browser_config: chrome_desktop
+  branch: main
+  active: true
+  width: 1280
+  height: 2400
+  file_size: 150000
+  approved_at: <%= Time.current - 1.week %>
+  approved_by: test@example.com
+  environment: production
+
+homepage_mobile_baseline:
+  page: homepage
+  browser_config: chrome_mobile
+  branch: main
+  active: true
+  width: 375
+  height: 2000
+  file_size: 80000
+  approved_at: <%= Time.current - 1.week %>
+  approved_by: test@example.com
+  environment: production
+
+login_baseline:
+  page: login_page
+  browser_config: chrome_desktop
+  branch: main
+  active: true
+  width: 1280
+  height: 800
+  file_size: 50000
+  approved_at: <%= Time.current - 2.weeks %>
+  approved_by: admin@example.com
+  environment: production
+
+dashboard_baseline:
+  page: dashboard
+  browser_config: chrome_desktop
+  branch: main
+  active: true
+  width: 1280
+  height: 3000
+  file_size: 200000
+  approved_at: <%= Time.current - 3.days %>
+  approved_by: developer@example.com
+  environment: production
+
+inactive_baseline:
+  page: homepage
+  browser_config: chrome_desktop
+  branch: main
+  active: false
+  width: 1280
+  height: 2000
+  file_size: 140000
+  approved_at: <%= Time.current - 2.months %>
+  approved_by: old@example.com
+  environment: production
+
+feature_branch_baseline:
+  page: homepage
+  browser_config: chrome_desktop
+  branch: feature/redesign
+  active: true
+  width: 1280
+  height: 2500
+  file_size: 160000
+  approved_at: <%= Time.current - 2.days %>
+  approved_by: feature@example.com
+  environment: production

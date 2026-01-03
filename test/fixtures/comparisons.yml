@@ -1,0 +1,72 @@
+# Test fixtures for Comparison model
+
+passed_comparison:
+  baseline: homepage_baseline
+  snapshot: compared_snapshot
+  test_run: passed_run
+  status: passed
+  diff_percentage: 0.5
+  diff_pixels: 15000
+  threshold_used: 0.01
+  within_threshold: true
+  comparison_duration_ms: 2500
+
+failed_comparison:
+  baseline: homepage_baseline
+  snapshot: captured_snapshot
+  test_run: failed_run
+  status: failed
+  diff_percentage: 5.2
+  diff_pixels: 156000
+  threshold_used: 0.01
+  within_threshold: false
+  review_status: pending
+  comparison_duration_ms: 2800
+
+approved_comparison:
+  baseline: login_baseline
+  snapshot: comparing_snapshot
+  test_run: passed_run
+  status: failed
+  diff_percentage: 3.0
+  diff_pixels: 24000
+  threshold_used: 0.01
+  within_threshold: false
+  review_status: approved
+  reviewed_at: <%= Time.current - 1.hour %>
+  reviewed_by: reviewer@example.com
+  comparison_duration_ms: 1500
+
+rejected_comparison:
+  baseline: dashboard_baseline
+  snapshot: error_snapshot
+  test_run: failed_run
+  status: failed
+  diff_percentage: 12.5
+  diff_pixels: 450000
+  threshold_used: 0.01
+  within_threshold: false
+  review_status: rejected
+  reviewed_at: <%= Time.current - 30.minutes %>
+  reviewed_by: qa@example.com
+  review_notes: "Major regression, needs fix"
+  comparison_duration_ms: 3200
+
+error_comparison:
+  baseline: homepage_baseline
+  snapshot: error_snapshot
+  test_run: error_run
+  status: error
+  comparison_duration_ms: 100
+
+pending_review:
+  baseline: homepage_mobile_baseline
+  snapshot: mobile_snapshot
+  test_run: running_run
+  status: failed
+  diff_percentage: 2.1
+  diff_pixels: 15000
+  threshold_used: 0.01
+  within_threshold: false
+  review_status: pending
+  comparison_duration_ms: 1800

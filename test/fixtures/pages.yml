@@ -1,0 +1,59 @@
+# Test fixtures for Page model
+
+homepage:
+  project: main_project
+  name: Homepage
+  path: /
+  slug: homepage
+  enabled: true
+  position: 0
+  hide_selectors:
+    - ".cookie-banner"
+  mask_selectors:
+    - ".dynamic-timestamp"
+  actions:
+    - type: wait
+      ms: 1000
+  wait_ms: 500
+
+login_page:
+  project: main_project
+  name: Login Page
+  path: /login
+  slug: login-page
+  enabled: true
+  position: 1
+  hide_selectors: []
+  mask_selectors: []
+
+dashboard:
+  project: main_project
+  name: Dashboard
+  path: /dashboard
+  slug: dashboard
+  enabled: true
+  position: 2
+  wait_for:
+    selector: ".dashboard-loaded"
+    timeout: 10000
+  actions:
+    - type: click
+      selector: ".expand-panel"
+    - type: scroll
+      y: 500
+
+disabled_page:
+  project: main_project
+  name: Disabled Page
+  path: /disabled
+  slug: disabled-page
+  enabled: false
+  position: 99
+
+secondary_home:
+  project: secondary_project
+  name: Secondary Homepage
+  path: /
+  slug: secondary-homepage
+  enabled: true
+  position: 0

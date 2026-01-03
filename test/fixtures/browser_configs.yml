@@ -1,0 +1,55 @@
+# Test fixtures for BrowserConfig model
+
+chrome_desktop:
+  project: main_project
+  browser: chromium
+  name: Chrome Desktop
+  width: 1280
+  height: 720
+  device_scale_factor: 1.0
+  is_mobile: false
+  has_touch: false
+  enabled: true
+
+chrome_mobile:
+  project: main_project
+  browser: chromium
+  name: Chrome Mobile
+  width: 375
+  height: 812
+  device_scale_factor: 2.0
+  is_mobile: true
+  has_touch: true
+  enabled: true
+
+firefox_desktop:
+  project: main_project
+  browser: firefox
+  name: Firefox Desktop
+  width: 1280
+  height: 720
+  enabled: true
+
+webkit_desktop:
+  project: main_project
+  browser: webkit
+  name: Safari Desktop
+  width: 1280
+  height: 720
+  enabled: true
+
+disabled_config:
+  project: main_project
+  browser: chromium
+  name: Disabled Config
+  width: 800
+  height: 600
+  enabled: false
+
+secondary_chrome:
+  project: secondary_project
+  browser: chromium
+  name: Chrome Desktop
+  width: 1024
+  height: 768
+  enabled: true

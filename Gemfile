@@ -86,6 +86,8 @@ end
 gem "phlex-rails", "~> 2.0"
 
 group :development, :test do
+  # Lock minitest to compatible version with Rails 8
+  gem "minitest", "~> 5.25"
   gem "simplecov", require: false
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"

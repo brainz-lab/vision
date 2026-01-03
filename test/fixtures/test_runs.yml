@@ -1,0 +1,70 @@
+# Test fixtures for TestRun model
+
+pending_run:
+  project: main_project
+  status: pending
+  branch: main
+  total_pages: 5
+  passed_count: 0
+  failed_count: 0
+  error_count: 0
+  pending_count: 5
+
+running_run:
+  project: main_project
+  status: running
+  branch: feature/new-feature
+  base_branch: main
+  total_pages: 3
+  passed_count: 1
+  failed_count: 0
+  error_count: 0
+  pending_count: 2
+  started_at: <%= Time.current - 30.seconds %>
+
+passed_run:
+  project: main_project
+  status: passed
+  branch: main
+  commit_sha: abc123def456
+  total_pages: 3
+  passed_count: 3
+  failed_count: 0
+  error_count: 0
+  pending_count: 0
+  started_at: <%= Time.current - 2.minutes %>
+  completed_at: <%= Time.current - 1.minute %>
+  duration_ms: 60000
+
+failed_run:
+  project: main_project
+  status: failed
+  branch: bugfix/fix-issue
+  total_pages: 4
+  passed_count: 2
+  failed_count: 2
+  error_count: 0
+  pending_count: 0
+  started_at: <%= Time.current - 3.minutes %>
+  completed_at: <%= Time.current - 2.minutes %>
+
+error_run:
+  project: main_project
+  status: error
+  branch: main
+  total_pages: 2
+  passed_count: 0
+  failed_count: 0
+  error_count: 2
+  pending_count: 0
+  started_at: <%= Time.current - 5.minutes %>
+  completed_at: <%= Time.current - 4.minutes %>
+
+with_pr:
+  project: main_project
+  status: pending
+  branch: feature/pr-123
+  base_branch: main
+  pr_number: "123"
+  pr_url: "https://github.com/example/repo/pull/123"
+  total_pages: 2
