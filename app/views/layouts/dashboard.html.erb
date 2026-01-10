@@ -22,6 +22,17 @@
       --color-vision-light: #FBBF24;
     }
   </style>
+
+  <%# Google Analytics - only in production %>
+  <% if Rails.env.production? %>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-CXHFR6PC8W"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-CXHFR6PC8W');
+    </script>
+  <% end %>
 </head>
 <body class="h-full antialiased" style="background: var(--color-cream-50);">
   <div class="flex h-full">
