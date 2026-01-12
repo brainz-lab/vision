@@ -2,10 +2,29 @@
 # for API key validation and usage tracking.
 
 class PlatformClient
+  # Cache durations
+  VALID_KEY_CACHE_TTL = 5.minutes
+  INVALID_KEY_CACHE_TTL = 30.seconds  # Short TTL for invalid keys to allow quick retry after fix
+
   class << self
     def validate_key(raw_key)
       return invalid_response unless raw_key.present?
 
+      # Check cache first
+      cache_key = "platform_key_validation:#{Digest::SHA256.hexdigest(raw_key)}"
+      cached = Rails.cache.read(cache_key)
+      return cached if cached.present?
+
+      result = validate_key_uncached(raw_key)
+
+      # Cache the result (shorter TTL for invalid keys)
+      ttl = result[:valid] ? VALID_KEY_CACHE_TTL : INVALID_KEY_CACHE_TTL
+      Rails.cache.write(cache_key, result, expires_in: ttl)
+
+      result
+    end
+
+    def validate_key_uncached(raw_key)
       response = make_request("/api/v1/keys/validate", { key: raw_key })
 
       if response[:valid]
