@@ -63,13 +63,13 @@ gem "faraday-retry"
 
 # BrainzLab SDK - use RubyGems in production/Docker, local path in development
 if ENV["BUNDLE_DEPLOYMENT"] == "1"
-  gem "brainzlab", "~> 0.1.1"
+  gem "brainzlab", "~> 0.1.11"
 elsif File.exist?("/brainzlab-sdk")
   gem "brainzlab", path: "/brainzlab-sdk"
 elsif File.exist?(File.expand_path("../brainzlab-sdk", __dir__))
   gem "brainzlab", path: "../brainzlab-sdk"
 else
-  gem "brainzlab", "~> 0.1.1"
+  gem "brainzlab", "~> 0.1.11"
 end
 
 # BrainzLab UI - Unified design system with Phlex components

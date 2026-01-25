@@ -18,6 +18,9 @@ class Project < ApplicationRecord
   validates :name, presence: true
   validates :base_url, presence: true, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }
 
+  scope :active, -> { where(archived_at: nil) }
+  scope :archived, -> { where.not(archived_at: nil) }
+
   after_create :create_default_browser_configs
 
   def self.find_or_create_for_platform!(platform_project_id:, name: nil, environment: "live")
