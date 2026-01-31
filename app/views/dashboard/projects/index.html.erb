@@ -19,15 +19,15 @@
 
   <% if @projects.any? %>
     <!-- Projects List -->
-    <div class="card overflow-hidden">
-      <div class="divide-y divide-stone-100">
+    <div class="card overflow-hidden bg-dm-surface border border-dm">
+      <div class="divide-y divide-dm-border-light">
         <% @projects.each do |project| %>
           <%= link_to dashboard_project_pages_path(project), class: "group block" do %>
-            <div class="px-6 py-5 flex items-center justify-between transition-colors hover:bg-stone-50">
+            <div class="px-6 py-5 flex items-center justify-between transition-colors bg-dm-hover">
               <div class="flex items-center gap-4">
                 <!-- Project Icon -->
-                <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-gradient-to-br from-amber-100 to-stone-200">
-                  <svg class="w-6 h-6 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg, var(--dm-warning-bg), var(--dm-surface-light));">
+                  <svg class="w-6 h-6" style="color: var(--dm-vision);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
@@ -35,10 +35,10 @@
 
                 <!-- Project Info -->
                 <div>
-                  <h3 class="text-[15px] font-semibold text-stone-900">
+                  <h3 class="text-[15px] font-semibold text-dm">
                     <%= project.name %>
                   </h3>
-                  <p class="text-sm mt-0.5 text-stone-500">
+                  <p class="text-sm mt-0.5 text-dm-muted">
                     <%= project.base_url %>
                   </p>
                 </div>
@@ -48,15 +48,15 @@
               <div class="flex items-center gap-8">
                 <div class="flex items-center gap-6">
                   <div class="text-center">
-                    <div class="text-lg font-semibold text-stone-900"><%= project.pages_count %></div>
-                    <div class="text-xs font-medium text-stone-400">Pages</div>
+                    <div class="text-lg font-semibold text-dm"><%= project.pages_count %></div>
+                    <div class="text-xs font-medium text-dm-subtle">Pages</div>
                   </div>
                   <div class="text-center">
-                    <div class="text-lg font-semibold text-stone-900"><%= project.test_runs_count %></div>
-                    <div class="text-xs font-medium text-stone-400">Test Runs</div>
+                    <div class="text-lg font-semibold text-dm"><%= project.test_runs_count %></div>
+                    <div class="text-xs font-medium text-dm-subtle">Test Runs</div>
                   </div>
                 </div>
-                <svg class="w-5 h-5 text-stone-300 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-dm-subtle transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
                 </svg>
               </div>
@@ -68,24 +68,24 @@
 
   <% else %>
     <!-- Empty State -->
-    <div class="card">
+    <div class="card bg-dm-surface border border-dm">
       <div class="empty-state py-16">
-        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5 bg-gradient-to-br from-amber-100 to-stone-200">
-          <svg class="w-8 h-8 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5" style="background: linear-gradient(135deg, var(--dm-warning-bg), var(--dm-surface-light));">
+          <svg class="w-8 h-8" style="color: var(--dm-vision);" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
             <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
           </svg>
         </div>
-        <h3 class="empty-state-title">No projects yet</h3>
+        <h3 class="empty-state-title text-dm">No projects yet</h3>
         <% if Rails.env.production? %>
-          <p class="empty-state-description">Create a project in Platform to get started.</p>
+          <p class="empty-state-description text-dm-muted">Create a project in Platform to get started.</p>
           <div class="mt-8">
             <%= link_to ENV.fetch('BRAINZLAB_PLATFORM_EXTERNAL_URL', 'https://platform.brainzlab.ai'), target: "_blank", class: "btn-primary" do %>
               Go to Platform
             <% end %>
           </div>
         <% else %>
-          <p class="empty-state-description">Get started by creating your first project to capture and compare screenshots.</p>
+          <p class="empty-state-description text-dm-muted">Get started by creating your first project to capture and compare screenshots.</p>
           <div class="mt-8">
             <%= link_to new_dashboard_project_path, class: "btn-primary" do %>
               <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

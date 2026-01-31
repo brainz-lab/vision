@@ -55,7 +55,7 @@
             </span>
           <% end %>
 
-          <div class="flex items-center gap-2 text-xs" style="color: var(--color-ink-500);">
+          <div class="flex items-center gap-2 text-xs text-dm-muted">
             <span class="badge badge-neutral"><%= @task.model %></span>
             <span class="badge badge-neutral"><%= @task.browser_provider %></span>
           </div>
@@ -99,39 +99,39 @@
 
   <!-- Quick Stats Bar -->
   <div class="grid grid-cols-4 gap-4">
-    <div class="stat-card">
-      <div class="stat-label">Duration</div>
-      <div class="stat-value text-lg">
+    <div class="stat-card bg-dm-surface border border-dm">
+      <div class="stat-label text-dm-muted">Duration</div>
+      <div class="stat-value text-lg text-dm">
         <% if @task.duration_ms %>
           <%= (@task.duration_ms / 1000.0).round(1) %><span class="text-sm font-normal ml-0.5">s</span>
         <% else %>
-          <span style="color: var(--color-ink-300);">—</span>
+          <span class="text-dm-subtle">—</span>
         <% end %>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Steps</div>
-      <div class="stat-value text-lg">
-        <%= @task.steps_executed %><span class="text-sm font-normal" style="color: var(--color-ink-500);"> / <%= @task.max_steps %></span>
+    <div class="stat-card bg-dm-surface border border-dm">
+      <div class="stat-label text-dm-muted">Steps</div>
+      <div class="stat-value text-lg text-dm">
+        <%= @task.steps_executed %><span class="text-sm font-normal text-dm-muted"> / <%= @task.max_steps %></span>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Tokens</div>
-      <div class="stat-value text-lg">
+    <div class="stat-card bg-dm-surface border border-dm">
+      <div class="stat-label text-dm-muted">Tokens</div>
+      <div class="stat-value text-lg text-dm">
         <% if @task.total_tokens > 0 %>
           <%= number_with_delimiter(@task.total_tokens) %>
         <% else %>
-          <span style="color: var(--color-ink-300);">—</span>
+          <span class="text-dm-subtle">—</span>
         <% end %>
       </div>
     </div>
-    <div class="stat-card">
-      <div class="stat-label">Screenshots</div>
-      <div class="stat-value text-lg">
+    <div class="stat-card bg-dm-surface border border-dm">
+      <div class="stat-label text-dm-muted">Screenshots</div>
+      <div class="stat-value text-lg text-dm">
         <% if @task.screenshots.attached? %>
           <%= @task.screenshots.count %>
         <% else %>
-          <span style="color: var(--color-ink-300);">0</span>
+          <span class="text-dm-subtle">0</span>
         <% end %>
       </div>
     </div>
@@ -144,67 +144,67 @@
 
       <!-- Result Section -->
       <% if @task.result.present? %>
-        <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-          <div class="px-5 py-3 flex items-center gap-2" style="background: #ECFDF5; border-bottom: 1px solid #A7F3D0;">
-            <svg class="w-4 h-4" style="color: #059669;" fill="currentColor" viewBox="0 0 20 20">
+        <div class="rounded-xl overflow-hidden bg-dm-surface border border-dm">
+          <div class="px-5 py-3 flex items-center gap-2 border-b" style="background: var(--dm-success-bg); border-color: var(--dm-success-border);">
+            <svg class="w-4 h-4" style="color: var(--dm-success);" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
             </svg>
-            <span class="text-[13px] font-medium" style="color: #047857;">Task Result</span>
+            <span class="text-[13px] font-medium" style="color: var(--dm-success);">Task Result</span>
           </div>
           <div class="p-5">
-            <p class="text-[14px] leading-relaxed whitespace-pre-wrap" style="color: #1A1A1A;"><%= @task.result %></p>
+            <p class="text-[14px] leading-relaxed whitespace-pre-wrap text-dm"><%= @task.result %></p>
           </div>
         </div>
       <% end %>
 
       <!-- Error Section -->
       <% if @task.error_message.present? %>
-        <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #FECACA;">
-          <div class="px-5 py-3 flex items-center gap-2" style="background: #FEF2F2; border-bottom: 1px solid #FECACA;">
-            <svg class="w-4 h-4" style="color: #DC2626;" fill="currentColor" viewBox="0 0 20 20">
+        <div class="rounded-xl overflow-hidden bg-dm-surface" style="border: 1px solid var(--dm-error-border);">
+          <div class="px-5 py-3 flex items-center gap-2" style="background: var(--dm-error-bg); border-bottom: 1px solid var(--dm-error-border);">
+            <svg class="w-4 h-4" style="color: var(--dm-error);" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
             </svg>
-            <span class="text-[13px] font-medium" style="color: #B91C1C;">Error</span>
+            <span class="text-[13px] font-medium" style="color: var(--dm-error);">Error</span>
           </div>
           <div class="p-5">
-            <p class="text-[14px] leading-relaxed font-mono" style="color: #991B1B;"><%= @task.error_message %></p>
+            <p class="text-[14px] leading-relaxed font-mono" style="color: var(--dm-error);"><%= @task.error_message %></p>
           </div>
         </div>
       <% end %>
 
       <!-- Extracted Data -->
       <% if @task.extracted_data.present? && @task.extracted_data.any? %>
-        <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-          <div class="px-5 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E8E5E0;">
+        <div class="rounded-xl overflow-hidden bg-dm-surface border border-dm">
+          <div class="px-5 py-3 flex items-center justify-between border-b border-dm">
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" style="color: #6366F1;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4" style="color: var(--dm-info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/>
               </svg>
-              <span class="text-[13px] font-medium" style="color: #1A1A1A;">Extracted Data</span>
+              <span class="text-[13px] font-medium text-dm">Extracted Data</span>
             </div>
             <button onclick="copyToClipboard(this, '<%= j(JSON.generate(@task.extracted_data)) %>')"
-                    class="text-[12px] px-2.5 py-1 rounded-lg transition-colors hover:bg-gray-100" style="color: #6B6760;">
+                    class="text-[12px] px-2.5 py-1 rounded-lg transition-colors text-dm-muted bg-dm-hover hover:bg-dm-active">
               Copy JSON
             </button>
           </div>
           <div class="p-4">
-            <pre class="text-[12px] overflow-x-auto p-4 rounded-lg leading-relaxed" style="background: #F8F7F5; color: #1A1A1A;"><%= JSON.pretty_generate(@task.extracted_data) %></pre>
+            <pre class="text-[12px] overflow-x-auto p-4 rounded-lg leading-relaxed text-dm" style="background: var(--dm-code-bg);"><%= JSON.pretty_generate(@task.extracted_data) %></pre>
           </div>
         </div>
       <% end %>
 
       <!-- Screenshots Gallery -->
       <% if @task.screenshots.attached? %>
-        <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-          <div class="px-5 py-3 flex items-center justify-between" style="border-bottom: 1px solid #E8E5E0;">
+        <div class="rounded-xl overflow-hidden bg-dm-surface border border-dm">
+          <div class="px-5 py-3 flex items-center justify-between border-b border-dm">
             <div class="flex items-center gap-2">
-              <svg class="w-4 h-4" style="color: #8B8780;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-dm-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
               </svg>
-              <span class="text-[13px] font-medium" style="color: #1A1A1A;">Screenshots</span>
-              <span class="text-[12px] px-2 py-0.5 rounded-full" style="background: #F5F3EF; color: #6B6760;"><%= @task.screenshots.count %></span>
+              <span class="text-[13px] font-medium text-dm">Screenshots</span>
+              <span class="text-[12px] px-2 py-0.5 rounded-full bg-dm-surface-light text-dm-muted"><%= @task.screenshots.count %></span>
             </div>
-            <button onclick="openReplayModal()" class="text-[12px] px-2.5 py-1 rounded-lg transition-colors hover:bg-gray-100 flex items-center gap-1" style="color: #6B6760;">
+            <button onclick="openReplayModal()" class="text-[12px] px-2.5 py-1 rounded-lg transition-colors text-dm-muted bg-dm-hover hover:bg-dm-active flex items-center gap-1">
               <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                 <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
               </svg>
@@ -215,7 +215,7 @@
             <div class="flex gap-3 overflow-x-auto pb-2 -mx-1 px-1" style="scrollbar-width: thin;">
               <% @task.screenshots.each_with_index do |screenshot, index| %>
                 <div class="relative flex-shrink-0 group cursor-pointer" onclick="openReplayModalAt(<%= index %>)">
-                  <div class="w-40 h-24 rounded-lg overflow-hidden border-2 border-transparent transition-all group-hover:border-orange-400 group-hover:shadow-lg" style="background: #F5F3EF;">
+                  <div class="w-40 h-24 rounded-lg overflow-hidden border-2 border-transparent transition-all group-hover:border-orange-400 group-hover:shadow-lg bg-dm-surface-light">
                     <%= image_tag public_storage_url(screenshot),
                         class: "w-full h-full object-cover object-top transition-transform group-hover:scale-105" %>
                   </div>
@@ -237,21 +237,21 @@
       <% end %>
 
       <!-- Execution Steps -->
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-        <div class="px-5 py-3 flex items-center gap-2" style="border-bottom: 1px solid #E8E5E0;">
-          <svg class="w-4 h-4" style="color: #8B8780;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="rounded-xl overflow-hidden bg-dm-surface border border-dm">
+        <div class="px-5 py-3 flex items-center gap-2 border-b border-dm">
+          <svg class="w-4 h-4 text-dm-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
           </svg>
-          <span class="text-[13px] font-medium" style="color: #1A1A1A;">Execution Steps</span>
-          <span class="text-[12px] px-2 py-0.5 rounded-full" style="background: #F5F3EF; color: #6B6760;"><%= @steps.count %></span>
+          <span class="text-[13px] font-medium text-dm">Execution Steps</span>
+          <span class="text-[12px] px-2 py-0.5 rounded-full bg-dm-surface-light text-dm-muted"><%= @steps.count %></span>
         </div>
 
         <% if @steps.any? %>
-          <div class="divide-y" style="border-color: #F0EFED;">
+          <div class="divide-y divide-dm-border-light">
             <% @steps.each do |step| %>
-              <div class="px-5 py-3 flex items-start gap-4 hover:bg-gray-50/50 transition-colors">
+              <div class="px-5 py-3 flex items-start gap-4 bg-dm-hover transition-colors">
                 <!-- Step Number -->
-                <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold <%= step.success ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600' %>">
+                <div class="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-semibold" style="background: <%= step.success ? 'var(--dm-success-bg)' : 'var(--dm-error-bg)' %>; color: <%= step.success ? 'var(--dm-success)' : 'var(--dm-error)' %>;">
                   <% if step.success %>
                     <%= step.position %>
                   <% else %>
@@ -264,24 +264,24 @@
                 <!-- Step Content -->
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center flex-wrap gap-2">
-                    <span class="text-[13px] font-medium px-2 py-0.5 rounded" style="background: #F5F3EF; color: #374151;"><%= step.action %></span>
+                    <span class="text-[13px] font-medium px-2 py-0.5 rounded bg-dm-surface-light text-dm"><%= step.action %></span>
                     <% if step.duration_ms %>
-                      <span class="text-[11px]" style="color: #9CA3AF;"><%= step.duration_ms %>ms</span>
+                      <span class="text-[11px] text-dm-subtle"><%= step.duration_ms %>ms</span>
                     <% end %>
                     <% if step.total_tokens > 0 %>
-                      <span class="text-[11px] px-1.5 py-0.5 rounded" style="background: rgba(217, 119, 6, 0.1); color: #B45309;"><%= number_with_delimiter(step.total_tokens) %> tokens</span>
+                      <span class="text-[11px] px-1.5 py-0.5 rounded" style="background: var(--dm-warning-bg); color: var(--dm-warning);"><%= number_with_delimiter(step.total_tokens) %> tokens</span>
                     <% end %>
                   </div>
                   <% if step.selector.present? %>
-                    <p class="text-[12px] font-mono mt-1.5 truncate" style="color: #6B7280;"><%= step.selector %></p>
+                    <p class="text-[12px] font-mono mt-1.5 truncate text-dm-muted"><%= step.selector %></p>
                   <% end %>
                   <% if step.value.present? %>
-                    <p class="text-[12px] mt-1" style="color: #6B7280;">
+                    <p class="text-[12px] mt-1 text-dm-muted">
                       <span class="font-medium">Value:</span> <%= step.value.to_s.truncate(80) %>
                     </p>
                   <% end %>
                   <% if step.error_message.present? %>
-                    <p class="text-[12px] mt-1.5 px-2 py-1 rounded" style="background: #FEF2F2; color: #DC2626;"><%= step.error_message %></p>
+                    <p class="text-[12px] mt-1.5 px-2 py-1 rounded" style="background: var(--dm-error-bg); color: var(--dm-error);"><%= step.error_message %></p>
                   <% end %>
                 </div>
               </div>
@@ -289,10 +289,10 @@
           </div>
         <% else %>
           <div class="px-5 py-8 text-center">
-            <svg class="w-8 h-8 mx-auto mb-2" style="color: #D1D5DB;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-8 h-8 mx-auto mb-2 text-dm-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
-            <p class="text-[13px]" style="color: #9CA3AF;">No steps recorded</p>
+            <p class="text-[13px] text-dm-subtle">No steps recorded</p>
           </div>
         <% end %>
       </div>
@@ -302,41 +302,41 @@
     <div class="col-span-4 space-y-5">
 
       <!-- Details Card -->
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-        <div class="px-4 py-3" style="background: #FAFAF9; border-bottom: 1px solid #E8E5E0;">
-          <h3 class="text-[12px] font-semibold uppercase tracking-wider" style="color: #6B6760;">Details</h3>
+      <div class="rounded-xl overflow-hidden bg-dm-surface border border-dm">
+        <div class="px-4 py-3 bg-dm-surface-light border-b border-dm">
+          <h3 class="text-[12px] font-semibold uppercase tracking-wider text-dm-muted">Details</h3>
         </div>
         <div class="p-4">
           <dl class="space-y-4">
             <div class="flex items-start justify-between">
-              <dt class="text-[12px]" style="color: #8B8780;">Task ID</dt>
-              <dd class="text-[12px] font-mono text-right" style="color: #1A1A1A;"><%= @task.id.to_s[0..7] %>...</dd>
+              <dt class="text-[12px] text-dm-subtle">Task ID</dt>
+              <dd class="text-[12px] font-mono text-right text-dm"><%= @task.id.to_s[0..7] %>...</dd>
             </div>
             <% if @task.final_url.present? %>
               <div>
-                <dt class="text-[12px] mb-1" style="color: #8B8780;">Final URL</dt>
-                <dd class="text-[12px] break-all leading-relaxed" style="color: #1A1A1A;"><%= @task.final_url %></dd>
+                <dt class="text-[12px] mb-1 text-dm-subtle">Final URL</dt>
+                <dd class="text-[12px] break-all leading-relaxed text-dm"><%= @task.final_url %></dd>
               </div>
             <% end %>
             <div class="flex items-start justify-between">
-              <dt class="text-[12px]" style="color: #8B8780;">Triggered By</dt>
-              <dd class="text-[12px] capitalize" style="color: #1A1A1A;"><%= @task.triggered_by || 'API' %></dd>
+              <dt class="text-[12px] text-dm-subtle">Triggered By</dt>
+              <dd class="text-[12px] capitalize text-dm"><%= @task.triggered_by || 'API' %></dd>
             </div>
             <% if @task.total_tokens > 0 %>
               <div>
-                <dt class="text-[12px] mb-1" style="color: #8B8780;">Token Usage</dt>
-                <dd class="text-[12px]" style="color: #1A1A1A;">
+                <dt class="text-[12px] mb-1 text-dm-subtle">Token Usage</dt>
+                <dd class="text-[12px] text-dm">
                   <div class="flex items-center gap-3">
-                    <span class="px-2 py-0.5 rounded" style="background: #F0FDF4; color: #166534;">In: <%= number_with_delimiter(@task.total_input_tokens || 0) %></span>
-                    <span class="px-2 py-0.5 rounded" style="background: #FEF3C7; color: #92400E;">Out: <%= number_with_delimiter(@task.total_output_tokens || 0) %></span>
+                    <span class="px-2 py-0.5 rounded" style="background: var(--dm-success-bg); color: var(--dm-success);">In: <%= number_with_delimiter(@task.total_input_tokens || 0) %></span>
+                    <span class="px-2 py-0.5 rounded" style="background: var(--dm-warning-bg); color: var(--dm-warning);">Out: <%= number_with_delimiter(@task.total_output_tokens || 0) %></span>
                   </div>
                 </dd>
               </div>
             <% end %>
             <% if @task.viewport.present? %>
               <div class="flex items-start justify-between">
-                <dt class="text-[12px]" style="color: #8B8780;">Viewport</dt>
-                <dd class="text-[12px] font-mono" style="color: #1A1A1A;"><%= @task.viewport['width'] %> x <%= @task.viewport['height'] %></dd>
+                <dt class="text-[12px] text-dm-subtle">Viewport</dt>
+                <dd class="text-[12px] font-mono text-dm"><%= @task.viewport['width'] %> x <%= @task.viewport['height'] %></dd>
               </div>
             <% end %>
           </dl>
@@ -344,27 +344,27 @@
       </div>
 
       <!-- Timeline Card -->
-      <div class="rounded-xl overflow-hidden" style="background: #FFFFFE; border: 1px solid #E8E5E0;">
-        <div class="px-4 py-3" style="background: #FAFAF9; border-bottom: 1px solid #E8E5E0;">
-          <h3 class="text-[12px] font-semibold uppercase tracking-wider" style="color: #6B6760;">Timeline</h3>
+      <div class="rounded-xl overflow-hidden bg-dm-surface border border-dm">
+        <div class="px-4 py-3 bg-dm-surface-light border-b border-dm">
+          <h3 class="text-[12px] font-semibold uppercase tracking-wider text-dm-muted">Timeline</h3>
         </div>
         <div class="p-4">
           <div class="relative">
-            <div class="absolute left-[7px] top-2 bottom-2 w-0.5" style="background: #E8E5E0;"></div>
+            <div class="absolute left-[7px] top-2 bottom-2 w-0.5 bg-dm-border"></div>
             <div class="space-y-4">
               <div class="flex items-start gap-3">
-                <div class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5" style="background: #FFFFFE; border-color: #D1D5DB;"></div>
+                <div class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 bg-dm-surface border-dm-subtle"></div>
                 <div>
-                  <p class="text-[12px] font-medium" style="color: #1A1A1A;">Created</p>
-                  <p class="text-[11px]" style="color: #8B8780;"><%= @task.created_at.strftime("%b %d, %Y at %H:%M:%S") %></p>
+                  <p class="text-[12px] font-medium text-dm">Created</p>
+                  <p class="text-[11px] text-dm-subtle"><%= @task.created_at.strftime("%b %d, %Y at %H:%M:%S") %></p>
                 </div>
               </div>
               <% if @task.completed_at %>
                 <div class="flex items-start gap-3">
-                  <div class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5 <%= @task.status == 'completed' ? 'bg-emerald-500 border-emerald-500' : 'bg-red-500 border-red-500' %>"></div>
+                  <div class="w-4 h-4 rounded-full border-2 flex-shrink-0 mt-0.5" style="background: <%= @task.status == 'completed' ? 'var(--dm-success)' : 'var(--dm-error)' %>; border-color: <%= @task.status == 'completed' ? 'var(--dm-success)' : 'var(--dm-error)' %>;"></div>
                   <div>
-                    <p class="text-[12px] font-medium" style="color: #1A1A1A;"><%= @task.status == 'completed' ? 'Completed' : 'Finished' %></p>
-                    <p class="text-[11px]" style="color: #8B8780;"><%= @task.completed_at.strftime("%b %d, %Y at %H:%M:%S") %></p>
+                    <p class="text-[12px] font-medium text-dm"><%= @task.status == 'completed' ? 'Completed' : 'Finished' %></p>
+                    <p class="text-[11px] text-dm-subtle"><%= @task.completed_at.strftime("%b %d, %Y at %H:%M:%S") %></p>
                   </div>
                 </div>
               <% end %>
@@ -376,13 +376,13 @@
       <!-- Retried From -->
       <% retried_from = @task.metadata&.dig('retried_from') || @task.metadata&.dig('replayed_from') %>
       <% if retried_from %>
-        <div class="rounded-xl p-4 flex items-center gap-3" style="background: #EFF6FF; border: 1px solid #BFDBFE;">
-          <svg class="w-5 h-5 flex-shrink-0" style="color: #3B82F6;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="rounded-xl p-4 flex items-center gap-3" style="background: var(--dm-info-bg); border: 1px solid var(--dm-info-border);">
+          <svg class="w-5 h-5 flex-shrink-0" style="color: var(--dm-info);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
           </svg>
           <div>
-            <p class="text-[12px] font-medium" style="color: #1E40AF;">Retried from</p>
-            <%= link_to dashboard_project_ai_task_path(@project, retried_from), class: "text-[12px] font-mono underline", style: "color: #3B82F6;" do %>
+            <p class="text-[12px] font-medium" style="color: var(--dm-info);">Retried from</p>
+            <%= link_to dashboard_project_ai_task_path(@project, retried_from), class: "text-[12px] font-mono underline", style: "color: var(--dm-info);" do %>
               <%= retried_from.to_s[0..7] %>...
             <% end %>
           </div>

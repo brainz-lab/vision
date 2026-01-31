@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full">
+<html lang="en" class="h-full" data-controller="dark-mode">
 <head>
   <title>Vision - <%= content_for(:title) || "Visual Regression Testing" %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
   <%# Fonts %>
@@ -12,7 +13,19 @@
 
   <%# BrainzLab UI Design System %>
   <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "dark_mode", "data-turbo-track": "reload" %>
   <%= javascript_importmap_tags %>
+
+  <%# Prevent flash of wrong theme %>
+  <script>
+    (function() {
+      const stored = localStorage.getItem('vision-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = stored || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+      if (theme === 'dark') document.documentElement.classList.add('dark');
+    })();
+  </script>
 
   <style>
     :root {
@@ -34,32 +47,47 @@
     </script>
   <% end %>
 </head>
-<body class="h-full antialiased" style="background: var(--color-cream-50);">
+<body class="h-full antialiased bg-dm">
   <div class="flex h-full">
     <!-- Sidebar -->
-    <aside class="w-64 flex flex-col" style="background: #fff; border-right: 1px solid var(--color-cream-200);">
-      <div class="p-5" style="border-bottom: 1px solid var(--color-cream-200);">
+    <aside class="w-64 flex flex-col bg-dm-surface border-r border-dm">
+      <div class="p-5 border-b border-dm flex items-center justify-between">
         <%= link_to dashboard_root_path, class: "flex items-center gap-2.5" do %>
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-vision);">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--dm-vision);">
             <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="currentColor">
               <circle cx="12" cy="12" r="8"/>
               <circle cx="12" cy="12" r="4" fill="white" fill-opacity="0.3"/>
               <circle cx="12" cy="12" r="1.5"/>
             </svg>
           </div>
-          <span class="font-semibold" style="color: var(--color-ink-950);">Vision</span>
+          <span class="font-semibold text-dm">Vision</span>
         <% end %>
+
+        <%# Dark Mode Toggle %>
+        <button type="button"
+                class="dark-mode-toggle"
+                data-action="click->dark-mode#toggle"
+                title="Toggle dark mode">
+          <%# Moon icon - visible in light mode %>
+          <svg class="icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z"/>
+          </svg>
+          <%# Sun icon - visible in dark mode %>
+          <svg class="icon-sun" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z"/>
+          </svg>
+        </button>
       </div>
 
       <% if defined?(@project) && @project&.persisted? %>
         <!-- Project Selector -->
-        <div class="px-4 py-3" style="border-bottom: 1px solid var(--color-cream-200);">
-          <%= link_to dashboard_projects_path, class: "flex items-center gap-2 px-2 py-1.5 rounded-lg transition", style: "color: var(--color-ink-700);" do %>
-            <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-semibold" style="background: rgba(217, 119, 6, 0.15); color: var(--color-vision);">
+        <div class="px-4 py-3 border-b border-dm">
+          <%= link_to dashboard_projects_path, class: "flex items-center gap-2 px-2 py-1.5 rounded-lg transition text-dm-muted hover:text-dm hover:bg-dm-hover" do %>
+            <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-semibold" style="background: rgba(217, 119, 6, 0.15); color: var(--dm-vision);">
               <%= @project.name.first.upcase %>
             </div>
             <span class="flex-1 text-sm font-medium truncate"><%= @project.name %></span>
-            <svg class="w-4 h-4" style="color: var(--color-ink-400);" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-dm-subtle" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
             </svg>
           <% end %>
@@ -94,20 +122,20 @@
         </nav>
       <% else %>
         <nav class="p-4 flex-1">
-          <p class="px-3 text-xs font-medium uppercase tracking-wider mb-3" style="color: var(--color-ink-400);">Select a project</p>
+          <p class="px-3 text-xs font-medium uppercase tracking-wider mb-3 text-dm-subtle">Select a project</p>
         </nav>
       <% end %>
 
       <!-- User Menu -->
       <% if defined?(current_user) && current_user %>
-        <div class="p-4" style="border-top: 1px solid var(--color-cream-200);">
+        <div class="p-4 border-t border-dm">
           <div class="flex items-center gap-3">
             <div class="avatar avatar-md avatar-primary">
               <%= current_user.name&.first&.upcase || current_user.email.first.upcase %>
             </div>
             <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium truncate" style="color: var(--color-ink-900);"><%= current_user.name || current_user.email.split('@').first %></p>
-              <p class="text-xs truncate" style="color: var(--color-ink-500);"><%= current_user.email %></p>
+              <p class="text-sm font-medium truncate text-dm"><%= current_user.name || current_user.email.split('@').first %></p>
+              <p class="text-xs truncate text-dm-muted"><%= current_user.email %></p>
             </div>
           </div>
         </div>
@@ -115,7 +143,7 @@
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 overflow-auto">
+    <main class="flex-1 overflow-auto bg-dm">
       <% if notice.present? %>
         <div class="m-8 mb-0 alert alert-success">
           <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
