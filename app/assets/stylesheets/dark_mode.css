@@ -1,0 +1,489 @@
+/*
+ * Vision Dashboard Dark Mode Support
+ * Uses brainzlab-ui dark mode tokens
+ */
+
+/* ============================================
+   CSS Variables - Light Theme (Default)
+   ============================================ */
+:root {
+  /* Background colors */
+  --dm-bg: #FAFAF9;
+  --dm-surface: #FFFFFF;
+  --dm-surface-light: #F5F3EF;
+
+  /* Text colors */
+  --dm-text: #1A1A1A;
+  --dm-text-muted: #6B6760;
+  --dm-text-subtle: #8B8780;
+
+  /* Border colors */
+  --dm-border: #E8E5E0;
+  --dm-border-light: #F0EFED;
+
+  /* Status colors - these stay consistent */
+  --dm-success: #16A34A;
+  --dm-success-bg: #ECFDF5;
+  --dm-success-border: #A7F3D0;
+  --dm-error: #DC2626;
+  --dm-error-bg: #FEF2F2;
+  --dm-error-border: #FECACA;
+  --dm-warning: #D97706;
+  --dm-warning-bg: #FFFBEB;
+  --dm-warning-border: #FDE68A;
+  --dm-info: #2563EB;
+  --dm-info-bg: #EFF6FF;
+  --dm-info-border: #BFDBFE;
+
+  /* Vision brand colors */
+  --dm-vision: #D97706;
+  --dm-vision-dark: #B45309;
+  --dm-vision-light: #FBBF24;
+
+  /* Interactive colors */
+  --dm-hover: rgba(0, 0, 0, 0.04);
+  --dm-active: rgba(0, 0, 0, 0.08);
+
+  /* Shadows */
+  --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --dm-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+
+  /* Code/monospace background */
+  --dm-code-bg: #F8F7F5;
+
+  /* Modal overlay */
+  --dm-overlay: rgba(0, 0, 0, 0.5);
+}
+
+/* ============================================
+   CSS Variables - Dark Theme
+   ============================================ */
+[data-theme="dark"],
+.dark {
+  /* Background colors - brainzlab-ui dark tokens */
+  --dm-bg: #121212;
+  --dm-surface: #1e1e1e;
+  --dm-surface-light: #2a2a2a;
+
+  /* Text colors - brainzlab-ui dark tokens */
+  --dm-text: #e8e1d7;
+  --dm-text-muted: #a0a0a0;
+  --dm-text-subtle: #757575;
+
+  /* Border colors - brainzlab-ui dark tokens */
+  --dm-border: #333333;
+  --dm-border-light: #2a2a2a;
+
+  /* Status colors - adjusted for dark mode */
+  --dm-success: #22C55E;
+  --dm-success-bg: rgba(34, 197, 94, 0.15);
+  --dm-success-border: rgba(34, 197, 94, 0.3);
+  --dm-error: #EF4444;
+  --dm-error-bg: rgba(239, 68, 68, 0.15);
+  --dm-error-border: rgba(239, 68, 68, 0.3);
+  --dm-warning: #F59E0B;
+  --dm-warning-bg: rgba(245, 158, 11, 0.15);
+  --dm-warning-border: rgba(245, 158, 11, 0.3);
+  --dm-info: #3B82F6;
+  --dm-info-bg: rgba(59, 130, 246, 0.15);
+  --dm-info-border: rgba(59, 130, 246, 0.3);
+
+  /* Vision brand colors - slightly adjusted for dark mode */
+  --dm-vision: #F59E0B;
+  --dm-vision-dark: #D97706;
+  --dm-vision-light: #FCD34D;
+
+  /* Interactive colors */
+  --dm-hover: rgba(255, 255, 255, 0.06);
+  --dm-active: rgba(255, 255, 255, 0.1);
+
+  /* Shadows - adjusted for dark mode */
+  --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --dm-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+  /* Code/monospace background */
+  --dm-code-bg: #2a2a2a;
+
+  /* Modal overlay */
+  --dm-overlay: rgba(0, 0, 0, 0.8);
+}
+
+/* ============================================
+   System Preference Support
+   ============================================ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    /* Background colors - brainzlab-ui dark tokens */
+    --dm-bg: #121212;
+    --dm-surface: #1e1e1e;
+    --dm-surface-light: #2a2a2a;
+
+    /* Text colors */
+    --dm-text: #e8e1d7;
+    --dm-text-muted: #a0a0a0;
+    --dm-text-subtle: #757575;
+
+    /* Border colors */
+    --dm-border: #333333;
+    --dm-border-light: #2a2a2a;
+
+    /* Status colors */
+    --dm-success: #22C55E;
+    --dm-success-bg: rgba(34, 197, 94, 0.15);
+    --dm-success-border: rgba(34, 197, 94, 0.3);
+    --dm-error: #EF4444;
+    --dm-error-bg: rgba(239, 68, 68, 0.15);
+    --dm-error-border: rgba(239, 68, 68, 0.3);
+    --dm-warning: #F59E0B;
+    --dm-warning-bg: rgba(245, 158, 11, 0.15);
+    --dm-warning-border: rgba(245, 158, 11, 0.3);
+    --dm-info: #3B82F6;
+    --dm-info-bg: rgba(59, 130, 246, 0.15);
+    --dm-info-border: rgba(59, 130, 246, 0.3);
+
+    /* Vision brand colors */
+    --dm-vision: #F59E0B;
+    --dm-vision-dark: #D97706;
+    --dm-vision-light: #FCD34D;
+
+    /* Interactive colors */
+    --dm-hover: rgba(255, 255, 255, 0.06);
+    --dm-active: rgba(255, 255, 255, 0.1);
+
+    /* Shadows */
+    --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --dm-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+
+    /* Code/monospace background */
+    --dm-code-bg: #2a2a2a;
+
+    /* Modal overlay */
+    --dm-overlay: rgba(0, 0, 0, 0.8);
+  }
+}
+
+/* ============================================
+   Utility Classes
+   ============================================ */
+
+/* Background utilities */
+.bg-dm { background-color: var(--dm-bg); }
+.bg-dm-surface { background-color: var(--dm-surface); }
+.bg-dm-surface-light { background-color: var(--dm-surface-light); }
+.bg-dm-hover:hover { background-color: var(--dm-hover); }
+
+/* Text utilities */
+.text-dm { color: var(--dm-text); }
+.text-dm-muted { color: var(--dm-text-muted); }
+.text-dm-subtle { color: var(--dm-text-subtle); }
+
+/* Border utilities */
+.border-dm { border-color: var(--dm-border); }
+.border-dm-light { border-color: var(--dm-border-light); }
+
+/* Shadow utilities */
+.shadow-dm-sm { box-shadow: var(--dm-shadow-sm); }
+.shadow-dm-md { box-shadow: var(--dm-shadow-md); }
+.shadow-dm-lg { box-shadow: var(--dm-shadow-lg); }
+
+/* ============================================
+   Component Overrides for Dark Mode
+   ============================================ */
+
+/* Dashboard Layout */
+[data-theme="dark"] body,
+.dark body {
+  background-color: var(--dm-bg);
+  color: var(--dm-text);
+}
+
+/* Sidebar */
+[data-theme="dark"] aside,
+.dark aside {
+  background-color: var(--dm-surface) !important;
+  border-color: var(--dm-border) !important;
+}
+
+/* Cards */
+[data-theme="dark"] .card,
+.dark .card {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .card-body,
+.dark .card-body {
+  background-color: var(--dm-surface);
+}
+
+/* Tables */
+[data-theme="dark"] .table thead,
+.dark .table thead {
+  background-color: var(--dm-surface-light);
+}
+
+[data-theme="dark"] .table th,
+.dark .table th {
+  color: var(--dm-text-muted);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .table td,
+.dark .table td {
+  color: var(--dm-text);
+  border-color: var(--dm-border-light);
+}
+
+[data-theme="dark"] .table tbody tr:hover,
+.dark .table tbody tr:hover {
+  background-color: var(--dm-hover);
+}
+
+/* Stat Cards */
+[data-theme="dark"] .stat-card,
+.dark .stat-card {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .stat-value,
+.dark .stat-value {
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .stat-label,
+.dark .stat-label {
+  color: var(--dm-text-muted);
+}
+
+/* Badges */
+[data-theme="dark"] .badge-neutral,
+.dark .badge-neutral {
+  background-color: var(--dm-surface-light);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .badge-success,
+.dark .badge-success {
+  background-color: var(--dm-success-bg);
+  color: var(--dm-success);
+}
+
+[data-theme="dark"] .badge-error,
+.dark .badge-error {
+  background-color: var(--dm-error-bg);
+  color: var(--dm-error);
+}
+
+[data-theme="dark"] .badge-warning,
+.dark .badge-warning {
+  background-color: var(--dm-warning-bg);
+  color: var(--dm-warning);
+}
+
+[data-theme="dark"] .badge-info,
+.dark .badge-info {
+  background-color: var(--dm-info-bg);
+  color: var(--dm-info);
+}
+
+/* Buttons */
+[data-theme="dark"] .btn-ghost,
+.dark .btn-ghost {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .btn-ghost:hover,
+.dark .btn-ghost:hover {
+  background-color: var(--dm-hover);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .btn-secondary,
+.dark .btn-secondary {
+  background-color: var(--dm-surface-light);
+  border-color: var(--dm-border);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .btn-secondary:hover,
+.dark .btn-secondary:hover {
+  background-color: var(--dm-active);
+}
+
+/* Inputs */
+[data-theme="dark"] .input,
+.dark .input,
+[data-theme="dark"] .claude-input,
+.dark .claude-input {
+  background-color: var(--dm-surface-light);
+  border-color: var(--dm-border);
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .input:focus,
+.dark .input:focus,
+[data-theme="dark"] .claude-input:focus,
+.dark .claude-input:focus {
+  border-color: var(--dm-vision);
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+[data-theme="dark"] .input::placeholder,
+.dark .input::placeholder,
+[data-theme="dark"] .claude-input::placeholder,
+.dark .claude-input::placeholder {
+  color: var(--dm-text-subtle);
+}
+
+/* Labels */
+[data-theme="dark"] .label,
+.dark .label,
+[data-theme="dark"] .claude-label,
+.dark .claude-label {
+  color: var(--dm-text-muted);
+}
+
+/* Alerts */
+[data-theme="dark"] .alert-success,
+.dark .alert-success {
+  background-color: var(--dm-success-bg);
+  border-color: var(--dm-success-border);
+  color: var(--dm-success);
+}
+
+[data-theme="dark"] .alert-error,
+.dark .alert-error {
+  background-color: var(--dm-error-bg);
+  border-color: var(--dm-error-border);
+  color: var(--dm-error);
+}
+
+/* Empty States */
+[data-theme="dark"] .empty-state,
+.dark .empty-state {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] .empty-state-title,
+.dark .empty-state-title {
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .empty-state-description,
+.dark .empty-state-description {
+  color: var(--dm-text-muted);
+}
+
+/* Section Headers */
+[data-theme="dark"] .section-header,
+.dark .section-header {
+  color: var(--dm-text);
+}
+
+[data-theme="dark"] .section-subheader,
+.dark .section-subheader {
+  color: var(--dm-text-muted);
+}
+
+/* Code blocks */
+[data-theme="dark"] pre,
+.dark pre,
+[data-theme="dark"] code,
+.dark code {
+  background-color: var(--dm-code-bg);
+  color: var(--dm-text);
+}
+
+/* Dividers */
+[data-theme="dark"] .divide-stone-100 > * + *,
+.dark .divide-stone-100 > * + * {
+  border-color: var(--dm-border);
+}
+
+/* Navigation links */
+[data-theme="dark"] nav a,
+.dark nav a {
+  color: var(--dm-text-muted);
+}
+
+[data-theme="dark"] nav a:hover,
+.dark nav a:hover {
+  color: var(--dm-text);
+  background-color: var(--dm-hover);
+}
+
+[data-theme="dark"] nav a.active,
+.dark nav a.active {
+  color: var(--dm-text);
+  background-color: var(--dm-active);
+}
+
+/* ============================================
+   Dark Mode Toggle Button Styles
+   ============================================ */
+.dark-mode-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background-color: transparent;
+  border: 1px solid var(--dm-border);
+  color: var(--dm-text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dark-mode-toggle:hover {
+  background-color: var(--dm-hover);
+  color: var(--dm-text);
+  border-color: var(--dm-border);
+}
+
+.dark-mode-toggle svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Sun icon - visible in dark mode */
+.dark-mode-toggle .icon-sun {
+  display: none;
+}
+
+[data-theme="dark"] .dark-mode-toggle .icon-sun,
+.dark .dark-mode-toggle .icon-sun {
+  display: block;
+}
+
+[data-theme="dark"] .dark-mode-toggle .icon-moon,
+.dark .dark-mode-toggle .icon-moon {
+  display: none;
+}
+
+/* ============================================
+   Transition Support
+   ============================================ */
+body,
+.card,
+.table,
+.badge,
+.btn-ghost,
+.btn-secondary,
+.input,
+aside,
+nav a,
+.stat-card {
+  transition: background-color 0.2s ease,
+              color 0.2s ease,
+              border-color 0.2s ease;
+}
+
+/* Disable transitions during theme change to prevent flicker */
+.theme-transitioning * {
+  transition: none !important;
+}
