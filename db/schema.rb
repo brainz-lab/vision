@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_29_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_25_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -232,6 +232,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_29_000001) do
 
   create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.float "apdex_t", default: 0.5
+    t.datetime "archived_at"
     t.jsonb "auth_config", default: {}
     t.string "base_url", null: false
     t.datetime "created_at", null: false
@@ -243,6 +244,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_29_000001) do
     t.string "staging_url"
     t.integer "test_runs_count", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["archived_at"], name: "index_projects_on_archived_at"
     t.index ["created_at"], name: "index_projects_on_created_at"
     t.index ["platform_project_id"], name: "index_projects_on_platform_project_id", unique: true
   end
