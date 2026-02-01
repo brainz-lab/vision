@@ -126,33 +126,47 @@
    ============================================ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    /* Background colors - brainzlab-ui dark tokens */
-    --dm-bg: #121212;
-    --dm-surface: #1e1e1e;
-    --dm-surface-light: #2a2a2a;
+    /* Background colors - terminal-inspired dark theme */
+    --dm-bg: #0a0a0a;
+    --dm-surface: #111111;
+    --dm-surface-alt: #161616;
+    --dm-surface-hover: #1c1c1c;
+    --dm-surface-light: #1a1a1a;
 
-    /* Text colors */
-    --dm-text: #e8e1d7;
-    --dm-text-muted: #a0a0a0;
-    --dm-text-subtle: #757575;
+    /* Text colors - terminal-inspired */
+    --dm-text: #e4e4e4;
+    --dm-text-secondary: #a3a3a3;
+    --dm-text-muted: #737373;
+    --dm-text-placeholder: #525252;
+    --dm-text-disabled: #404040;
+    --dm-text-subtle: #737373;
 
-    /* Border colors */
-    --dm-border: #333333;
-    --dm-border-light: #2a2a2a;
+    /* Border colors - terminal-inspired */
+    --dm-border: #262626;
+    --dm-border-light: #1f1f1f;
 
-    /* Status colors */
-    --dm-success: #22C55E;
-    --dm-success-bg: rgba(34, 197, 94, 0.15);
-    --dm-success-border: rgba(34, 197, 94, 0.3);
-    --dm-error: #EF4444;
-    --dm-error-bg: rgba(239, 68, 68, 0.15);
-    --dm-error-border: rgba(239, 68, 68, 0.3);
-    --dm-warning: #F59E0B;
-    --dm-warning-bg: rgba(245, 158, 11, 0.15);
-    --dm-warning-border: rgba(245, 158, 11, 0.3);
-    --dm-info: #3B82F6;
-    --dm-info-bg: rgba(59, 130, 246, 0.15);
-    --dm-info-border: rgba(59, 130, 246, 0.3);
+    /* Input styles */
+    --dm-input-bg: #161616;
+    --dm-input-border: #262626;
+    --dm-hover-bg: #1c1c1c;
+
+    /* Code/monospace background */
+    --dm-code-bg: #000000;
+    --dm-code-text: #e4e4e4;
+
+    /* Status colors - terminal-inspired */
+    --dm-success: #4ade80;
+    --dm-success-bg: rgba(74, 222, 128, 0.1);
+    --dm-success-border: rgba(74, 222, 128, 0.3);
+    --dm-error: #f87171;
+    --dm-error-bg: rgba(248, 113, 113, 0.1);
+    --dm-error-border: rgba(248, 113, 113, 0.3);
+    --dm-warning: #fbbf24;
+    --dm-warning-bg: rgba(251, 191, 36, 0.1);
+    --dm-warning-border: rgba(251, 191, 36, 0.3);
+    --dm-info: #60a5fa;
+    --dm-info-bg: rgba(96, 165, 250, 0.1);
+    --dm-info-border: rgba(96, 165, 250, 0.3);
 
     /* Vision brand colors */
     --dm-vision: #F59E0B;
@@ -163,13 +177,10 @@
     --dm-hover: rgba(255, 255, 255, 0.06);
     --dm-active: rgba(255, 255, 255, 0.1);
 
-    /* Shadows */
-    --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-    --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+    /* Shadows - 0.5 opacity for terminal feel */
+    --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+    --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
     --dm-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-
-    /* Code/monospace background */
-    --dm-code-bg: #2a2a2a;
 
     /* Modal overlay */
     --dm-overlay: rgba(0, 0, 0, 0.8);
@@ -199,6 +210,111 @@
 .shadow-dm-sm { box-shadow: var(--dm-shadow-sm); }
 .shadow-dm-md { box-shadow: var(--dm-shadow-md); }
 .shadow-dm-lg { box-shadow: var(--dm-shadow-lg); }
+
+/* ============================================
+   Dark Mode Card Components
+   ============================================ */
+
+/* Base dark mode card */
+.dm-card {
+  background-color: var(--dm-surface);
+  border: 1px solid var(--dm-border);
+  border-radius: 8px;
+  box-shadow: var(--dm-shadow-sm);
+}
+
+/* Flat card - no shadow, minimal border */
+.dm-card-flat {
+  background-color: var(--dm-surface);
+  border: 1px solid var(--dm-border-light);
+  border-radius: 8px;
+  box-shadow: none;
+}
+
+/* Row component - horizontal list item style */
+.dm-row {
+  background-color: var(--dm-surface);
+  border-bottom: 1px solid var(--dm-border-light);
+  padding: 12px 16px;
+}
+
+.dm-row:first-child {
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.dm-row:last-child {
+  border-bottom: none;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.dm-row:hover {
+  background-color: var(--dm-surface-hover);
+}
+
+/* Container - wrapper for content sections */
+.dm-container {
+  background-color: var(--dm-bg);
+  border: 1px solid var(--dm-border);
+  border-radius: 8px;
+  padding: 16px;
+}
+
+/* List item - individual item in a list */
+.dm-list-item {
+  background-color: transparent;
+  border-bottom: 1px solid var(--dm-border-light);
+  padding: 12px 0;
+}
+
+.dm-list-item:last-child {
+  border-bottom: none;
+}
+
+.dm-list-item:hover {
+  background-color: var(--dm-hover-bg);
+}
+
+/* Dark mode specific overrides for flat cards */
+[data-theme="dark"] .dm-card,
+.dark .dm-card {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .dm-card-flat,
+.dark .dm-card-flat {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border-light);
+}
+
+[data-theme="dark"] .dm-row,
+.dark .dm-row {
+  background-color: var(--dm-surface);
+  border-color: var(--dm-border-light);
+}
+
+[data-theme="dark"] .dm-row:hover,
+.dark .dm-row:hover {
+  background-color: var(--dm-surface-hover);
+}
+
+[data-theme="dark"] .dm-container,
+.dark .dm-container {
+  background-color: var(--dm-bg);
+  border-color: var(--dm-border);
+}
+
+[data-theme="dark"] .dm-list-item,
+.dark .dm-list-item {
+  border-color: var(--dm-border-light);
+}
+
+[data-theme="dark"] .dm-list-item:hover,
+.dark .dm-list-item:hover {
+  background-color: var(--dm-hover-bg);
+}
 
 /* ============================================
    Component Overrides for Dark Mode
@@ -330,8 +446,8 @@
 .dark .input,
 [data-theme="dark"] .claude-input,
 .dark .claude-input {
-  background-color: var(--dm-surface-light);
-  border-color: var(--dm-border);
+  background-color: var(--dm-input-bg);
+  border-color: var(--dm-input-border);
   color: var(--dm-text);
 }
 
@@ -347,7 +463,7 @@
 .dark .input::placeholder,
 [data-theme="dark"] .claude-input::placeholder,
 .dark .claude-input::placeholder {
-  color: var(--dm-text-subtle);
+  color: var(--dm-text-placeholder);
 }
 
 /* Labels */
@@ -406,7 +522,7 @@
 [data-theme="dark"] code,
 .dark code {
   background-color: var(--dm-code-bg);
-  color: var(--dm-text);
+  color: var(--dm-code-text);
 }
 
 /* Dividers */
@@ -667,8 +783,8 @@
 
 [data-theme="dark"] .claude-input,
 .dark .claude-input {
-  background: var(--dm-surface-light) !important;
-  border-color: var(--dm-border) !important;
+  background: var(--dm-input-bg) !important;
+  border-color: var(--dm-input-border) !important;
   color: var(--dm-text) !important;
 }
 
@@ -760,8 +876,8 @@
 .dark textarea,
 [data-theme="dark"] select,
 .dark select {
-  background-color: var(--dm-surface-light) !important;
-  border-color: var(--dm-border) !important;
+  background-color: var(--dm-input-bg) !important;
+  border-color: var(--dm-input-border) !important;
   color: var(--dm-text) !important;
 }
 
@@ -769,7 +885,7 @@
 .dark input::placeholder,
 [data-theme="dark"] textarea::placeholder,
 .dark textarea::placeholder {
-  color: var(--dm-text-subtle) !important;
+  color: var(--dm-text-placeholder) !important;
 }
 
 /* ============================================
@@ -1050,8 +1166,8 @@
 .dark .select,
 [data-theme="dark"] .textarea,
 .dark .textarea {
-  background-color: var(--dm-surface-light) !important;
-  border-color: var(--dm-border) !important;
+  background-color: var(--dm-input-bg) !important;
+  border-color: var(--dm-input-border) !important;
   color: var(--dm-text) !important;
 }
 
