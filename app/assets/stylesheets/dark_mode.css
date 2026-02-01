@@ -61,33 +61,47 @@
    ============================================ */
 [data-theme="dark"],
 .dark {
-  /* Background colors - brainzlab-ui dark tokens */
-  --dm-bg: #121212;
-  --dm-surface: #1e1e1e;
-  --dm-surface-light: #2a2a2a;
+  /* Background colors - terminal-inspired dark theme */
+  --dm-bg: #0a0a0a;
+  --dm-surface: #111111;
+  --dm-surface-alt: #161616;
+  --dm-surface-hover: #1c1c1c;
+  --dm-surface-light: #1a1a1a;
 
-  /* Text colors - brainzlab-ui dark tokens */
-  --dm-text: #e8e1d7;
-  --dm-text-muted: #a0a0a0;
-  --dm-text-subtle: #757575;
+  /* Text colors - terminal-inspired */
+  --dm-text: #e4e4e4;
+  --dm-text-secondary: #a3a3a3;
+  --dm-text-muted: #737373;
+  --dm-text-placeholder: #525252;
+  --dm-text-disabled: #404040;
+  --dm-text-subtle: #737373;
 
-  /* Border colors - brainzlab-ui dark tokens */
-  --dm-border: #333333;
-  --dm-border-light: #2a2a2a;
+  /* Border colors - terminal-inspired */
+  --dm-border: #262626;
+  --dm-border-light: #1f1f1f;
 
-  /* Status colors - adjusted for dark mode */
-  --dm-success: #22C55E;
-  --dm-success-bg: rgba(34, 197, 94, 0.15);
-  --dm-success-border: rgba(34, 197, 94, 0.3);
-  --dm-error: #EF4444;
-  --dm-error-bg: rgba(239, 68, 68, 0.15);
-  --dm-error-border: rgba(239, 68, 68, 0.3);
-  --dm-warning: #F59E0B;
-  --dm-warning-bg: rgba(245, 158, 11, 0.15);
-  --dm-warning-border: rgba(245, 158, 11, 0.3);
-  --dm-info: #3B82F6;
-  --dm-info-bg: rgba(59, 130, 246, 0.15);
-  --dm-info-border: rgba(59, 130, 246, 0.3);
+  /* Input styles */
+  --dm-input-bg: #161616;
+  --dm-input-border: #262626;
+  --dm-hover-bg: #1c1c1c;
+
+  /* Code/monospace background */
+  --dm-code-bg: #000000;
+  --dm-code-text: #e4e4e4;
+
+  /* Status colors - terminal-inspired */
+  --dm-success: #4ade80;
+  --dm-success-bg: rgba(74, 222, 128, 0.1);
+  --dm-success-border: rgba(74, 222, 128, 0.3);
+  --dm-error: #f87171;
+  --dm-error-bg: rgba(248, 113, 113, 0.1);
+  --dm-error-border: rgba(248, 113, 113, 0.3);
+  --dm-warning: #fbbf24;
+  --dm-warning-bg: rgba(251, 191, 36, 0.1);
+  --dm-warning-border: rgba(251, 191, 36, 0.3);
+  --dm-info: #60a5fa;
+  --dm-info-bg: rgba(96, 165, 250, 0.1);
+  --dm-info-border: rgba(96, 165, 250, 0.3);
 
   /* Vision brand colors - slightly adjusted for dark mode */
   --dm-vision: #F59E0B;
@@ -98,13 +112,10 @@
   --dm-hover: rgba(255, 255, 255, 0.06);
   --dm-active: rgba(255, 255, 255, 0.1);
 
-  /* Shadows - adjusted for dark mode */
-  --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
-  --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  /* Shadows - 0.5 opacity for terminal feel */
+  --dm-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --dm-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
   --dm-shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
-
-  /* Code/monospace background */
-  --dm-code-bg: #2a2a2a;
 
   /* Modal overlay */
   --dm-overlay: rgba(0, 0, 0, 0.8);
