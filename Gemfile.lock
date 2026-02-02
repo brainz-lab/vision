@@ -449,7 +449,7 @@ DEPENDENCIES
   aws-sdk-s3
   bootsnap
   brainzlab (~> 0.1.12)
-  brainzlab-ui (~> 0.1.0)
+  brainzlab-ui
   brakeman
   bundler-audit
   connection_pool
