@@ -61,28 +61,9 @@ gem "connection_pool"
 gem "faraday", "~> 2.0"
 gem "faraday-retry"
 
-# BrainzLab SDK - use RubyGems in production/Docker, local path in development
-if ENV["BUNDLE_DEPLOYMENT"] == "1"
-  gem "brainzlab", "~> 0.1.12"
-elsif File.exist?("/brainzlab-sdk")
-  gem "brainzlab", path: "/brainzlab-sdk"
-elsif File.exist?(File.expand_path("../brainzlab-sdk", __dir__))
-  gem "brainzlab", path: "../brainzlab-sdk"
-else
-  gem "brainzlab", "~> 0.1.12"
-end
+gem "brainzlab", "~> 0.1.12"
+gem "brainzlab-ui"
 
-# BrainzLab UI - Unified design system with Phlex components
-# Use local path only in development, RubyGems in production/Docker
-if ENV["BUNDLE_DEPLOYMENT"] == "1"
-  gem "brainzlab-ui", "~> 0.1.0"
-elsif File.exist?("/brainzlab-ui")
-  gem "brainzlab-ui", path: "/brainzlab-ui"
-elsif File.exist?(File.expand_path("../brainzlab-ui", __dir__))
-  gem "brainzlab-ui", path: "../brainzlab-ui"
-else
-  gem "brainzlab-ui", "~> 0.1.0"
-end
 gem "phlex-rails", "~> 2.0"
 
 group :development, :test do
