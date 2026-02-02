@@ -16,9 +16,7 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: vision_production
-    username: vision
-    password: <%= ENV["VISION_DATABASE_PASSWORD"] %>
+    url: <%= ENV["DATABASE_URL"] %>
   cache:
     <<: *default
     url: <%= ENV.fetch("CACHE_DATABASE_URL") { ENV.fetch("DATABASE_URL", "").gsub(/vision_production/, "vision_production_cache") } %>
