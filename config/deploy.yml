@@ -4,12 +4,10 @@ image: brainz/vision
 
 servers:
   web:
-    - afmp@an-ssh.brainz.computer
-    - edixonhernandez@ed-ssh.brainz.computer
+    - an-ssh.brainz.computer
   job:
     hosts:
-      - afmp@an-ssh.brainz.computer
-      - edixonhernandez@ed-ssh.brainz.computer
+      - an-ssh.brainz.computer
     cmd: bin/jobs
 
 proxy:
@@ -55,4 +53,5 @@ volumes:
 builder:
   arch: arm64
 
-# SSH users configured per-host in servers section
+ssh:
+  user: afmp
