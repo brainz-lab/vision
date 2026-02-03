@@ -82,3 +82,6 @@ coverage/
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 
+
+# Secrets (NEVER commit)
+.secrets.md
