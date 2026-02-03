@@ -30,8 +30,6 @@ env:
     - CABLE_DATABASE_URL
     - VAULT_API_KEY
     - SERVICE_KEY
-    - AWS_ACCESS_KEY_ID
-    - AWS_SECRET_ACCESS_KEY
   clear:
     RAILS_ENV: production
     RAILS_LOG_TO_STDOUT: "true"
