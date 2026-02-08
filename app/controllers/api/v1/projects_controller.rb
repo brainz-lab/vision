@@ -1,68 +1,90 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class ProjectsController < ActionController::API
-      before_action :authenticate_master_key!, only: [ :provision ]
+      before_action :authenticate_master_key!, only: [:provision]
 
       # POST /api/v1/projects/provision
-      # Auto-provision a project (called by SDK)
-      # Follows same pattern as Recall/Reflex for consistency
+      # Creates a new project or returns existing one, linked to Platform
       def provision
+        platform_project_id = params[:platform_project_id]
         name = params[:name]&.strip
-        return render json: { error: "name is required" }, status: :unprocessable_entity if name.blank?
 
-        project = Project.find_or_initialize_by(name: name)
+        # If platform_project_id provided, use it as the primary key
+        if platform_project_id.present?
+          project = Project.find_or_initialize_by(platform_project_id: platform_project_id)
+          project.name = name if name.present?
+          project.base_url = params[:base_url] if params[:base_url].present?
+          project.environment = params[:environment] if params[:environment].present?
 
-        if project.new_record?
-          project.platform_project_id = params[:platform_project_id] || "vis_#{SecureRandom.hex(8)}"
-          project.base_url = params[:base_url] || "https://example.com"
-          project.environment = params[:environment] || "development"
-
-          # Generate keys following service pattern
-          ingest_key = "vis_ingest_#{SecureRandom.hex(16)}"
-          api_key = "vis_api_#{SecureRandom.hex(16)}"
-
-          project.settings = (project.settings || {}).merge(
-            "ingest_key" => ingest_key,
-            "api_key" => api_key
-          )
+          if project.new_record?
+            project.base_url ||= "https://example.com"
+            ensure_project_keys(project)
+          end
 
           project.save!
+        elsif name.present?
+          # Fallback for standalone mode (no Platform integration)
+          project = Project.find_or_initialize_by(name: name)
+
+          if project.new_record?
+            project.platform_project_id = "vis_#{SecureRandom.hex(8)}"
+            project.base_url = params[:base_url] || "https://example.com"
+            project.environment = params[:environment] || "development"
+            ensure_project_keys(project)
+            project.save!
+          end
+        else
+          return render json: { error: "Either platform_project_id or name is required" }, status: :bad_request
         end
 
         render json: {
           id: project.id,
+          platform_project_id: project.platform_project_id,
           name: project.name,
           slug: project.name.parameterize,
-          platform_project_id: project.platform_project_id,
-          ingest_key: project.settings["ingest_key"],
-          api_key: project.settings["api_key"],
-          base_url: project.base_url
-        }, status: :created
+          environment: project.environment,
+          base_url: project.base_url,
+          ingest_key: project.settings&.dig("ingest_key"),
+          api_key: project.settings&.dig("api_key")
+        }, status: project.previously_new_record? ? :created : :ok
       end
 
       # GET /api/v1/projects/lookup
+      # Looks up a project by name or platform_project_id
       def lookup
-        project = if params[:platform_project_id].present?
-          Project.find_by!(platform_project_id: params[:platform_project_id])
-        elsif params[:name].present?
-          Project.find_by!(name: params[:name])
-        else
-          raise ActiveRecord::RecordNotFound
-        end
+        project = find_project
 
-        render json: {
-          id: project.id,
-          name: project.name,
-          slug: project.name.parameterize,
-          platform_project_id: project.platform_project_id,
-          base_url: project.base_url,
-          environment: project.environment
-        }
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: "Project not found" }, status: :not_found
+        if project
+          render json: {
+            id: project.id,
+            platform_project_id: project.platform_project_id,
+            name: project.name,
+            slug: project.name.parameterize,
+            environment: project.environment,
+            base_url: project.base_url
+          }
+        else
+          render json: { error: "Project not found" }, status: :not_found
+        end
       end
 
       private
+
+      def find_project
+        if params[:platform_project_id].present?
+          Project.find_by(platform_project_id: params[:platform_project_id])
+        elsif params[:name].present?
+          Project.find_by(name: params[:name])
+        end
+      end
+
+      def ensure_project_keys(project)
+        project.settings ||= {}
+        project.settings["ingest_key"] ||= "vis_ingest_#{SecureRandom.hex(16)}"
+        project.settings["api_key"] ||= "vis_api_#{SecureRandom.hex(16)}"
+      end
 
       def authenticate_master_key!
         key = request.headers["X-Master-Key"]
