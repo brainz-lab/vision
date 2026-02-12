@@ -6,12 +6,38 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 }.to_i + ENV.fetch("JOB_CONCURRENCY") { 4 }.to_i %>
 
 development:
-  <<: *default
-  url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_development
+  primary:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_development
+  queue:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_development
+    migrations_paths: db/queue_migrate
+  cache:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_development
+    migrations_paths: db/cache_migrate
+  cable:
+    <<: *default
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_development
+    migrations_paths: db/cable_migrate
 
 test:
-  <<: *default
-  database: vision_test
+  primary:
+    <<: *default
+    database: vision_test
+  queue:
+    <<: *default
+    database: vision_test
+    migrations_paths: db/queue_migrate
+  cache:
+    <<: *default
+    database: vision_test
+    migrations_paths: db/cache_migrate
+  cable:
+    <<: *default
+    database: vision_test
+    migrations_paths: db/cable_migrate
 
 production:
   primary: &primary_production
