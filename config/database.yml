@@ -7,7 +7,7 @@ default: &default
 
 development:
   <<: *default
-  database: vision_development
+  url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_development
 
 test:
   <<: *default
