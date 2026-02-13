@@ -62,7 +62,15 @@ gem "faraday", "~> 2.0"
 gem "faraday-retry"
 
 gem "brainzlab", "~> 0.1.12"
-gem "brainzlab-ui"
+if ENV["BUNDLE_DEPLOYMENT"] == "1"
+  gem "brainzlab-ui", "~> 0.1.0"
+elsif File.exist?("/brainzlab-ui")
+  gem "brainzlab-ui", path: "/brainzlab-ui"
+elsif File.exist?(File.expand_path("../brainzlab-ui", __dir__))
+  gem "brainzlab-ui", path: "../brainzlab-ui"
+else
+  gem "brainzlab-ui", "~> 0.1.0"
+end
 
 gem "phlex-rails", "~> 2.0"
 
