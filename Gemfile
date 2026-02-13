@@ -58,7 +58,7 @@ gem "aws-sdk-s3", require: false
 gem "connection_pool"
 
 # HTTP client with retries for external API calls
-gem "faraday", "~> 2.0"
+gem "faraday", "~> 2.14"
 gem "faraday-retry"
 
 gem "brainzlab", "~> 0.1.12"
