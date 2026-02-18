@@ -1,0 +1,196 @@
+<% content_for(:title) { "MCP Setup" } %>
+
+<div class="max-w-2xl space-y-8">
+  <div>
+    <h1 class="text-[22px] font-semibold tracking-tight dm-text">MCP Setup Guide</h1>
+    <p class="mt-2 text-[15px] dm-text-muted">Connect Claude or other AI assistants to Vision using the Model Context Protocol.</p>
+  </div>
+
+  <!-- Step 1 -->
+  <% display_key = @raw_api_key || @api_key %>
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold" style="background: var(--dm-text); color: var(--dm-bg);">1</span>
+      <h2 class="text-[16px] font-medium dm-text">Get your API key</h2>
+    </div>
+    <p class="text-[14px] dm-text-muted">Use this API key to authenticate MCP requests:</p>
+    <% if @raw_api_key %>
+      <div class="mb-4 rounded-md bg-amber-50 p-3 border border-amber-200">
+        <p class="text-sm text-amber-800">New API key created. Copy it now - it won't be shown again.</p>
+      </div>
+    <% end %>
+    <div class="group" style="position: relative;">
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code-block"><code><%= display_key %></code></pre>
+      <button onclick="copyToClipboard('<%= display_key %>', this)"
+              class="copy-btn px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100"
+              style="position: absolute; top: 12px; right: 12px; background: #3A3A3A; color: #E8E5E0; border: 1px solid #4A4A4A;">
+        Copy
+      </button>
+    </div>
+    <div class="mt-2">
+      <%= button_to "Regenerate API Key", regenerate_mcp_token_dashboard_project_path(@project), method: :post, class: "px-3 py-1.5 text-[12px] font-medium rounded-md", style: "background: #3A3A3A; color: #E8E5E0; border: 1px solid #4A4A4A;", data: { turbo_confirm: "This will invalidate the current API key. Continue?" } %>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <% mcp_json = { mcpServers: { vision: { url: "#{request.base_url}/mcp/rpc", headers: { Authorization: "Bearer #{display_key}" } } } }.to_json %>
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold" style="background: var(--dm-text); color: var(--dm-bg);">2</span>
+      <h2 class="text-[16px] font-medium dm-text">Configure Claude Code</h2>
+    </div>
+    <p class="text-[14px] dm-text-muted">Add Vision as an MCP server in your Claude Code settings:</p>
+    <div class="group" style="position: relative;">
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code-block"><code>{
+  "mcpServers": {
+    "vision": {
+      "url": "<%= request.base_url %>/mcp/rpc",
+      "headers": {
+        "Authorization": "Bearer <%= display_key %>"
+      }
+    }
+  }
+}</code></pre>
+      <button onclick="copyToClipboard(document.getElementById('mcp-json').textContent, this)"
+              class="copy-btn px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100"
+              style="position: absolute; top: 12px; right: 12px; background: #3A3A3A; color: #E8E5E0; border: 1px solid #4A4A4A;">
+        Copy
+      </button>
+      <template id="mcp-json"><%= mcp_json %></template>
+    </div>
+    <p class="text-[14px] dm-text-subtle">Add this to <code class="px-1.5 py-0.5 rounded text-[13px] dm-bg-surface-light dm-text">~/.claude/settings.json</code> or your project's <code class="px-1.5 py-0.5 rounded text-[13px] dm-bg-surface-light dm-text">.claude/settings.json</code></p>
+  </div>
+
+  <!-- Step 3 -->
+  <div class="space-y-4">
+    <div class="flex items-center gap-3">
+      <span class="flex items-center justify-center w-7 h-7 rounded-full text-[13px] font-semibold" style="background: var(--dm-text); color: var(--dm-bg);">3</span>
+      <h2 class="text-[16px] font-medium dm-text">Start using Vision with Claude</h2>
+    </div>
+    <p class="text-[14px] dm-text-muted">Once configured, Claude can capture screenshots, run visual tests, and automate browser tasks. Try asking:</p>
+    <div class="space-y-3 mt-4">
+      <div class="px-4 py-3 rounded-lg dm-bg-surface-light dm-border">
+        <p class="text-[14px] font-medium dm-text">"Capture a screenshot of the homepage"</p>
+      </div>
+      <div class="px-4 py-3 rounded-lg dm-bg-surface-light dm-border">
+        <p class="text-[14px] font-medium dm-text">"Run a visual regression test on all pages"</p>
+      </div>
+      <div class="px-4 py-3 rounded-lg dm-bg-surface-light dm-border">
+        <p class="text-[14px] font-medium dm-text">"Compare the current state of /login to the baseline"</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Available Tools -->
+  <div class="pt-6" style="border-top: 1px solid var(--dm-border);">
+    <h3 class="text-[15px] font-medium mb-4 dm-text">Available MCP tools</h3>
+    <div class="space-y-3">
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;">vision_capture</code>
+        <p class="text-[13px] dm-text-muted">Take a screenshot of a URL with configurable viewport and wait options</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0;">vision_compare</code>
+        <p class="text-[13px] dm-text-muted">Compare current state of a page to its approved baseline</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #F3E8FF; color: #7C3AED; border: 1px solid #DDD6FE;">vision_test</code>
+        <p class="text-[13px] dm-text-muted">Run a full visual regression test suite across all pages</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #ECFDF5; color: #059669; border: 1px solid #A7F3D0;">vision_approve</code>
+        <p class="text-[13px] dm-text-muted">Approve visual changes and update the baseline screenshot</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #FEF2F2; color: #DC2626; border: 1px solid #FECACA;">vision_list_failures</code>
+        <p class="text-[13px] dm-text-muted">List failed comparisons that need review</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A;">vision_task</code>
+        <p class="text-[13px] dm-text-muted">Execute an autonomous AI browser task with optional credential injection</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #FFFBEB; color: #B45309; border: 1px solid #FDE68A;">vision_ai_action</code>
+        <p class="text-[13px] dm-text-muted">Perform a single AI-powered browser action</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 dm-bg-surface-light dm-text-muted dm-border">vision_perform</code>
+        <p class="text-[13px] dm-text-muted">Execute a direct browser action without AI (click, type, navigate)</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0" style="background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE;">vision_extract</code>
+        <p class="text-[13px] dm-text-muted">Extract structured data from a web page</p>
+      </div>
+      <div class="flex items-start gap-3">
+        <code class="px-2 py-1 rounded text-[12px] font-mono shrink-0 dm-bg-surface-light dm-text-muted dm-border">vision_credential</code>
+        <p class="text-[13px] dm-text-muted">Store and manage credentials in Vault for browser automation</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Example workflows -->
+  <div class="pt-6" style="border-top: 1px solid var(--dm-border);">
+    <h3 class="text-[15px] font-medium mb-4 dm-text">Example workflows</h3>
+    <div class="space-y-4">
+      <div class="px-4 py-3 rounded-lg" style="background: #F0FDF4; border: 1px solid #BBF7D0;">
+        <p class="text-[13px] font-medium" style="color: #166534;">Visual regression after deploy</p>
+        <p class="text-[12px] mt-1" style="color: #166534;">"Run visual tests on all pages and show me any differences from the baselines"</p>
+      </div>
+      <div class="px-4 py-3 rounded-lg" style="background: #FEF2F2; border: 1px solid #FECACA;">
+        <p class="text-[13px] font-medium" style="color: #991B1B;">Investigate UI issues</p>
+        <p class="text-[12px] mt-1" style="color: #991B1B;">"Capture the checkout page on mobile and desktop viewports and compare them"</p>
+      </div>
+      <div class="px-4 py-3 rounded-lg" style="background: #EFF6FF; border: 1px solid #BFDBFE;">
+        <p class="text-[13px] font-medium" style="color: #1D4ED8;">Automated browser task</p>
+        <p class="text-[12px] mt-1" style="color: #1D4ED8;">"Log into the app and verify the dashboard loads correctly with all widgets"</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Test it -->
+  <% curl_cmd = "curl #{request.base_url}/mcp/tools -H \"Authorization: Bearer #{display_key}\"" %>
+  <div class="space-y-4">
+    <h3 class="text-[15px] font-medium dm-text">Test MCP connection</h3>
+    <p class="text-[14px] dm-text-muted">List available tools with curl:</p>
+    <div class="group" style="position: relative;">
+      <pre class="px-5 py-4 rounded-xl text-[13px] font-mono overflow-x-auto dm-code-block"><code>curl <%= request.base_url %>/mcp/tools \
+  -H "Authorization: Bearer <%= display_key %>"</code></pre>
+      <button onclick="copyToClipboard(document.getElementById('curl-cmd').textContent, this)"
+              class="copy-btn px-3 py-1.5 text-[12px] font-medium rounded-md transition-all opacity-0 group-hover:opacity-100"
+              style="position: absolute; top: 12px; right: 12px; background: #3A3A3A; color: #E8E5E0; border: 1px solid #4A4A4A;">
+        Copy
+      </button>
+      <template id="curl-cmd"><%= curl_cmd %></template>
+    </div>
+  </div>
+</div>
+
+<script>
+  function copyToClipboard(text, btn) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() {
+        showCopied(btn);
+      });
+    } else {
+      var textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      showCopied(btn);
+    }
+  }
+
+  function showCopied(btn) {
+    var original = btn.textContent;
+    btn.textContent = 'Copied!';
+    btn.style.opacity = '1';
+    setTimeout(function() {
+      btn.textContent = original;
+      btn.style.opacity = '';
+    }, 2000);
+  }
+</script>
