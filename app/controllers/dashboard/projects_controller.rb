@@ -1,6 +1,6 @@
 module Dashboard
   class ProjectsController < BaseController
-    before_action :set_project, only: [ :show, :edit, :update, :settings ]
+    before_action :set_project, only: [ :show, :edit, :update, :settings, :mcp_setup, :regenerate_mcp_token ]
     before_action :redirect_to_platform_in_production, only: [ :new, :create ]
 
     def index
@@ -46,6 +46,27 @@ module Dashboard
     end
 
     def settings
+    end
+
+    def mcp_setup
+      @api_key = @project.settings&.dig("api_key")
+
+      if @api_key.blank?
+        @project.settings ||= {}
+        new_key = "vis_api_#{SecureRandom.hex(24)}"
+        @project.settings["api_key"] = new_key
+        @project.save!
+        @api_key = new_key
+        @raw_api_key = new_key
+      end
+    end
+
+    def regenerate_mcp_token
+      @project.settings ||= {}
+      new_key = "vis_api_#{SecureRandom.hex(24)}"
+      @project.settings["api_key"] = new_key
+      @project.save!
+      redirect_to mcp_setup_dashboard_project_path(@project), notice: "API key regenerated"
     end
 
     private

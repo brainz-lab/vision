@@ -779,6 +779,8 @@
   --claude-border: #333333;
   --claude-success: #22C55E;
   --claude-error: #EF4444;
+  --claude-card-bg: #111111;
+  --claude-input-bg: #1a1a1a;
 }
 
 [data-theme="dark"] .claude-input,
@@ -808,6 +810,28 @@
 [data-theme="dark"] .claude-toggle.active,
 .dark .claude-toggle.active {
   background: var(--dm-success) !important;
+}
+
+[data-theme="dark"] .claude-btn-secondary,
+.dark .claude-btn-secondary {
+  color: var(--claude-brown-light) !important;
+  border-color: var(--claude-border) !important;
+}
+
+[data-theme="dark"] .claude-btn-secondary:hover,
+.dark .claude-btn-secondary:hover {
+  background: var(--claude-cream-dark) !important;
+  border-color: #444444 !important;
+}
+
+[data-theme="dark"] .claude-stat-value,
+.dark .claude-stat-value {
+  color: var(--claude-brown) !important;
+}
+
+[data-theme="dark"] .claude-stat-label,
+.dark .claude-stat-label {
+  color: var(--claude-brown-muted) !important;
 }
 
 /* ============================================

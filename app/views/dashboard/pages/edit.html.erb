@@ -13,10 +13,30 @@
     --claude-border: #E7E0D6;
     --claude-success: #16A34A;
     --claude-error: #DC2626;
+    --claude-card-bg: #ffffff;
+    --claude-input-bg: #ffffff;
+    --claude-toggle-bg: #D1D5DB;
+  }
+
+  .dark {
+    --claude-orange: #F59E0B;
+    --claude-orange-light: #FCD34D;
+    --claude-orange-dark: #D97706;
+    --claude-cream: #1a1a1a;
+    --claude-cream-dark: #222222;
+    --claude-brown: #e8e1d7;
+    --claude-brown-light: #c4bfb8;
+    --claude-brown-muted: #a0a0a0;
+    --claude-border: #333333;
+    --claude-success: #22C55E;
+    --claude-error: #EF4444;
+    --claude-card-bg: #111111;
+    --claude-input-bg: #1a1a1a;
+    --claude-toggle-bg: #555555;
   }
 
   .claude-input {
-    background: white;
+    background: var(--claude-input-bg);
     border: 1px solid var(--claude-border);
     border-radius: 12px;
     padding: 14px 18px;
@@ -40,7 +60,7 @@
     position: relative;
     width: 52px;
     height: 28px;
-    background: #D1D5DB;
+    background: var(--claude-toggle-bg);
     border-radius: 14px;
     cursor: pointer;
     transition: background 0.2s ease;
@@ -101,11 +121,11 @@
 
   .claude-btn-secondary:hover {
     background: var(--claude-cream-dark);
-    border-color: #D1CBC0;
+    border-color: var(--claude-border);
   }
 
   .claude-card {
-    background: white;
+    background: var(--claude-card-bg);
     border: 1px solid var(--claude-border);
     border-radius: 20px;
     overflow: hidden;
@@ -167,7 +187,7 @@
   <!-- Main Card -->
   <div class="claude-card">
     <!-- Header -->
-    <div class="px-8 py-8" style="background: linear-gradient(180deg, var(--claude-cream) 0%, white 100%); border-bottom: 1px solid var(--claude-border);">
+    <div class="px-8 py-8" style="background: linear-gradient(180deg, var(--claude-cream) 0%, var(--claude-card-bg, white) 100%); border-bottom: 1px solid var(--claude-border);">
       <div class="flex items-center gap-5">
         <!-- Icon -->
         <div class="w-14 h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style="background: linear-gradient(135deg, var(--claude-orange) 0%, var(--claude-orange-dark) 100%); box-shadow: 0 6px 16px -4px rgba(217, 119, 87, 0.4);">
@@ -355,7 +375,7 @@
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     const checkbox = document.getElementById('enabled_toggle');
-    const toggle = checkbox.nextElementSibling;
+    const toggle = checkbox.parentElement.querySelector('.claude-toggle');
 
     // Initialize toggle state
     if (checkbox.checked) {

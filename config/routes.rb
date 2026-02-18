@@ -101,6 +101,8 @@ Rails.application.routes.draw do
       end
       member do
         get :settings
+        get :mcp_setup
+        post :regenerate_mcp_token
       end
     end
   end

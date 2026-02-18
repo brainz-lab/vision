@@ -140,6 +140,11 @@
             AI Tasks
           <% end %>
 
+          <%= link_to mcp_setup_dashboard_project_path(@project), class: nav_link_class('/mcp_setup') do %>
+            <%= icon(:mcp) %>
+            MCP Setup
+          <% end %>
+
           <%= link_to settings_dashboard_project_path(@project), class: nav_link_class('/settings') do %>
             <%= icon(:settings) %>
             Settings
