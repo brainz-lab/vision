@@ -4,9 +4,15 @@ module Dashboard
     before_action :redirect_to_platform_in_production, only: [ :new, :create ]
 
     def index
-      # Load projects eagerly to prevent separate EXISTS query from .any? check
-      # Counter cache columns (pages_count, test_runs_count) eliminate N+1 queries
-      @projects = Project.order(created_at: :desc).load
+      if Rails.env.development?
+        @projects = Project.order(created_at: :desc).load
+      elsif session[:platform_project_id]
+        @projects = Project.where(platform_project_id: session[:platform_project_id])
+                           .or(Project.where(archived_at: nil))
+                           .order(created_at: :desc).load
+      else
+        @projects = Project.none
+      end
     end
 
     def show
