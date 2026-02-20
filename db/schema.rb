@@ -13,8 +13,11 @@
 ActiveRecord::Schema[8.1].define(version: 2026_01_25_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
   enable_extension "pgcrypto"
   enable_extension "timescaledb"
+  enable_extension "uuid-ossp"
+  enable_extension "vector"
 
   create_table "action_cache_entries", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.jsonb "action_data", default: {}, null: false
