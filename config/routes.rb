@@ -5,6 +5,9 @@ Rails.application.routes.draw do
       # Projects (auto-provisioning)
       post "projects/provision", to: "projects#provision"
       get "projects/lookup", to: "projects#lookup"
+      post "projects/:platform_project_id/archive", to: "projects#archive"
+      post "projects/:platform_project_id/unarchive", to: "projects#unarchive"
+      post "projects/:platform_project_id/purge", to: "projects#purge"
 
       # Pages
       resources :pages, only: [ :index, :show, :create, :update, :destroy ]
