@@ -1,0 +1,6 @@
+---
+:concurrency: 3
+:queues:
+  - default
+  - ai_tasks
+  - low

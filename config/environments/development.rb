@@ -1,6 +1,9 @@
 require "active_support/core_ext/integer/time"
 
 Rails.application.configure do
+
+  # Use Sidekiq for background jobs in development (threads, no fork)
+  config.active_job.queue_adapter = :sidekiq
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time
