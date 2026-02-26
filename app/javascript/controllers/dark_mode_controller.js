@@ -25,7 +25,8 @@ export default class extends Controller {
 
   // Unified localStorage key for all BrainzLab products
   static values = {
-    storageKey: { type: String, default: "brainzlab-theme" }
+    storageKey: { type: String, default: "brainzlab-theme" },
+    defaultTheme: { type: String, default: "light" }
   }
 
   connect() {
@@ -64,6 +65,9 @@ export default class extends Controller {
       this.applyTheme("dark", false)
     } else if (storedTheme === "light") {
       this.applyTheme("light", false)
+    } else if (this.defaultThemeValue) {
+      // ENV-configured default theme (e.g., light when BRAINZLAB_LOGO_LIGHT_URL is set)
+      this.applyTheme(this.defaultThemeValue, false)
     } else {
       // No stored preference - use system preference
       const prefersDark = this.mediaQuery.matches
