@@ -1,7 +1,22 @@
 module Api
   module V1
     class ComparisonsController < BaseController
-      before_action :set_comparison
+      before_action :set_comparison, only: [:show, :approve, :reject, :update_baseline]
+
+      # GET /api/v1/comparisons
+      def index
+        comparisons = Comparison.joins(snapshot: { page: :project })
+                                .where(pages: { project_id: current_project.id })
+                                .order(created_at: :desc)
+
+        comparisons = comparisons.where(status: params[:status]) if params[:status].present?
+        comparisons = comparisons.where(review_status: params[:review_status]) if params[:review_status].present?
+        comparisons = comparisons.limit(params[:limit] || 50)
+
+        render json: {
+          comparisons: comparisons.map { |c| serialize_comparison(c) }
+        }
+      end
 
       # GET /api/v1/comparisons/:id
       def show

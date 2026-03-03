@@ -9,7 +9,7 @@ class Snapshot < ApplicationRecord
 
   validates :status, inclusion: { in: %w[pending captured comparing compared error] }
 
-  scope :recent, -> { order(Arel.sql("COALESCE(captured_at, created_at) DESC")) }
+  scope :recent, -> { order(Arel.sql("COALESCE(snapshots.captured_at, snapshots.created_at) DESC")) }
   scope :captured, -> { where(status: "captured") }
   scope :for_branch, ->(branch) { where(branch: branch) }
 

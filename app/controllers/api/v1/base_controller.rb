@@ -4,9 +4,36 @@ module Api
       before_action :authenticate!
       before_action :check_feature_access!
 
+      rescue_from ActiveRecord::RecordNotFound, with: :not_found
+      rescue_from ActiveRecord::RecordInvalid, with: :unprocessable_entity
+      rescue_from ActionController::ParameterMissing, with: :bad_request
+      rescue_from ActionDispatch::Http::Parameters::ParseError, with: :handle_parse_error
+
       attr_reader :current_project, :key_info
 
       private
+
+      def not_found(exception)
+        model = exception.model || "Record"
+        id = exception.id
+        message = id ? "#{model} not found with id=#{id}" : "#{model} not found"
+        render json: { error: message }, status: :not_found
+      end
+
+      def unprocessable_entity(exception)
+        render json: {
+          error: "Validation failed",
+          details: exception.record.errors.full_messages
+        }, status: :unprocessable_entity
+      end
+
+      def bad_request(exception)
+        render json: { error: exception.message }, status: :bad_request
+      end
+
+      def handle_parse_error(exception)
+        render json: { error: "Invalid JSON: #{exception.message}" }, status: :bad_request
+      end
 
       def authenticate!
         raw_key = extract_api_key

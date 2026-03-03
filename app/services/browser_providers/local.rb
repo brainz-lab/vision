@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
-require "playwright"
+begin
+  require "playwright"
+  PLAYWRIGHT_AVAILABLE = true
+rescue LoadError
+  PLAYWRIGHT_AVAILABLE = false
+end
 
 module BrowserProviders
   # Local Playwright browser provider
@@ -25,7 +30,18 @@ module BrowserProviders
       true
     end
 
+    def self.available?
+      return false unless PLAYWRIGHT_AVAILABLE
+
+      # Check if browser binaries are installed
+      path = new.send(:find_playwright_path)
+      system("#{path.split.first} --version > /dev/null 2>&1")
+    end
+
     def create_session(**options)
+      unless PLAYWRIGHT_AVAILABLE
+        raise "Playwright gem is not installed. Run: bundle add playwright-ruby-client && npx playwright install chromium"
+      end
       session_id = SecureRandom.uuid
       viewport = options[:viewport] || { width: 1280, height: 720 }
       # Ensure viewport has symbol keys
@@ -73,6 +89,12 @@ module BrowserProviders
         session_id: session_id,
         provider: "local"
       }
+    rescue RuntimeError => e
+      if e.message.include?("Executable doesn't exist") || e.message.include?("browserType.launch")
+        raise "Playwright browsers not installed. Run: npx playwright install chromium"
+      end
+      log_error(:create_session, e)
+      raise
     rescue => e
       log_error(:create_session, e)
       raise

@@ -14,7 +14,7 @@ class VaultClient
   class NotFoundError < VaultError; end
   class AccessDeniedError < VaultError; end
 
-  VAULT_URL = ENV.fetch("BRAINZLAB_VAULT_URL", "http://localhost:4009")
+  VAULT_URL = ENV.fetch("BRAINZLAB_VAULT_URL", "http://localhost:4006")
   REQUEST_TIMEOUT = 30
 
   attr_reader :access_token
@@ -187,11 +187,17 @@ class VaultClient
   end
 
   class << self
+    # Check if Vault is configured for a project (without raising)
+    # Follows Platform's ProductClient.configured? pattern
+    def configured_for?(project)
+      project.vault_access_token.present?
+    end
+
     # Create a client for a Vision project
     # Uses the project's Vault access token
     def for_project(project)
       token = project.vault_access_token
-      raise AuthenticationError, "Project has no Vault access token configured" unless token.present?
+      raise AuthenticationError, "Vault access token not configured. Set VAULT_ACCESS_TOKEN environment variable or configure via project settings." unless token.present?
 
       new(access_token: token)
     end

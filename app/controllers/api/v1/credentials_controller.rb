@@ -26,20 +26,28 @@ module Api
       def create
         credential = @current_project.credentials.new(credential_params)
 
-        # Store the actual credential in Vault
+        vault_warning = nil
+
+        # Store the actual credential in Vault (if values provided)
         if params[:username].present? || params[:password].present?
-          begin
-            credential.store!(
-              username: params[:username],
-              password: params[:password]
-            )
-          rescue VaultClient::VaultError => e
-            return render json: { error: "Failed to store credential in Vault: #{e.message}" }, status: :unprocessable_entity
+          if @current_project.vault_configured?
+            begin
+              credential.store!(
+                username: params[:username],
+                password: params[:password]
+              )
+            rescue VaultClient::VaultError => e
+              vault_warning = "Credential record saved but values could not be stored in Vault: #{e.message}"
+            end
+          else
+            vault_warning = "Credential record saved without storing values. Vault is not configured. Set VAULT_ACCESS_TOKEN environment variable or configure via project settings."
           end
         end
 
         if credential.save
-          render json: { credential: credential_json(credential) }, status: :created
+          response = { credential: credential_json(credential) }
+          response[:warning] = vault_warning if vault_warning
+          render json: response, status: :created
         else
           render json: { errors: credential.errors.full_messages }, status: :unprocessable_entity
         end
@@ -48,23 +56,30 @@ module Api
       # PUT /api/v1/credentials/:id
       # Update credential metadata and optionally update Vault value
       def update
+        vault_warning = nil
+
         # Update Vault if new credentials provided
         if params[:username].present? || params[:password].present?
-          begin
-            # Fetch existing to merge
-            existing = @credential.fetch rescue {}
+          if @credential.project.vault_configured?
+            begin
+              existing = @credential.fetch rescue {}
 
-            @credential.store!(
-              username: params[:username] || existing[:username],
-              password: params[:password] || existing[:password]
-            )
-          rescue VaultClient::VaultError => e
-            return render json: { error: "Failed to update credential in Vault: #{e.message}" }, status: :unprocessable_entity
+              @credential.store!(
+                username: params[:username] || existing[:username],
+                password: params[:password] || existing[:password]
+              )
+            rescue VaultClient::VaultError => e
+              vault_warning = "Credential metadata updated but values could not be stored in Vault: #{e.message}"
+            end
+          else
+            vault_warning = "Credential metadata updated without storing values. Vault is not configured. Set VAULT_ACCESS_TOKEN environment variable or configure via project settings."
           end
         end
 
         if @credential.update(credential_params)
-          render json: { credential: credential_json(@credential) }
+          response = { credential: credential_json(@credential) }
+          response[:warning] = vault_warning if vault_warning
+          render json: response
         else
           render json: { errors: @credential.errors.full_messages }, status: :unprocessable_entity
         end
@@ -80,6 +95,13 @@ module Api
       # POST /api/v1/credentials/:id/test
       # Test credential by attempting to fetch from Vault
       def test
+        unless @credential.project.vault_configured?
+          return render json: {
+            success: false,
+            error: "Vault is not configured. Set VAULT_ACCESS_TOKEN environment variable or configure via project settings."
+          }, status: :unprocessable_entity
+        end
+
         begin
           creds = @credential.fetch
 
@@ -125,6 +147,7 @@ module Api
           credential_type: credential.credential_type,
           vault_path: credential.vault_path,
           vault_environment: credential.vault_environment,
+          vault_configured: credential.project.vault_configured?,
           active: credential.active,
           expires_at: credential.expires_at,
           last_used_at: credential.last_used_at,

@@ -8,6 +8,7 @@ class Page < ApplicationRecord
   validates :name, presence: true
   validates :path, presence: true
   validates :slug, presence: true, uniqueness: { scope: :project_id }
+  validate :path_must_be_valid
 
   before_validation :generate_slug, if: -> { slug.blank? && name.present? }
 
@@ -52,5 +53,21 @@ class Page < ApplicationRecord
 
   def generate_slug
     self.slug = name.parameterize
+  end
+
+  def path_must_be_valid
+    return if path.blank?
+
+    if path.start_with?("http://", "https://")
+      # Full URL provided — validate and extract path
+      uri = URI.parse(path)
+      unless uri.host.present?
+        errors.add(:path, "is not a valid URL")
+      end
+    elsif !path.start_with?("/")
+      errors.add(:path, "must start with / (relative path) or be a full URL (http/https)")
+    end
+  rescue URI::InvalidURIError
+    errors.add(:path, "is not a valid URL or path")
   end
 end
