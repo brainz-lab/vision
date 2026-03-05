@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_25_000001) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_05_200000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -101,6 +101,25 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_25_000001) do
     t.index ["project_id"], name: "index_ai_tasks_on_project_id"
     t.index ["status"], name: "index_ai_tasks_on_status"
     t.index ["triggered_by"], name: "index_ai_tasks_on_triggered_by"
+  end
+
+  create_table "assistant_chats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "title"
+    t.datetime "updated_at", null: false
+    t.integer "user_id"
+    t.index ["user_id"], name: "index_assistant_chats_on_user_id"
+  end
+
+  create_table "assistant_messages", force: :cascade do |t|
+    t.bigint "assistant_chat_id", null: false
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.jsonb "metadata", default: {}
+    t.integer "role", default: 0
+    t.datetime "updated_at", null: false
+    t.index ["assistant_chat_id", "created_at"], name: "index_assistant_messages_on_assistant_chat_id_and_created_at"
+    t.index ["assistant_chat_id"], name: "index_assistant_messages_on_assistant_chat_id"
   end
 
   create_table "baselines", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -474,6 +493,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_25_000001) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ai_tasks", "browser_sessions"
   add_foreign_key "ai_tasks", "projects"
+  add_foreign_key "assistant_messages", "assistant_chats"
   add_foreign_key "baselines", "browser_configs"
   add_foreign_key "baselines", "pages"
   add_foreign_key "browser_configs", "projects"

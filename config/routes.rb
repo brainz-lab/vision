@@ -87,6 +87,12 @@ Rails.application.routes.draw do
   namespace :dashboard do
     root to: "projects#index"
 
+    resources :assistant, only: [:index, :show, :create] do
+      member do
+        post :message
+      end
+    end
+
     resources :projects, only: [ :index, :show, :new, :create, :edit, :update ] do
       resources :pages, only: [ :index, :show, :new, :create, :edit, :update, :destroy ]
       resources :test_runs, only: [ :index, :show, :create ]
