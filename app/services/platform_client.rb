@@ -102,7 +102,7 @@ class PlatformClient
     end
 
     def service_key
-      ENV["SERVICE_KEY"]
+      Rails.application.credentials.dig(:service_key) || ENV["SERVICE_KEY"]
     end
   end
 end
