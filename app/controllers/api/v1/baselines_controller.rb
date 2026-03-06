@@ -1,7 +1,7 @@
 module Api
   module V1
     class BaselinesController < BaseController
-      before_action :set_baseline, only: [:show]
+      before_action :set_baseline, only: [:show, :approve, :reject]
 
       # GET /api/v1/baselines
       def index
@@ -21,7 +21,31 @@ module Api
         render json: serialize_baseline(@baseline)
       end
 
+      # POST /api/v1/baselines/:id/approve
+      def approve
+        @baseline.approve!(current_user_email)
+
+        render json: {
+          message: "Baseline approved",
+          baseline: serialize_baseline(@baseline)
+        }
+      end
+
+      # POST /api/v1/baselines/:id/reject
+      def reject
+        @baseline.update!(active: false)
+
+        render json: {
+          message: "Baseline rejected",
+          baseline: serialize_baseline(@baseline)
+        }
+      end
+
       private
+
+      def current_user_email
+        params[:user_email] || @key_info[:user_email] || "api@vision.brainzlab.ai"
+      end
 
       def set_baseline
         @baseline = current_project.baselines.find(params[:id])
