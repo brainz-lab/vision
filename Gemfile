@@ -63,7 +63,7 @@ gem "faraday", "~> 2.0"
 gem "faraday-retry"
 
 gem "anthropic", "~> 0.4"
-gem "brainzlab", "~> 0.1.12"
+gem "fluyenta-ruby", "~> 0.1.16", require: "brainzlab"
 if File.exist?(File.expand_path("../fluyenta-ui", __dir__))
   gem "fluyenta-ui", path: "../fluyenta-ui"
 else
