@@ -92,7 +92,7 @@ module Ai
           if messages.last && messages.last[:role] == "user" && messages.last[:content].is_a?(Array)
             messages.last[:content] << block
           else
-            messages << { role: "user", content: [block] }
+            messages << { role: "user", content: [ block ] }
           end
         end
       end

@@ -14,7 +14,7 @@ FactoryBot.define do
     # Suppress the after_create callback that creates default browser configs,
     # so factories stay lean and tests control their own setup.
     after(:build) do |project|
-      project.define_singleton_method(:create_default_browser_configs) {}
+      project.define_singleton_method(:create_default_browser_configs) { }
     end
 
     trait :with_browser_configs do
