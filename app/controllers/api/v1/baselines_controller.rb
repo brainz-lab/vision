@@ -1,7 +1,7 @@
 module Api
   module V1
     class BaselinesController < BaseController
-      before_action :set_baseline, only: [:show, :approve, :reject]
+      before_action :set_baseline, only: [ :show, :approve, :reject ]
 
       # GET /api/v1/baselines
       def index

@@ -1,7 +1,7 @@
 module Api
   module V1
     class ComparisonsController < BaseController
-      before_action :set_comparison, only: [:show, :approve, :reject, :update_baseline]
+      before_action :set_comparison, only: [ :show, :approve, :reject, :update_baseline ]
 
       # GET /api/v1/comparisons
       def index

@@ -96,7 +96,7 @@ class SsoController < ApplicationController
       project.save!
     end
 
-    Project.where.not(platform_project_id: [nil, ""])
+    Project.where.not(platform_project_id: [ nil, "" ])
            .where.not(platform_project_id: platform_ids)
            .where(archived_at: nil)
            .update_all(archived_at: Time.current)

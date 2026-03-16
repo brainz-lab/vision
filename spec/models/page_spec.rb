@@ -103,8 +103,8 @@ RSpec.describe Page, type: :model do
   end
 
   describe "#effective_hide_selectors" do
-    let(:project) { build(:project, settings: { "api_key" => "vis_api_test", "ingest_key" => "vis_ingest_test", "hide_selectors" => [".ad"] }) }
-    let(:page)    { build(:page, project: project, hide_selectors: [".banner"]) }
+    let(:project) { build(:project, settings: { "api_key" => "vis_api_test", "ingest_key" => "vis_ingest_test", "hide_selectors" => [ ".ad" ] }) }
+    let(:page)    { build(:page, project: project, hide_selectors: [ ".banner" ]) }
 
     it "merges page and project selectors" do
       expect(page.effective_hide_selectors).to include(".banner", ".ad")
