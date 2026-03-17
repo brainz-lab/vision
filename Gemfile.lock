@@ -1,13 +1,7 @@
 PATH
-  remote: ../brainzlab-platform-client
-  specs:
-    brainzlab-platform-client (0.1.2)
-      rails (>= 7.0)
-
-PATH
   remote: ../fluyenta-ui
   specs:
-    fluyenta-ui (0.1.4)
+    fluyenta-ui (0.1.5)
       phlex (~> 2.0)
       phlex-rails (~> 2.0)
       rails (>= 7.0)
@@ -503,6 +497,12 @@ GEM
     websocket-extensions (0.1.5)
     zeitwerk (2.7.4)
 
+GEM
+  remote: https://rubygems.pkg.github.com/fluyenta/
+  specs:
+    brainzlab-platform-client (0.1.2)
+      rails (>= 7.0)
+
 PLATFORMS
   aarch64-linux
   aarch64-linux-gnu
@@ -520,7 +520,7 @@ DEPENDENCIES
   aws-sdk-s3
   bootsnap
   brainzlab (~> 0.1.12)
-  brainzlab-platform-client!
+  brainzlab-platform-client (= 0.1.2)!
   brakeman
   bundler-audit
   connection_pool
