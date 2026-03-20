@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full" data-controller="dark-mode"<%= ' data-dark-mode-default-theme-value="light"'.html_safe if ENV['BRAINZLAB_LOGO_LIGHT_URL'].present? %>>
+<html lang="en" class="h-full" data-controller="dark-mode"<%= ' data-dark-mode-default-theme-value="light"'.html_safe if ENV['BRAINZLAB_DARK_MODE_DISABLED'].present? %>>
 <head>
   <title>Vision - <%= content_for(:title) || "Visual Regression Testing" %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -96,14 +96,13 @@
         <div class="flex items-center justify-between">
           <%= link_to dashboard_root_path, class: "flex flex-col items-end gap-1" do %>
             <div class="flex items-center">
-              <img src="<%= ENV.fetch('BRAINZLAB_LOGO_LIGHT_URL', '/fluyenta-logo-light.png') %>" alt="Fluyenta" class="h-12 dark:hidden">
-                <img src="<%= ENV.fetch('BRAINZLAB_LOGO_DARK_URL', '/fluyenta-logo-dark.png') %>" alt="Fluyenta" class="h-12 hidden dark:block">
+              <%= brainzlab_logo_tag %>
             </div>
             <span class="text-[10px] font-semibold tracking-wider uppercase px-1.5 py-0.5 rounded" style="color: var(--dm-brand); background: color-mix(in srgb, var(--dm-brand) 12%, transparent);">Vision</span>
           <% end %>
 
           <%# Dark Mode Toggle %>
-          <% unless ENV['BRAINZLAB_LOGO_LIGHT_URL'].present? %>
+          <% unless ENV['BRAINZLAB_DARK_MODE_DISABLED'].present? %>
           <button type="button"
                   class="dark-mode-toggle"
                   onclick="toggleDarkMode()"

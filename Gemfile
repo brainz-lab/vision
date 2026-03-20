@@ -67,7 +67,7 @@ gem "fluyenta-ruby", "~> 0.1.16", require: "brainzlab"
 if File.exist?(File.expand_path("../fluyenta-ui", __dir__))
   gem "fluyenta-ui", path: "../fluyenta-ui"
 else
-  gem "fluyenta-ui", "0.1.3", source: "https://rubygems.pkg.github.com/fluyenta"
+  gem "fluyenta-ui", "0.1.7", source: "https://rubygems.pkg.github.com/fluyenta"
 end
 
 gem "phlex-rails", "~> 2.0"
