@@ -1,0 +1,33 @@
+{
+  "name": "brainzlab-e2e",
+  "version": "1.0.0",
+  "description": "Cross-service E2E integration and regression tests for BrainzLab",
+  "scripts": {
+    "test": "playwright test",
+    "test:integration": "playwright test tests/integration/",
+    "test:regression": "playwright test tests/regression/",
+    "test:smoke": "playwright test --grep @smoke",
+    "test:gate": "playwright test tests/regression/ --reporter=github,html",
+    "test:signal": "playwright test tests/signal/",
+    "test:dendrite": "playwright test tests/dendrite/",
+    "test:pulse": "playwright test tests/pulse/",
+    "test:recall": "playwright test tests/recall/",
+    "test:reflex": "playwright test tests/reflex/",
+    "test:beacon": "playwright test tests/beacon/",
+    "test:flux": "playwright test tests/flux/",
+    "test:cortex": "playwright test tests/cortex/",
+    "test:platform": "playwright test tests/platform/",
+    "test:nexus": "playwright test tests/nexus/",
+    "test:vault": "playwright test tests/vault/",
+    "test:synapse": "playwright test tests/synapse/",
+    "test:sentinel": "playwright test tests/sentinel/",
+    "test:vision": "playwright test tests/vision/",
+    "test:landing": "playwright test tests/landing/",
+    "test:nerve": "playwright test tests/nerve/",
+    "test:all": "playwright test",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0"
+  }
+}
