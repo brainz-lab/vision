@@ -21,6 +21,9 @@ jobs:
       - name: Configure git for private gems
         run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
 
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
+
       - name: Cache bundle gems
         uses: actions/cache@v4
         with:
@@ -49,6 +52,9 @@ jobs:
       - name: Configure git for private gems
         run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
 
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
+
       - name: Cache bundle gems
         uses: actions/cache@v4
         with:
@@ -75,6 +81,9 @@ jobs:
 
       - name: Configure git for private gems
         run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
 
       - name: Cache bundle gems
         uses: actions/cache@v4
@@ -106,7 +115,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres
+        image: timescale/timescaledb-ha:pg17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -116,13 +125,16 @@ jobs:
 
     steps:
       - name: Install packages
-        run: apt-get update -qq && apt-get install --no-install-recommends -y libpq-dev
+        run: apt-get update -qq && apt-get install --no-install-recommends -y libpq-dev libvips-dev
 
       - name: Checkout code
         uses: actions/checkout@v6
 
       - name: Configure git for private gems
         run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
 
       - name: Cache bundle gems
         uses: actions/cache@v4
