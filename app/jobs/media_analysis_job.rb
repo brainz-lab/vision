@@ -49,7 +49,7 @@ class MediaAnalysisJob < ApplicationJob
     segments = if analysis.parameters["segments"].present?
       analysis.parameters["segments"].map(&:symbolize_keys)
     else
-      [{ start: "00:00:00.000", end: "00:00:00.000", text: analysis.parameters["text"] || "" }]
+      [ { start: "00:00:00.000", end: "00:00:00.000", text: analysis.parameters["text"] || "" } ]
     end
 
     detector = Media::KeywordDetector.new(segments, keywords: keywords, weights: weights)

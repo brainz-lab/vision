@@ -42,7 +42,7 @@ RSpec.describe Media::AudioTranscriber do
         allow_any_instance_of(described_class).to receive(:convert_to_wav).and_return("#{tmp_dir}/audio.wav")
         allow_any_instance_of(described_class).to receive(:whisper_available?).and_return(false)
         allow_any_instance_of(described_class).to receive(:transcribe_via_api).and_return({
-          segments: [{ start: "00:00:00.000", end: "00:00:05.000", text: "Test transcription" }],
+          segments: [ { start: "00:00:00.000", end: "00:00:05.000", text: "Test transcription" } ],
           full_text: "Test transcription"
         })
       end

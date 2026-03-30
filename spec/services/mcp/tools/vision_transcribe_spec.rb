@@ -9,7 +9,7 @@ RSpec.describe Mcp::Tools::VisionTranscribe do
     context "synchronous mode" do
       before do
         allow_any_instance_of(Media::AudioTranscriber).to receive(:transcribe).and_return({
-          segments: [{ start: "00:00:00.000", end: "00:00:05.000", text: "Hola mundo" }],
+          segments: [ { start: "00:00:00.000", end: "00:00:05.000", text: "Hola mundo" } ],
           full_text: "Hola mundo",
           language: "es",
           engine: "whisper.cpp"

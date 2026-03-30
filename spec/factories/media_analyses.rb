@@ -28,7 +28,7 @@ FactoryBot.define do
 
     trait :keyword_detection do
       analysis_type { "detect_keywords" }
-      parameters { { keywords: ["plata", "arreglo", "no reportar"] } }
+      parameters { { keywords: [ "plata", "arreglo", "no reportar" ] } }
     end
 
     trait :frame_extraction do

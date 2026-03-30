@@ -9,7 +9,7 @@ RSpec.describe MediaAnalysisJob do
 
       before do
         allow_any_instance_of(Media::AudioTranscriber).to receive(:transcribe).and_return({
-          segments: [{ start: "00:00:00.000", end: "00:00:05.000", text: "Hello" }],
+          segments: [ { start: "00:00:00.000", end: "00:00:05.000", text: "Hello" } ],
           full_text: "Hello",
           language: "es",
           engine: "whisper.cpp"
@@ -28,7 +28,7 @@ RSpec.describe MediaAnalysisJob do
     context "keyword detection" do
       let(:analysis) do
         create(:media_analysis, :keyword_detection, project: project,
-               parameters: { "keywords" => ["plata"], "text" => "Le doy plata" })
+               parameters: { "keywords" => [ "plata" ], "text" => "Le doy plata" })
       end
 
       it "runs KeywordDetector and completes the analysis" do

@@ -14,6 +14,6 @@ class CreateMediaAnalyses < ActiveRecord::Migration[8.0]
 
     add_index :media_analyses, :status
     add_index :media_analyses, :analysis_type
-    add_index :media_analyses, [:project_id, :status]
+    add_index :media_analyses, [ :project_id, :status ]
   end
 end

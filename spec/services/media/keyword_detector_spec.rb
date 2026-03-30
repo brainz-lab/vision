@@ -10,7 +10,7 @@ RSpec.describe Media::KeywordDetector do
     ]
   end
 
-  let(:keywords) { ["plata", "arreglo", "no reportar", "no reporta", "entre nosotros", "colaboracion"] }
+  let(:keywords) { [ "plata", "arreglo", "no reportar", "no reporta", "entre nosotros", "colaboracion" ] }
 
   describe "#detect" do
     it "returns matches with timestamps and context" do

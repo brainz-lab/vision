@@ -127,11 +127,11 @@ module Media
       request["Authorization"] = "Bearer #{api_key}"
 
       form_data = [
-        ["file", File.open(wav_path), { filename: "audio.wav", content_type: "audio/wav" }],
-        ["model", "whisper-1"],
-        ["language", language],
-        ["response_format", "verbose_json"],
-        ["timestamp_granularities[]", "segment"]
+        [ "file", File.open(wav_path), { filename: "audio.wav", content_type: "audio/wav" } ],
+        [ "model", "whisper-1" ],
+        [ "language", language ],
+        [ "response_format", "verbose_json" ],
+        [ "timestamp_granularities[]", "segment" ]
       ]
       request.set_form(form_data, "multipart/form-data")
 

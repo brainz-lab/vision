@@ -10,7 +10,7 @@ RSpec.describe Mcp::Tools::VisionDetectKeywords do
     ]
   end
 
-  let(:keywords) { ["plata", "no reporta", "arreglo"] }
+  let(:keywords) { [ "plata", "no reporta", "arreglo" ] }
 
   describe "#call" do
     it "detects keywords in provided segments" do

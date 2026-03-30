@@ -44,7 +44,7 @@ module Mcp
         segments = if args[:segments].present?
           args[:segments].map { |s| s.transform_keys(&:to_sym) }
         elsif args[:text].present?
-          [{ start: "00:00:00.000", end: "00:00:00.000", text: args[:text] }]
+          [ { start: "00:00:00.000", end: "00:00:00.000", text: args[:text] } ]
         else
           return error("Either segments or text is required")
         end
