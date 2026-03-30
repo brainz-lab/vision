@@ -14,7 +14,7 @@ FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Install base packages including Playwright dependencies
+# Install base packages including Playwright dependencies and media analysis tools
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y \
     curl \
@@ -22,6 +22,8 @@ RUN apt-get update -qq && \
     libvips \
     postgresql-client \
     imagemagick \
+    # FFmpeg for video frame extraction (Media Analysis)
+    ffmpeg \
     # Playwright browser dependencies
     libnss3 \
     libnspr4 \
@@ -50,10 +52,22 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
-# Install packages needed to build gems
+# Install packages needed to build gems and whisper.cpp
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libyaml-dev pkg-config cmake && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Build whisper.cpp from source (MIT license, local audio transcription)
+RUN git clone --depth 1 https://github.com/ggerganov/whisper.cpp.git /tmp/whisper.cpp && \
+    cd /tmp/whisper.cpp && \
+    cmake -B build && \
+    cmake --build build --config Release -j$(nproc) && \
+    cp build/bin/whisper-cli /usr/local/bin/whisper-cli && \
+    # Download base model (~142MB, good balance of speed/accuracy)
+    bash models/download-ggml-model.sh base && \
+    mkdir -p /usr/local/share/whisper && \
+    cp models/ggml-base.bin /usr/local/share/whisper/ && \
+    rm -rf /tmp/whisper.cpp
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
@@ -83,7 +97,9 @@ RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 # Final stage for app image
 FROM base
 
-ENV BUNDLE_DEPLOYMENT="1"
+ENV BUNDLE_DEPLOYMENT="1" \
+    WHISPER_BIN="/usr/local/bin/whisper-cli" \
+    WHISPER_MODEL_PATH="/usr/local/share/whisper/ggml-base.bin"
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
@@ -93,6 +109,10 @@ USER 1000:1000
 # Copy built artifacts: gems, application
 COPY --chown=rails:rails --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --chown=rails:rails --from=build /rails /rails
+
+# Copy whisper.cpp binary and model from build stage
+COPY --from=build /usr/local/bin/whisper-cli /usr/local/bin/whisper-cli
+COPY --from=build /usr/local/share/whisper /usr/local/share/whisper
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]

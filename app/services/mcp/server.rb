@@ -16,7 +16,13 @@ module Mcp
       "vision_extract" => Tools::VisionExtract,
 
       # Credential management (Vault integration)
-      "vision_credential" => Tools::VisionCredential
+      "vision_credential" => Tools::VisionCredential,
+
+      # Media analysis tools
+      "vision_transcribe" => Tools::VisionTranscribe,
+      "vision_detect_keywords" => Tools::VisionDetectKeywords,
+      "vision_extract_frames" => Tools::VisionExtractFrames,
+      "vision_analyze_video" => Tools::VisionAnalyzeVideo
     }.freeze
 
     attr_reader :project

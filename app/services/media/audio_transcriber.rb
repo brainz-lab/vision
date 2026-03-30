@@ -88,8 +88,7 @@ module Media
         "-m", model_path,
         "-l", language,
         "-f", wav_path,
-        "--output-text", "false",
-        "--no-timestamps", "false"
+        "--no-prints"
       ]
 
       Rails.logger.info "[Media::AudioTranscriber] Running: #{cmd.join(' ')}"
