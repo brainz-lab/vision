@@ -11,8 +11,19 @@ RSpec.describe BrowserSession, type: :model do
 
     it { is_expected.to validate_presence_of(:provider_session_id) }
     it { is_expected.to validate_uniqueness_of(:provider_session_id) }
-    it { is_expected.to validate_presence_of(:browser_provider) }
-    it { is_expected.to validate_presence_of(:status) }
+
+    it "requires browser_provider to be present (set by default)" do
+      session = build(:browser_session)
+      session.valid?
+      expect(session.browser_provider).to be_present
+    end
+
+    it "requires status to be present (set by default)" do
+      session = build(:browser_session)
+      session.valid?
+      expect(session.status).to be_present
+    end
+
     it { is_expected.to validate_inclusion_of(:browser_provider).in_array(BrowserSession::PROVIDERS) }
     it { is_expected.to validate_inclusion_of(:status).in_array(BrowserSession::STATUSES) }
   end

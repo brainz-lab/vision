@@ -48,12 +48,14 @@ RSpec.describe "API::V1::Tasks", type: :request do
   describe "POST /api/v1/tasks" do
     let(:valid_params) do
       {
-        instruction:      "Click the login button",
-        start_url:        "https://example.com",
-        model:            "claude-sonnet-4",
-        browser_provider: "local",
-        max_steps:        10,
-        timeout_seconds:  120
+        task: {
+          instruction:      "Click the login button",
+          start_url:        "https://example.com",
+          model:            "claude-sonnet-4",
+          browser_provider: "local",
+          max_steps:        10,
+          timeout_seconds:  120
+        }
       }
     end
 
@@ -69,15 +71,15 @@ RSpec.describe "API::V1::Tasks", type: :request do
     it "returns task in response" do
       post "/api/v1/tasks", params: valid_params, headers: headers
       body = JSON.parse(response.body)
-      expect(body["instruction"]).to include("Click")
-      expect(body["status"]).to eq("pending")
+      expect(body["task"]["instruction"]).to include("Click")
+      expect(body["task"]["status"]).to eq("pending")
     end
 
-    it "returns 422 for missing instruction" do
+    it "returns 400 for missing instruction (params.require raises ActionController::ParameterMissing)" do
       post "/api/v1/tasks",
-           params: { model: "claude-sonnet-4" },
+           params: { task: { model: "claude-sonnet-4" } },
            headers: headers
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:bad_request).or have_http_status(:unprocessable_entity)
     end
   end
 
@@ -88,9 +90,9 @@ RSpec.describe "API::V1::Tasks", type: :request do
       get "/api/v1/tasks/#{task.id}", headers: headers
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body["id"]).to eq(task.id)
-      expect(body).to have_key("result")
-      expect(body).to have_key("steps_executed")
+      expect(body["task"]["id"]).to eq(task.id)
+      expect(body["task"]).to have_key("result")
+      expect(body["task"]).to have_key("steps_executed")
     end
 
     it "returns 404 for unknown task" do

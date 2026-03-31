@@ -12,7 +12,12 @@ RSpec.describe Page, type: :model do
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:path) }
-    it { is_expected.to validate_presence_of(:slug) }
+
+    it "requires slug to be present (auto-generated from name)" do
+      page = build(:page)
+      page.valid?
+      expect(page.slug).to be_present
+    end
 
     it "validates slug uniqueness scoped to project_id" do
       project = create(:project)

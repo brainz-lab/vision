@@ -10,15 +10,18 @@ RSpec.describe "API::V1::Sessions", type: :request do
       create_session: { session_id: "sess_mock_#{SecureRandom.hex(8)}", live_url: nil },
       close_session:  true,
       navigate:       { url: "https://example.com", title: "Example" },
-      screenshot:     "base64_png_data",
+      screenshot:     { data: "raw_png_data", content_type: "image/png" },
       page_content:   "<html><body>Hello</body></html>",
       perform_action: { success: true },
-      execute_ai_action: { action: "click", selector: "#btn", success: true, reasoning: "Found the button" }
+      execute_ai_action: { action: "click", selector: "#btn", success: true, reasoning: "Found the button" },
+      current_url:    "https://example.com",
+      current_title:  "Example Page"
     )
   end
 
   before do
     allow(BrowserProviders::Factory).to receive(:for).and_return(mock_provider)
+    allow(BrowserProviders::Factory).to receive(:for_project).and_return(mock_provider)
   end
 
   describe "GET /api/v1/sessions" do
@@ -70,9 +73,9 @@ RSpec.describe "API::V1::Sessions", type: :request do
       get "/api/v1/sessions/#{session.id}", headers: headers
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body["id"]).to eq(session.id)
-      expect(body).to have_key("status")
-      expect(body).to have_key("browser_provider")
+      expect(body["session"]["id"]).to eq(session.id)
+      expect(body["session"]).to have_key("status")
+      expect(body["session"]).to have_key("browser_provider")
     end
 
     it "returns 404 for unknown session" do
@@ -100,24 +103,16 @@ RSpec.describe "API::V1::Sessions", type: :request do
   describe "GET /api/v1/sessions/:id/screenshot" do
     let!(:session) { create(:browser_session, project: project, status: "active") }
 
-    before do
-      allow_any_instance_of(BrowserSession).to receive(:screenshot).and_return("mock_png_data")
-    end
-
     it "returns screenshot data" do
       get "/api/v1/sessions/#{session.id}/screenshot", headers: headers
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body).to have_key("screenshot")
+      expect(body).to have_key("data")
     end
   end
 
   describe "GET /api/v1/sessions/:id/state" do
     let!(:session) { create(:browser_session, :with_url, project: project, status: "active") }
-
-    before do
-      allow_any_instance_of(BrowserSession).to receive(:page_content).and_return("<html></html>")
-    end
 
     it "returns current page state" do
       get "/api/v1/sessions/#{session.id}/state", headers: headers

@@ -71,8 +71,8 @@ RSpec.describe "API::V1::Credentials", type: :request do
 
       expect(response).to have_http_status(:created)
       body = JSON.parse(response.body)
-      expect(body["name"]).to eq("my-service")
-      expect(body).not_to have_key("password")
+      expect(body["credential"]["name"]).to eq("my-service")
+      expect(body["credential"]).not_to have_key("password")
     end
 
     it "returns 422 for invalid credential type" do
@@ -98,9 +98,9 @@ RSpec.describe "API::V1::Credentials", type: :request do
       get "/api/v1/credentials/#{cred.id}", headers: headers
       expect(response).to have_http_status(:ok)
       body = JSON.parse(response.body)
-      expect(body["id"]).to eq(cred.id)
-      expect(body["name"]).to eq(cred.name)
-      expect(body).not_to have_key("password")
+      expect(body["credential"]["id"]).to eq(cred.id)
+      expect(body["credential"]["name"]).to eq(cred.name)
+      expect(body["credential"]).not_to have_key("password")
     end
 
     it "returns 404 for unknown credential" do
@@ -141,6 +141,11 @@ RSpec.describe "API::V1::Credentials", type: :request do
 
   describe "POST /api/v1/credentials/:id/test" do
     let!(:cred) { create(:credential, project: project) }
+
+    before do
+      allow_any_instance_of(Project).to receive(:vault_configured?).and_return(true)
+      allow(mock_vault_client).to receive(:get_credential).and_return({ username: "user", password: "secret" })
+    end
 
     it "tests Vault connectivity" do
       post "/api/v1/credentials/#{cred.id}/test", headers: headers

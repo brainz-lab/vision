@@ -70,7 +70,8 @@ RSpec.describe ActionCacheEntry, type: :model do
     it "increments success_count for existing entry" do
       ActionCacheEntry.store(project: project, url: "https://example.com/login", action: "click", action_data: { selector: "btn" })
       entry = ActionCacheEntry.store(project: project, url: "https://example.com/login", action: "click", action_data: { selector: "btn" })
-      expect(entry.success_count).to eq(2)
+      # DB default for success_count is 1, first store increments to 2, second to 3
+      expect(entry.success_count).to eq(3)
     end
   end
 

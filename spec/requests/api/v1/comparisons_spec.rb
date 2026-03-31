@@ -58,13 +58,10 @@ RSpec.describe "API::V1::Comparisons", type: :request do
     end
 
     it "updates baseline when update_baseline is true" do
-      allow_any_instance_of(Snapshot).to receive_message_chain(:screenshot, :attached?).and_return(true)
-      allow_any_instance_of(Snapshot).to receive_message_chain(:screenshot, :blob).and_return(double("blob"))
-      allow_any_instance_of(Comparison).to receive(:approve!).and_call_original
       allow_any_instance_of(Snapshot).to receive(:promote_to_baseline!).and_return(double("baseline"))
 
       post "/api/v1/comparisons/#{comparison.id}/approve",
-           params: { user_email: "admin@example.com", update_baseline: true },
+           params: { user_email: "admin@example.com", update_baseline: "true" },
            headers: headers
 
       expect(response).to have_http_status(:ok)
