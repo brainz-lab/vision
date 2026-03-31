@@ -34,7 +34,7 @@ RSpec.describe "API::V1::Pages", type: :request do
 
   describe "POST /api/v1/pages" do
     let(:valid_params) do
-      { page: { name: "Home Page", path: "/", enabled: true } }
+      { name: "Home Page", path: "/", enabled: true }
     end
 
     it "creates a new page and returns 201" do
@@ -50,7 +50,7 @@ RSpec.describe "API::V1::Pages", type: :request do
 
     it "returns 422 for invalid params" do
       post "/api/v1/pages",
-           params: { page: { name: "", path: "" } },
+           params: { name: "", path: "" },
            headers: headers
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -85,7 +85,7 @@ RSpec.describe "API::V1::Pages", type: :request do
 
     it "updates the page" do
       patch "/api/v1/pages/#{page.id}",
-            params: { page: { name: "New Name" } },
+            params: { name: "New Name" },
             headers: headers
       expect(response).to have_http_status(:ok)
       expect(page.reload.name).to eq("New Name")

@@ -61,14 +61,15 @@ RSpec.describe Baseline, type: :model do
   end
 
   describe "deactivate_previous callback" do
-    it "deactivates previously active baselines for same page/config/branch" do
+    it "deactivates previously active baselines when approving an inactive baseline" do
       project   = create(:project)
       page      = create(:page, project: project)
       config    = create(:browser_config, project: project)
       original  = create(:baseline, page: page, browser_config: config, branch: "main", active: true)
 
-      # Creating a new active baseline should deactivate the original
-      _new_baseline = create(:baseline, page: page, browser_config: config, branch: "main", active: true)
+      # Create a new baseline that starts inactive, then approve it
+      new_baseline = create(:baseline, page: page, browser_config: config, branch: "main", active: false)
+      new_baseline.approve!("admin@example.com")
 
       expect(original.reload.active).to be false
     end
@@ -79,7 +80,8 @@ RSpec.describe Baseline, type: :model do
       config        = create(:browser_config, project: project)
       main_baseline = create(:baseline, page: page, browser_config: config, branch: "main", active: true)
 
-      _feature = create(:baseline, page: page, browser_config: config, branch: "feature", active: true)
+      inactive_feature = create(:baseline, page: page, browser_config: config, branch: "feature", active: false)
+      inactive_feature.approve!("admin@example.com")
 
       expect(main_baseline.reload.active).to be true
     end

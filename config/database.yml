@@ -25,18 +25,18 @@ development:
 test:
   primary:
     <<: *default
-    database: vision_test
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_test
   queue:
     <<: *default
-    database: vision_test
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_test
     migrations_paths: db/queue_migrate
   cache:
     <<: *default
-    database: vision_test
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_test
     migrations_paths: db/cache_migrate
   cable:
     <<: *default
-    database: vision_test
+    url: <%= ENV.fetch("DATABASE_URL", "postgres://postgres:postgres@localhost:5432") %>/vision_test
     migrations_paths: db/cable_migrate
 
 production:

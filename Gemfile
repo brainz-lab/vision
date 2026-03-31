@@ -49,6 +49,7 @@ gem "playwright-ruby-client"
 
 # Image processing for screenshots
 gem "image_processing", "~> 1.2"
+gem "streamio-ffmpeg", "~> 3.0"
 gem "mini_magick"
 gem "ruby-vips"
 
@@ -63,11 +64,11 @@ gem "faraday", "~> 2.0"
 gem "faraday-retry"
 
 gem "anthropic", "~> 0.4"
-gem "brainzlab", "~> 0.1.12"
+gem "fluyenta-ruby", "~> 0.1.16", require: "brainzlab"
 if File.exist?(File.expand_path("../fluyenta-ui", __dir__))
   gem "fluyenta-ui", path: "../fluyenta-ui"
 else
-  gem "fluyenta-ui", "0.1.5", source: "https://rubygems.pkg.github.com/fluyenta"
+  gem "fluyenta-ui", "0.1.7", source: "https://rubygems.pkg.github.com/fluyenta"
 end
 
 gem "phlex-rails", "~> 2.0"

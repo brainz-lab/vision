@@ -34,7 +34,7 @@ RSpec.describe "API::V1::BrowserConfigs", type: :request do
 
   describe "POST /api/v1/browser_configs" do
     let(:valid_params) do
-      { browser_config: { browser: "firefox", name: "Firefox Desktop", width: 1280, height: 800 } }
+      { browser: "firefox", name: "Firefox Desktop", width: 1280, height: 800 }
     end
 
     it "creates a new browser config and returns 201" do
@@ -50,7 +50,7 @@ RSpec.describe "API::V1::BrowserConfigs", type: :request do
 
     it "returns 422 for invalid browser" do
       post "/api/v1/browser_configs",
-           params: { browser_config: { browser: "edge", name: "Edge", width: 1280, height: 720 } },
+           params: { browser: "edge", name: "Edge", width: 1280, height: 720 },
            headers: headers
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -79,7 +79,7 @@ RSpec.describe "API::V1::BrowserConfigs", type: :request do
 
     it "updates the browser config" do
       patch "/api/v1/browser_configs/#{config.id}",
-            params: { browser_config: { name: "New Config" } },
+            params: { name: "New Config" },
             headers: headers
       expect(response).to have_http_status(:ok)
       expect(config.reload.name).to eq("New Config")

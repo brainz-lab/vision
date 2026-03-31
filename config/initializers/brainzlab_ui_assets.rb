@@ -19,7 +19,7 @@ Rails.application.config.after_initialize do
     end
   end
 
-  unless target.exist?
+  unless target.exist? || target.symlink?
     FileUtils.ln_s(source, target)
   end
 end

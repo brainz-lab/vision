@@ -13,6 +13,7 @@ class Project < ApplicationRecord
 
   # Vault integration for secure credential storage
   has_many :credentials, dependent: :destroy
+  has_many :media_analyses, dependent: :destroy
 
   validates :platform_project_id, presence: true, uniqueness: true
   validates :name, presence: true

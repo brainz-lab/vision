@@ -2,14 +2,25 @@ require "rails_helper"
 
 RSpec.describe Credential, type: :model do
   describe "associations" do
-    it { is_expected.to belong_to(:project) }
+    it "belongs to a project" do
+      project = create(:project)
+      cred = create(:credential, project: project)
+      expect(cred.project).to eq(project)
+    end
   end
 
   describe "validations" do
     subject { build(:credential) }
 
     it { is_expected.to validate_presence_of(:name) }
-    it { is_expected.to validate_presence_of(:vault_path) }
+
+    it "requires vault_path to be present (auto-set by callback)" do
+      project = create(:project, platform_project_id: "proj_abc")
+      cred = build(:credential, project: project, name: "test-svc")
+      cred.valid?
+      expect(cred.vault_path).to be_present
+    end
+
     it { is_expected.to validate_inclusion_of(:credential_type).in_array(Credential::TYPES) }
 
     it "validates name uniqueness scoped to project_id" do

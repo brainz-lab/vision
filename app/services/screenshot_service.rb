@@ -116,7 +116,7 @@ class ScreenshotService
   end
 
   def escape_selector(selector)
-    selector.gsub("'", "\\'")
+    selector.gsub("'") { "\\'" }
   end
 
   def get_page_dimensions(browser_page)
