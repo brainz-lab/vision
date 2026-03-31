@@ -65,6 +65,15 @@ RSpec.describe PlatformClient do
     end
 
     context "caching" do
+      around do |example|
+        original_cache = Rails.cache
+        Rails.cache = ActiveSupport::Cache::MemoryStore.new
+        Rails.cache.clear
+        example.run
+      ensure
+        Rails.cache = original_cache
+      end
+
       before do
         stub_request(:post, "#{platform_url}/api/v1/keys/validate")
           .to_return(
@@ -86,13 +95,8 @@ RSpec.describe PlatformClient do
       before do
         stub_request(:post, "#{platform_url}/api/v1/keys/validate")
           .to_raise(Errno::ECONNREFUSED)
-      end
-
-      around do |example|
-        original = Rails.env
-        # Force test env to behave like production (not development bypass)
+        # Ensure Rails.env is not development so the bypass doesn't trigger
         allow(Rails).to receive(:env).and_return(ActiveSupport::StringInquirer.new("test"))
-        example.run
       end
 
       it "returns invalid response" do

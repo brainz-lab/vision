@@ -1,7 +1,7 @@
 PATH
   remote: ../brainzlab-platform-client
   specs:
-    brainzlab-platform-client (0.1.2)
+    brainzlab-platform-client (0.1.4)
       rails (>= 7.0)
 
 PATH
@@ -121,7 +121,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.21.1)
       msgpack (~> 1.2)
-    brakeman (8.0.1)
+    brakeman (8.0.4)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -236,6 +236,7 @@ GEM
     mini_mime (1.1.5)
     minitest (5.27.0)
     msgpack (1.8.0)
+    multi_json (1.19.1)
     multipart-post (2.4.1)
     net-http (0.9.1)
       uri (>= 0.11.1)
@@ -460,6 +461,8 @@ GEM
       ostruct
     stimulus-rails (1.3.4)
       railties (>= 6.0.0)
+    streamio-ffmpeg (3.0.2)
+      multi_json (~> 1.8)
     stringio (3.2.0)
     tailwindcss-rails (4.4.0)
       railties (>= 7.0.0)
@@ -555,6 +558,7 @@ DEPENDENCIES
   solid_cache
   solid_queue
   stimulus-rails
+  streamio-ffmpeg (~> 3.0)
   tailwindcss-rails
   thruster
   timecop

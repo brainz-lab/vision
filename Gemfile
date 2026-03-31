@@ -49,6 +49,7 @@ gem "playwright-ruby-client"
 
 # Image processing for screenshots
 gem "image_processing", "~> 1.2"
+gem "streamio-ffmpeg", "~> 3.0"
 gem "mini_magick"
 gem "ruby-vips"
 

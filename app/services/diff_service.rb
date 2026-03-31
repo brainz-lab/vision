@@ -82,15 +82,16 @@ class DiffService
     # Fuzz factor for color tolerance (0-100%)
     fuzz = options[:fuzz] || "5%"
 
-    # Create a composite diff image
-    MiniMagick::Tool::Compare.new do |compare|
-      compare.metric("AE")  # Absolute Error count
-      compare.fuzz(fuzz)
-      compare.highlight_color("red")
-      compare.lowlight_color("white")
-      compare << img1_path
-      compare << img2_path
-      compare << diff_path
+    # Create a composite diff image (IM7-compatible: magick compare)
+    MiniMagick::Tool::Magick.new do |magick|
+      magick << "compare"
+      magick.metric("AE")  # Absolute Error count
+      magick.fuzz(fuzz)
+      magick.highlight_color("red")
+      magick.lowlight_color("white")
+      magick << img1_path
+      magick << img2_path
+      magick << diff_path
     end
 
     # Parse the diff pixel count from stderr (ImageMagick outputs it there)

@@ -3,23 +3,39 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [ main ]
+    branches: [ main, develop ]
 
 env:
-  RUNNER_TOOL_CACHE: /tmp/hostedtoolcache
+  BUNDLE_RUBYGEMS__PKG__GITHUB__COM: ${{ secrets.BUNDLE_RUBYGEMS__PKG__GITHUB__COM }}
 
 jobs:
   scan_ruby:
     runs-on: arc-runner-set
+    container:
+      image: ruby:3.4.7
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Install system dependencies
+        run: apt-get update -qq && apt-get install --no-install-recommends -y libvips-dev
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Configure git for private gems
+        run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
+
+      - name: Cache bundle gems
+        uses: actions/cache@v4
         with:
-          bundler-cache: true
+          path: /usr/local/bundle
+          key: bundle-${{ runner.os }}-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: bundle-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bundle install --jobs 4
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
@@ -29,33 +45,66 @@ jobs:
 
   scan_js:
     runs-on: arc-runner-set
+    container:
+      image: ruby:3.4.7
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v5
+      - name: Install system dependencies
+        run: apt-get update -qq && apt-get install --no-install-recommends -y libvips-dev
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Configure git for private gems
+        run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
+
+      - name: Cache bundle gems
+        uses: actions/cache@v4
         with:
-          bundler-cache: true
+          path: /usr/local/bundle
+          key: bundle-${{ runner.os }}-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: bundle-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bundle install --jobs 4
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
         run: bin/importmap audit
 
   lint:
     runs-on: arc-runner-set
+    container:
+      image: ruby:3.4.7
     env:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
+
     steps:
+      - name: Install system dependencies
+        run: apt-get update -qq && apt-get install --no-install-recommends -y libvips-dev
+
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Configure git for private gems
+        run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
+
+      - name: Cache bundle gems
+        uses: actions/cache@v4
         with:
-          bundler-cache: true
+          path: /usr/local/bundle
+          key: bundle-${{ runner.os }}-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: bundle-${{ runner.os }}-
 
-      - name: Prepare RuboCop cache
+      - name: Install dependencies
+        run: bundle install --jobs 4
+
+      - name: Cache RuboCop results
         uses: actions/cache@v4
         env:
           DEPENDENCIES_HASH: ${{ hashFiles('.ruby-version', '**/.rubocop.yml', '**/.rubocop_todo.yml', 'Gemfile.lock') }}
@@ -70,10 +119,12 @@ jobs:
 
   test:
     runs-on: arc-runner-set
+    container:
+      image: ruby:3.4.7
 
     services:
       postgres:
-        image: postgres
+        image: timescale/timescaledb-ha:pg17
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -83,21 +134,38 @@ jobs:
 
     steps:
       - name: Install packages
-        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libpq-dev
+        run: apt-get update -qq && apt-get install --no-install-recommends -y libpq-dev libvips-dev
 
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Configure git for private gems
+        run: git config --global url."https://x-access-token:${{ github.token }}@github.com/".insteadOf "git@github.com:"
+
+      - name: Re-resolve fluyenta-ui from GitHub Packages
+        run: bundle lock --update fluyenta-ui
+
+      - name: Cache bundle gems
+        uses: actions/cache@v4
         with:
-          bundler-cache: true
+          path: /usr/local/bundle
+          key: bundle-pg-${{ runner.os }}-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: bundle-pg-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bundle install --jobs 4
+
+      - name: Prepare database
+        env:
+          RAILS_ENV: test
+          DATABASE_URL: postgres://postgres:postgres@postgres:5432
+        run: bin/rails db:create db:schema:load
 
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
-        run: bin/rails db:test:prepare test
+          DATABASE_URL: postgres://postgres:postgres@postgres:5432
+        run: bundle exec rspec
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

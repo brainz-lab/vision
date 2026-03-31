@@ -12,7 +12,12 @@ RSpec.describe Page, type: :model do
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:path) }
-    it { is_expected.to validate_presence_of(:slug) }
+
+    it "requires slug to be present (auto-generated from name)" do
+      page = build(:page)
+      page.valid?
+      expect(page.slug).to be_present
+    end
 
     it "validates slug uniqueness scoped to project_id" do
       project = create(:project)
@@ -103,8 +108,8 @@ RSpec.describe Page, type: :model do
   end
 
   describe "#effective_hide_selectors" do
-    let(:project) { build(:project, settings: { "api_key" => "vis_api_test", "ingest_key" => "vis_ingest_test", "hide_selectors" => [".ad"] }) }
-    let(:page)    { build(:page, project: project, hide_selectors: [".banner"]) }
+    let(:project) { build(:project, settings: { "api_key" => "vis_api_test", "ingest_key" => "vis_ingest_test", "hide_selectors" => [ ".ad" ] }) }
+    let(:page)    { build(:page, project: project, hide_selectors: [ ".banner" ]) }
 
     it "merges page and project selectors" do
       expect(page.effective_hide_selectors).to include(".banner", ".ad")

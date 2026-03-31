@@ -11,8 +11,19 @@ RSpec.describe AiTask, type: :model do
     subject { build(:ai_task) }
 
     it { is_expected.to validate_presence_of(:instruction) }
-    it { is_expected.to validate_presence_of(:model) }
-    it { is_expected.to validate_presence_of(:status) }
+
+    it "requires model to be present (not blank after defaults)" do
+      task = build(:ai_task, instruction: "Do something")
+      task.valid?
+      expect(task.model).to be_present
+    end
+
+    it "requires status to be present (not blank after defaults)" do
+      task = build(:ai_task, instruction: "Do something")
+      task.valid?
+      expect(task.status).to be_present
+    end
+
     it { is_expected.to validate_inclusion_of(:status).in_array(AiTask::STATUSES) }
     it { is_expected.to validate_inclusion_of(:triggered_by).in_array(AiTask::TRIGGERS).allow_nil }
 

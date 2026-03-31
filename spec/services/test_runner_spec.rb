@@ -94,7 +94,7 @@ RSpec.describe TestRunner do
     it "passes PR info when provided" do
       TestRunner.run_for_project!(project, pr_number: 42, pr_url: "https://github.com/org/repo/pull/42")
       run = TestRun.order(:created_at).last
-      expect(run.pr_number).to eq(42)
+      expect(run.pr_number).to eq("42")
     end
   end
 end

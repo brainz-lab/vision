@@ -5,7 +5,7 @@ SimpleCov.start "rails" do
   add_filter "/test/"
   add_filter "/config/"
   add_filter "/vendor/"
-  
+
   add_group "Controllers", "app/controllers"
   add_group "Models", "app/models"
   add_group "Services", "app/services"
@@ -17,6 +17,7 @@ end
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "minitest/mock"
 
 module ActiveSupport
   class TestCase

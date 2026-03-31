@@ -2,7 +2,12 @@ require "rails_helper"
 
 RSpec.describe TaskStep, type: :model do
   describe "associations" do
-    it { is_expected.to belong_to(:ai_task) }
+    it "belongs to an ai_task" do
+      project = create(:project)
+      task = create(:ai_task, project: project)
+      step = create(:task_step, ai_task: task)
+      expect(step.ai_task).to eq(task)
+    end
   end
 
   describe "validations" do

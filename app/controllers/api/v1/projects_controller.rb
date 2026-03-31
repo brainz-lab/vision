@@ -3,7 +3,7 @@
 module Api
   module V1
     class ProjectsController < ActionController::API
-      before_action :authenticate_master_key!, only: [:provision, :archive, :unarchive, :purge]
+      before_action :authenticate_master_key!, only: [ :provision, :archive, :unarchive, :purge ]
 
       # POST /api/v1/projects/provision
       # Creates a new project or returns existing one, linked to Platform

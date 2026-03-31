@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_03_05_200000) do
+ActiveRecord::Schema[8.1].define(version: 2026_03_30_202612) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -228,6 +228,23 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200000) do
     t.index ["project_id"], name: "index_credentials_on_project_id"
     t.index ["service_url"], name: "index_credentials_on_service_url"
     t.index ["vault_path"], name: "index_credentials_on_vault_path"
+  end
+
+  create_table "media_analyses", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "analysis_type", null: false
+    t.datetime "created_at", null: false
+    t.integer "duration_ms"
+    t.text "error_message"
+    t.jsonb "parameters", default: {}
+    t.uuid "project_id", null: false
+    t.jsonb "result", default: {}
+    t.string "source_url", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "updated_at", null: false
+    t.index ["analysis_type"], name: "index_media_analyses_on_analysis_type"
+    t.index ["project_id", "status"], name: "index_media_analyses_on_project_id_and_status"
+    t.index ["project_id"], name: "index_media_analyses_on_project_id"
+    t.index ["status"], name: "index_media_analyses_on_status"
   end
 
   create_table "pages", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -502,6 +519,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_03_05_200000) do
   add_foreign_key "comparisons", "snapshots"
   add_foreign_key "comparisons", "test_runs"
   add_foreign_key "credentials", "projects"
+  add_foreign_key "media_analyses", "projects"
   add_foreign_key "pages", "projects"
   add_foreign_key "snapshots", "browser_configs"
   add_foreign_key "snapshots", "pages"

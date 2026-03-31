@@ -190,10 +190,10 @@ class CaptureScreenshotJobTest < ActiveJob::TestCase
   def create_test_image
     Dir.mktmpdir do |dir|
       path = File.join(dir, "test.png")
-      MiniMagick::Tool::Convert.new do |convert|
-        convert.size("100x100")
-        convert.xc("white")
-        convert << path
+      MiniMagick::Tool::Magick.new do |magick|
+        magick.size("100x100")
+        magick.xc("white")
+        magick << path
       end
       File.binread(path)
     end

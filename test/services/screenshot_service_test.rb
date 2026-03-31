@@ -283,10 +283,10 @@ class ScreenshotServiceTest < ActiveSupport::TestCase
     Dir.mktmpdir do |dir|
       path = File.join(dir, "test.png")
 
-      MiniMagick::Tool::Convert.new do |convert|
-        convert.size("#{width}x#{height}")
-        convert.xc(color)
-        convert << path
+      MiniMagick::Tool::Magick.new do |magick|
+        magick.size("#{width}x#{height}")
+        magick.xc(color)
+        magick << path
       end
 
       File.binread(path)
