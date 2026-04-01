@@ -82,7 +82,7 @@ end
 
 group :development, :test do
   # Lock minitest to compatible version with Rails 8
-  gem "minitest", "~> 5.25"
+  gem "minitest", "~> 6.0"
   gem "simplecov", require: false
   gem "simplecov-json", require: false
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
